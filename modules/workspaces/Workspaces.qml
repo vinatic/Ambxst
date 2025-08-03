@@ -142,7 +142,22 @@ Item {
         z: 2
         property real activeWorkspaceMargin: 4
         implicitHeight: parent.workspaceButtonWidth - activeWorkspaceMargin * 2
-        radius: Configuration.roundness - parent.widgetPadding - activeWorkspaceMargin
+        radius: {
+            const currentWorkspaceHasWindows = Hyprland.workspaces.values.some(ws => 
+                ws.id === (monitor?.activeWorkspace?.id || 1) && 
+                HyprlandData.windowList.some(w => w.workspace.id === ws.id)
+            );
+            return currentWorkspaceHasWindows 
+                ? Configuration.roundness - parent.widgetPadding - activeWorkspaceMargin
+                : implicitHeight / 2;
+        }
+        
+        Behavior on radius {
+            NumberAnimation {
+                duration: 200
+                easing.type: Easing.OutQuad
+            }
+        }
         color: Colors.adapter.primary
         anchors.verticalCenter: parent.verticalCenter
 
