@@ -4,10 +4,10 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
-import "../../globals"
-import "../../theme"
-import "../../workspaces"
-import "../../services"
+import qs.modules.globals
+import qs.modules.theme
+import qs.modules.workspaces
+import qs.modules.services
 import qs.config
 
 Item {
@@ -91,10 +91,10 @@ Item {
                             Text {
                                 anchors.centerIn: parent
                                 text: workspaceValue
-                                font.pixelSize: Math.min(parent.width, parent.height) * 0.3
-                                font.weight: Font.DemiBold
-                                color: Colors.adapter.onSurface
-                                opacity: 0.3
+                                font.pixelSize: Math.min(parent.width, parent.height) * 0.25
+                                font.weight: Font.Bold
+                                color: Colors.adapter.surfaceContainerHigh
+                                opacity: 1
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -185,7 +185,7 @@ Item {
                 width: overviewRoot.workspaceImplicitWidth
                 height: overviewRoot.workspaceImplicitHeight
                 color: "transparent"
-                radius: Configuration.roundness * overviewRoot.scale
+                radius: Configuration.roundness
                 border.width: 2
                 border.color: overviewRoot.activeBorderColor
 
