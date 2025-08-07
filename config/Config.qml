@@ -29,7 +29,7 @@ Singleton {
                 property string launcherIcon: ""
                 property string overviewIcon: ""
                 property bool showBackground: false
-                property real bgOpacity: 1.0
+                property real bgOpacity: 0.75
                 property bool verbose: true
                 property list<string> screenList: []
             }

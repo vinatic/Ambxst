@@ -77,19 +77,14 @@ PanelWindow {
         Rectangle {
             id: barBgShadow
             anchors.fill: barBg
-            property color bgColor: Qt.rgba(
-              Colors.adapter.surfaceContainerLowest.r,
-              Colors.adapter.surfaceContainerLowest.g,
-              Colors.adapter.surfaceContainerLowest.b,
-              Config.bar.bgOpacity
-            )
-            color: Config.bar.showBackground ? bgColor : "transparent"
+            color: Config.bar.showBackground ? "black" : "transparent"
 
             layer.enabled: true
             layer.effect: MultiEffect {
                 maskEnabled: true
                 maskSource: barBgShadow
                 maskInverted: true
+                maskThresholdMin: 0.75
                 shadowEnabled: true
                 shadowHorizontalOffset: 0
                 shadowVerticalOffset: 0
