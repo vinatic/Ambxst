@@ -273,100 +273,126 @@ NotchAnimationBehavior {
         implicitWidth: 400
         implicitHeight: 300
 
-        Column {
+        Row {
             anchors.fill: parent
             anchors.margins: 16
-            spacing: 12
+            spacing: 16
 
-            Text {
-                text: "Wallpapers"
-                color: Colors.adapter.overSurface
-                font.family: Styling.defaultFont
-                font.pixelSize: 16
-                font.weight: Font.Bold
+            // Placeholder rectangle a la izquierda
+            Rectangle {
+                width: 150
+                height: parent.height
+                color: Colors.surfaceContainer
+                radius: Config.roundness > 0 ? Config.roundness : 0
+                border.color: Colors.adapter.outline
+                border.width: 1
+
+                Text {
+                    anchors.centerIn: parent
+                    text: "Preview\nPlaceholder"
+                    color: Colors.adapter.overSurfaceVariant
+                    font.family: Styling.defaultFont
+                    font.pixelSize: 14
+                    horizontalAlignment: Text.AlignHCenter
+                }
             }
 
-            ScrollView {
-                width: parent.width
-                height: parent.height - parent.children[0].height - parent.spacing
+            // Grid de wallpapers a la derecha
+            Column {
+                width: parent.width - 150 - 16
+                height: parent.height
+                spacing: 12
 
-                GridView {
-                    id: wallpaperGrid
-                    cellWidth: 120
-                    cellHeight: 90
-                    model: GlobalStates.wallpaperManager ? GlobalStates.wallpaperManager.wallpaperPaths : []
+                Text {
+                    text: "Wallpapers"
+                    color: Colors.adapter.overSurface
+                    font.family: Styling.defaultFont
+                    font.pixelSize: 16
+                    font.weight: Font.Bold
+                }
 
-                    delegate: Rectangle {
-                        width: wallpaperGrid.cellWidth - 8
-                        height: wallpaperGrid.cellHeight - 8
-                        radius: 8
-                        color: Colors.surface
-                        border.color: isCurrentWallpaper ? Colors.adapter.primary : Colors.adapter.outline
-                        border.width: isCurrentWallpaper ? 2 : 1
+                ScrollView {
+                    width: parent.width
+                    height: parent.height - parent.children[0].height - parent.spacing
 
-                        property bool isCurrentWallpaper: GlobalStates.wallpaperManager && GlobalStates.wallpaperManager.currentIndex === index
+                    GridView {
+                        id: wallpaperGrid
+                        cellWidth: 104
+                        cellHeight: 104
+                        model: GlobalStates.wallpaperManager ? GlobalStates.wallpaperManager.wallpaperPaths : []
 
-                        Behavior on border.color {
-                            ColorAnimation {
-                                duration: Config.animDuration
-                                easing.type: Easing.OutCubic
+                        delegate: Rectangle {
+                            width: 96
+                            height: 96
+                            radius: 8
+                            color: Colors.surface
+                            border.color: isCurrentWallpaper ? Colors.adapter.primary : Colors.adapter.outline
+                            border.width: isCurrentWallpaper ? 2 : 1
+
+                            property bool isCurrentWallpaper: GlobalStates.wallpaperManager && GlobalStates.wallpaperManager.currentIndex === index
+
+                            Behavior on border.color {
+                                ColorAnimation {
+                                    duration: Config.animDuration
+                                    easing.type: Easing.OutCubic
+                                }
                             }
-                        }
 
-                        Image {
-                            anchors.fill: parent
-                            anchors.margins: 4
-                            source: "file://" + modelData
-                            fillMode: Image.PreserveAspectCrop
-                            asynchronous: true
-                            smooth: true
-                            clip: true
-
-                            Rectangle {
+                            Image {
                                 anchors.fill: parent
-                                color: "transparent"
-                                radius: 4
-                                border.color: parent.parent.isCurrentWallpaper ? Colors.adapter.primary : "transparent"
-                                border.width: 1
-                            }
-                        }
+                                anchors.margins: 4
+                                source: "file://" + modelData
+                                fillMode: Image.PreserveAspectCrop
+                                asynchronous: true
+                                smooth: true
+                                clip: true
 
-                        MouseArea {
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-
-                            onEntered: {
-                                if (!parent.isCurrentWallpaper) {
-                                    parent.color = Colors.surfaceContainerHigh;
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: "transparent"
+                                    radius: 4
+                                    border.color: parent.parent.isCurrentWallpaper ? Colors.adapter.primary : "transparent"
+                                    border.width: 1
                                 }
                             }
-                            onExited: {
-                                if (!parent.isCurrentWallpaper) {
-                                    parent.color = Colors.surface;
+
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+
+                                onEntered: {
+                                    if (!parent.isCurrentWallpaper) {
+                                        parent.color = Colors.surfaceContainerHigh;
+                                    }
+                                }
+                                onExited: {
+                                    if (!parent.isCurrentWallpaper) {
+                                        parent.color = Colors.surface;
+                                    }
+                                }
+                                onPressed: parent.scale = 0.95
+                                onReleased: parent.scale = 1.0
+
+                                onClicked: {
+                                    if (GlobalStates.wallpaperManager) {
+                                        GlobalStates.wallpaperManager.setWallpaperByIndex(index);
+                                    }
                                 }
                             }
-                            onPressed: parent.scale = 0.95
-                            onReleased: parent.scale = 1.0
 
-                            onClicked: {
-                                if (GlobalStates.wallpaperManager) {
-                                    GlobalStates.wallpaperManager.setWallpaperByIndex(index);
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: Config.animDuration / 2
+                                    easing.type: Easing.OutCubic
                                 }
                             }
-                        }
 
-                        Behavior on color {
-                            ColorAnimation {
-                                duration: Config.animDuration / 2
-                                easing.type: Easing.OutCubic
-                            }
-                        }
-
-                        Behavior on scale {
-                            NumberAnimation {
-                                duration: Config.animDuration / 3
-                                easing.type: Easing.OutCubic
+                            Behavior on scale {
+                                NumberAnimation {
+                                    duration: Config.animDuration / 3
+                                    easing.type: Easing.OutCubic
+                                }
                             }
                         }
                     }
