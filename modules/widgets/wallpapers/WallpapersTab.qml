@@ -193,14 +193,13 @@ Rectangle {
                             anchors.right: parent.right
                             height: 24
                             color: Colors.adapter.surfaceContainerLowest
-                            clip: true
-                            z: 10  // Asegurar que esté encima
+                            z: 10
 
                             Text {
                                 anchors.fill: parent
                                 anchors.margins: 4
                                 text: modelData ? modelData.split('/').pop() : ""
-                                color: Colors.adapter.onSurface
+                                color: Colors.adapter.overBackground
                                 font.family: Config.theme.font
                                 font.pixelSize: 10
                                 verticalAlignment: Text.AlignVCenter
@@ -256,55 +255,6 @@ Rectangle {
                             NumberAnimation {
                                 duration: Config.animDuration / 3
                                 easing.type: Easing.OutCubic
-                            }
-                        }
-
-                        // Etiqueta con nombre del archivo al hacer hover
-                        Rectangle {
-                            visible: parent.isHovered && !parent.isCurrentWallpaper
-                            anchors.bottom: parent.bottom
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            height: 24
-                            color: Colors.adapter.surfaceContainerLowest
-                            clip: true
-
-                            ScrollView {
-                                anchors.fill: parent
-                                contentWidth: fileNameText.width
-                                ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
-                                ScrollBar.vertical.policy: ScrollBar.AlwaysOff
-
-                                Text {
-                                    id: fileNameText
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text: modelData ? modelData.split('/').pop() : ""
-                                    color: Colors.adapter.overBackground
-                                    font.family: Config.theme.font
-                                    font.pixelSize: 10
-
-                                    // Animación de scroll horizontal si el texto es muy largo
-                                    SequentialAnimation on x {
-                                        running: fileNameText.width > parent.parent.width - 8
-                                        loops: Animation.Infinite
-                                        PauseAnimation { duration: 1000 }
-                                        NumberAnimation {
-                                            to: parent.parent.width - fileNameText.width - 8
-                                            duration: Math.max(2000, fileNameText.width * 10)
-                                            easing.type: Easing.InOutQuad
-                                        }
-                                        PauseAnimation { duration: 1000 }
-                                        NumberAnimation {
-                                            to: 4
-                                            duration: Math.max(2000, fileNameText.width * 10)
-                                            easing.type: Easing.InOutQuad
-                                        }
-                                    }
-
-                                    Component.onCompleted: {
-                                        x = 4;
-                                    }
-                                }
                             }
                         }
                     }
