@@ -13,7 +13,7 @@ Rectangle {
     radius: Config.roundness > 0 ? Config.roundness : 0
 
     property string searchText: ""
-    readonly property int gridColumns: 3
+    readonly property int gridColumns: 5
 
     function focusSearch() {
         wallpaperSearchInput.focusInput();
@@ -91,7 +91,7 @@ Rectangle {
         // Grid de wallpapers a la derecha
         Rectangle {
             id: wallpaperGridContainer
-            width: wallpaperGridContainer.height
+            width: wallpaperWidth * gridColumns
             height: parent.height
             color: Colors.surfaceContainer
             radius: Config.roundness > 0 ? Config.roundness : 0
@@ -99,7 +99,7 @@ Rectangle {
             border.width: 0
             clip: true
 
-            readonly property int wallpaperHeight: height / 3  // 1/3 de la altura del contenedor
+            readonly property int wallpaperHeight: height / 3  // Siempre 3 filas
             readonly property int wallpaperWidth: wallpaperHeight  // Mantener cuadrados
 
             ScrollView {
@@ -136,8 +136,9 @@ Rectangle {
                         Loader {
                             anchors.fill: parent
                             sourceComponent: {
-                                if (!GlobalStates.wallpaperManager) return null;
-                                
+                                if (!GlobalStates.wallpaperManager)
+                                    return null;
+
                                 var fileType = GlobalStates.wallpaperManager.getFileType(modelData);
                                 if (fileType === 'image') {
                                     return staticImageComponent;
@@ -146,10 +147,10 @@ Rectangle {
                                 }
                                 return staticImageComponent; // fallback
                             }
-                            
+
                             property string sourceFile: modelData
                         }
-                        
+
                         Component {
                             id: staticImageComponent
                             Image {
@@ -159,7 +160,7 @@ Rectangle {
                                 smooth: true
                             }
                         }
-                        
+
                         Component {
                             id: animatedImageComponent
                             AnimatedImage {
