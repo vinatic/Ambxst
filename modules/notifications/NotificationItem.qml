@@ -118,7 +118,7 @@ Item {
 
     Rectangle {
         id: background
-        width: parent.width
+        width: parent.width - (onlyNotification ? dedicatedButtonsColumn.width + 8 : 0)
         anchors.left: parent.left
         radius: 8
         anchors.leftMargin: root.xOffset
@@ -223,6 +223,7 @@ Item {
                     implicitHeight: actionRowLayout.implicitHeight
                     contentWidth: actionRowLayout.implicitWidth
                     clip: !onlyNotification
+                    visible: onlyNotification ? (notificationObject.actions.length > 0) : true
 
                     Behavior on opacity {
                         NumberAnimation {
@@ -244,7 +245,9 @@ Item {
                         id: actionRowLayout
                         Layout.alignment: Qt.AlignBottom
 
+                        // Solo mostrar botones de Close y Copy si NO es notificación individual
                         NotificationActionButton {
+                            visible: !onlyNotification
                             Layout.fillWidth: true
                             buttonText: qsTr("Close")
                             urgency: notificationObject.urgency
@@ -267,6 +270,7 @@ Item {
                             }
                         }
 
+                        // Mostrar acciones de la notificación (para individuales y agrupadas)
                         Repeater {
                             id: actionRepeater
                             model: notificationObject.actions
@@ -281,13 +285,12 @@ Item {
                         }
 
                         NotificationActionButton {
+                            visible: !onlyNotification
                             Layout.fillWidth: true
                             urgency: notificationObject.urgency
                             implicitWidth: (notificationObject.actions.length == 0) ? ((actionsFlickable.width - actionRowLayout.spacing) / 2) : (contentItem.implicitWidth + leftPadding + rightPadding)
 
                             onClicked: {
-                                // Copy notification body to clipboard
-                                // Note: Quickshell.clipboardText might not be available, using alternative
                                 console.log("Copy:", notificationObject.body);
                             }
 
@@ -302,6 +305,78 @@ Item {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    // Botones dedicados para notificaciones individuales
+    Column {
+        id: dedicatedButtonsColumn
+        visible: onlyNotification
+        anchors.right: parent.right
+        anchors.verticalCenter: background.verticalCenter
+        spacing: 4
+        width: visible ? 28 : 0
+
+        // Botón de descartar
+        Button {
+            id: dismissButton
+            width: 24
+            height: 24
+
+            background: Rectangle {
+                color: dismissButton.pressed ? Colors.adapter.primary : (dismissButton.hovered ? Colors.surfaceBright : Colors.surfaceContainerHigh)
+                radius: Config.roundness
+
+                Behavior on color {
+                    ColorAnimation {
+                        duration: Config.animDuration / 2
+                    }
+                }
+            }
+
+            contentItem: Text {
+                text: "✕"
+                font.family: Config.theme.font
+                font.pixelSize: 12
+                color: dismissButton.pressed ? Colors.adapter.overPrimary : (dismissButton.hovered ? Colors.adapter.overBackground : Colors.adapter.primary)
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            onClicked: {
+                root.destroyRequested();
+            }
+        }
+
+        // Botón de copiar
+        Button {
+            id: copyButton
+            width: 24
+            height: 24
+
+            background: Rectangle {
+                color: copyButton.pressed ? Colors.adapter.primary : (copyButton.hovered ? Colors.surfaceBright : Colors.surfaceContainerHigh)
+                radius: Config.roundness
+
+                Behavior on color {
+                    ColorAnimation {
+                        duration: Config.animDuration / 2
+                    }
+                }
+            }
+
+            contentItem: Text {
+                text: "📋"
+                font.family: Config.theme.font
+                font.pixelSize: 12
+                color: copyButton.pressed ? Colors.adapter.overPrimary : (copyButton.hovered ? Colors.adapter.overBackground : Colors.adapter.primary)
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            onClicked: {
+                console.log("Copy:", notificationObject.body);
             }
         }
     }
