@@ -12,8 +12,6 @@ import qs.config
 Rectangle {
     // Configuración de estilo y layout del componente.
     color: Colors.background
-    anchors.fill: parent
-    anchors.margins: 4
     radius: Config.roundness > 0 ? Config.roundness : 0
 
     // Propiedades personalizadas para la funcionalidad del componente.
@@ -70,7 +68,6 @@ Rectangle {
     // Layout principal con una fila para la barra lateral y la cuadrícula.
     Row {
         anchors.fill: parent
-        anchors.margins: 8
         spacing: 8
 
         // Columna para el buscador y las opciones.
@@ -88,7 +85,7 @@ Rectangle {
                 placeholderText: "Search wallpapers..."
                 iconText: ""
                 clearOnEscape: false
-                radius: Config.roundness > 0 ? Config.roundness - 8 : 0
+                radius: Config.roundness > 0 ? Config.roundness : 0
 
                 // Manejo de eventos de búsqueda y teclado.
                 onSearchTextChanged: text => {
@@ -179,18 +176,18 @@ Rectangle {
             // Área placeholder para opciones futuras.
             Rectangle {
                 width: parent.width
-                height: parent.height - wallpaperSearchInput.height - 8
+                height: parent.height - wallpaperSearchInput.height - 12
                 color: Colors.surfaceContainer
                 radius: Config.roundness > 0 ? Config.roundness : 0
                 border.color: Colors.adapter.outline
-                border.width: 1
+                border.width: 0
 
                 Text {
                     anchors.centerIn: parent
                     text: "Placeholder\nfor future\noptions"
                     color: Colors.adapter.overSurfaceVariant
                     font.family: Config.theme.font
-                    font.pixelSize: 12
+                    font.pixelSize: Config.theme.fontSize
                     horizontalAlignment: Text.AlignHCenter
                     lineHeight: 1.2
                 }
@@ -202,20 +199,19 @@ Rectangle {
             id: wallpaperGridContainer
             width: wallpaperHeight * gridColumns
             height: parent.height
-            color: Colors.surfaceContainer
-            radius: Config.roundness > 0 ? Config.roundness - 8 : 0
+            color: "transparent"
+            radius: Config.roundness > 0 ? Config.roundness : 0
             border.color: Colors.adapter.outline
             border.width: 0
             clip: true
 
-            readonly property int wallpaperHeight: (height - wallpaperMargin) / gridRows
-            readonly property int wallpaperWidth: (width - wallpaperMargin) / gridColumns
+            readonly property int wallpaperHeight: (height + wallpaperMargin) / gridRows
+            readonly property int wallpaperWidth: (width + wallpaperMargin) / gridColumns
             readonly property int wallpaperMargin: 4
 
             ScrollView {
                 id: scrollView
                 anchors.fill: parent
-                anchors.margins: wallpaperGridContainer.wallpaperMargin / 2
 
                 GridView {
                     id: wallpaperGrid
@@ -386,26 +382,38 @@ Rectangle {
                         property bool isHovered: false
                         property bool isSelected: selectedIndex === index
 
-                        // Carga la imagen o el GIF según el tipo de archivo.
-                        Loader {
+                        // ClippingRectangle para contener la imagen con bordes redondeados
+                        Item {
                             anchors.fill: parent
                             anchors.margins: wallpaperGridContainer.wallpaperMargin
-                            sourceComponent: {
-                                if (!GlobalStates.wallpaperManager)
-                                    return null;
+                            clip: true
 
-                                var fileType = GlobalStates.wallpaperManager.getFileType(modelData);
-                                if (fileType === 'image') {
-                                    return staticImageComponent;
-                                } else if (fileType === 'gif') {
-                                    return animatedImageComponent;
-                                } else if (fileType === 'video') {
-                                    return videoThumbnailComponent;
+                            ClippingRectangle {
+                                color: Colors.surfaceContainer
+                                anchors.fill: parent
+                                radius: Config.roundness - wallpaperGridContainer.wallpaperMargin
+
+                                // Carga la imagen o el GIF según el tipo de archivo.
+                                Loader {
+                                    anchors.fill: parent
+                                    sourceComponent: {
+                                        if (!GlobalStates.wallpaperManager)
+                                            return null;
+
+                                        var fileType = GlobalStates.wallpaperManager.getFileType(modelData);
+                                        if (fileType === 'image') {
+                                            return staticImageComponent;
+                                        } else if (fileType === 'gif') {
+                                            return animatedImageComponent;
+                                        } else if (fileType === 'video') {
+                                            return videoThumbnailComponent;
+                                        }
+                                        return staticImageComponent; // Fallback
+                                    }
+
+                                    property string sourceFile: modelData
                                 }
-                                return staticImageComponent; // Fallback
                             }
-
-                            property string sourceFile: modelData
                         }
 
                         // Componente para imágenes estáticas.
@@ -427,7 +435,8 @@ Rectangle {
                                 fillMode: Image.PreserveAspectCrop
                                 asynchronous: true
                                 smooth: true
-                                playing: parent.parent.isSelected // Solo se anima cuando está seleccionado
+                                playing: false
+                                // playing: parent.parent.isSelected // Solo se anima cuando está seleccionado
                             }
                         }
 
@@ -453,7 +462,7 @@ Rectangle {
                                     // Placeholder mientras carga o si falla
                                     Rectangle {
                                         anchors.fill: parent
-                                        color: Colors.surfaceContainerHigh
+                                        color: Colors.surfaceContainer
                                         visible: parent.status !== Image.Ready
 
                                         Text {
