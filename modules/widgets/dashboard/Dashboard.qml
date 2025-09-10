@@ -121,7 +121,7 @@ NotchAnimationBehavior {
 
                         contentItem: Text {
                             text: parent.text
-                            color: root.state.currentTab === index ? Colors.background : Colors.adapter.overBackground
+                            color: root.state.currentTab === index ? Colors.adapter.overPrimary : Colors.adapter.overBackground
                             // font.family: Config.theme.font
                             font.family: Icons.font
                             // font.pixelSize: Config.theme.fontSize

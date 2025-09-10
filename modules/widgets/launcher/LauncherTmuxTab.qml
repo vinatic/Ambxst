@@ -945,7 +945,7 @@ Rectangle {
                             } else if (modelData.isCreateButton) {
                                 return Colors.adapter.primary;
                             } else {
-                                return Colors.adapter.surface;
+                                return Colors.surface;
                             }
                         }
                         radius: Config.roundness > 4 ? Config.roundness - 4 : 0

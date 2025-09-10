@@ -179,7 +179,7 @@ FocusScope {
                         text: modelData.icon || ""
                         font.family: Icons.font
                         font.pixelSize: root.iconSize
-                        color: actionButton.pressed ? Colors.background : (index === root.currentIndex ? Colors.background : Colors.adapter.overBackground)
+                        color: actionButton.pressed ? Colors.background : (index === root.currentIndex ? Colors.adapter.overPrimary : Colors.adapter.overBackground)
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
 
