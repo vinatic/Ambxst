@@ -30,6 +30,7 @@ Rectangle {
     property string sessionToRename: ""
     property string newSessionName: ""
     property int renameSelectedIndex: -1
+    property int renameButtonIndex: 0 // 0 = cancel, 1 = confirm
     property string pendingRenamedSession: "" // Track session to select after rename
 
     signal itemSelected
@@ -193,6 +194,7 @@ Rectangle {
         renameMode = true;
         sessionToRename = sessionName;
         newSessionName = sessionName; // Start with the current name
+        renameButtonIndex = 0; // Start with cancel button selected
         // Quitar focus del SearchInput para que el componente root pueda capturar teclas
         root.forceActiveFocus();
         // Force focus to the TextInput after the loader switches components
@@ -207,6 +209,7 @@ Rectangle {
         renameMode = false;
         sessionToRename = "";
         newSessionName = "";
+        renameButtonIndex = 0;
         // Only clear pending selection if we're not waiting for a rename result
         if (pendingRenamedSession === "") {
             // Devolver focus al SearchInput
@@ -528,13 +531,14 @@ Rectangle {
                 clip: true
 
                 property bool isInDeleteMode: root.deleteMode && modelData.name === root.sessionToDelete
+                property bool isInRenameMode: root.renameMode && modelData.name === root.sessionToRename
 
                 // Gestos táctiles y mouse
                 MouseArea {
                     id: mouseArea
                     anchors.fill: parent
                     hoverEnabled: true
-                    enabled: !isInDeleteMode
+                    enabled: !isInDeleteMode && !isInRenameMode
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
 
                     // Variables para gestos táctiles
@@ -750,6 +754,162 @@ Rectangle {
                     }
                 }
 
+                // Botones de acción para rename que aparecen desde la derecha
+                Rectangle {
+                    id: renameActionContainer
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.rightMargin: 8
+                    width: 68 // 32 + 4 + 32
+                    height: 32
+                    color: "transparent"
+                    opacity: isInRenameMode ? 1.0 : 0.0
+                    visible: opacity > 0
+
+                    transform: Translate {
+                        x: isInRenameMode ? 0 : 80
+
+                        Behavior on x {
+                            NumberAnimation {
+                                duration: Config.animDuration
+                                easing.type: Easing.OutQuart
+                            }
+                        }
+                    }
+
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: Config.animDuration / 2
+                            easing.type: Easing.OutQuart
+                        }
+                    }
+
+                    // Highlight elástico que se estira entre botones para rename
+                    Rectangle {
+                        id: renameHighlight
+                        color: Colors.adapter.overPrimary
+                        radius: Config.roundness > 4 ? Config.roundness - 4 : 0
+                        visible: isInRenameMode
+                        z: 0
+
+                        property real activeButtonMargin: 2
+                        property real idx1X: root.renameButtonIndex
+                        property real idx2X: root.renameButtonIndex
+
+                        // Posición y tamaño con efecto elástico
+                        x: {
+                            let minX = Math.min(idx1X, idx2X) * 36 + activeButtonMargin; // 32 + 4 spacing
+                            return minX;
+                        }
+
+                        y: activeButtonMargin
+
+                        width: {
+                            let stretchX = Math.abs(idx1X - idx2X) * 36 + 32 - activeButtonMargin * 2; // 32 + 4 spacing
+                            return stretchX;
+                        }
+
+                        height: 32 - activeButtonMargin * 2
+
+                        Behavior on idx1X {
+                            NumberAnimation {
+                                duration: Config.animDuration / 3
+                                easing.type: Easing.OutSine
+                            }
+                        }
+                        Behavior on idx2X {
+                            NumberAnimation {
+                                duration: Config.animDuration
+                                easing.type: Easing.OutSine
+                            }
+                        }
+                    }
+
+                    Row {
+                        id: renameActionButtons
+                        anchors.fill: parent
+                        spacing: 4
+
+                        // Botón cancelar (cruz) para rename
+                        Rectangle {
+                            id: renameCancelButton
+                            width: 32
+                            height: 32
+                            color: "transparent"
+                            radius: 6
+                            border.width: 0
+                            border.color: Colors.adapter.outline
+                            z: 1
+
+                            property bool isHighlighted: root.renameButtonIndex === 0
+
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                onClicked: root.cancelRenameMode()
+                                onEntered: {
+                                    root.renameButtonIndex = 0;
+                                    parent.color = Colors.adapter.surfaceVariant;
+                                }
+                                onExited: parent.color = "transparent"
+                            }
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: Icons.cancel
+                                color: renameCancelButton.isHighlighted ? Colors.adapter.primary : Colors.adapter.overPrimary
+                                font.pixelSize: 14
+                                font.family: Icons.font
+
+                                Behavior on color {
+                                    ColorAnimation {
+                                        duration: Config.animDuration / 2
+                                        easing.type: Easing.OutQuart
+                                    }
+                                }
+                            }
+                        }
+
+                        // Botón confirmar (check) para rename
+                        Rectangle {
+                            id: renameConfirmButton
+                            width: 32
+                            height: 32
+                            color: "transparent"
+                            radius: 6
+                            z: 1
+
+                            property bool isHighlighted: root.renameButtonIndex === 1
+
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                onClicked: root.confirmRenameSession()
+                                onEntered: {
+                                    root.renameButtonIndex = 1;
+                                    parent.color = Qt.darker(Colors.adapter.primary, 1.1);
+                                }
+                                onExited: parent.color = "transparent"
+                            }
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: Icons.accept
+                                color: renameConfirmButton.isHighlighted ? Colors.adapter.primary : Colors.adapter.overPrimary
+                                font.pixelSize: 14
+                                font.family: Icons.font
+
+                                Behavior on color {
+                                    ColorAnimation {
+                                        duration: Config.animDuration / 2
+                                        easing.type: Easing.OutQuart
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 // Overlay para cerrar el menú al hacer click fuera
                 MouseArea {
                     anchors.fill: parent
@@ -867,9 +1027,9 @@ Rectangle {
                             id: renameTextInput
                             TextField {
                                 text: root.newSessionName
-                                color: Colors.adapter.overBackground
-                                selectionColor: Colors.adapter.primary
-                                selectedTextColor: Colors.adapter.overPrimary
+                                color: Colors.adapter.overPrimary
+                                selectionColor: Colors.adapter.overPrimary
+                                selectedTextColor: Colors.adapter.primary
                                 font.family: Config.theme.font
                                 font.pixelSize: Config.theme.fontSize
                                 font.weight: Font.Bold
@@ -911,7 +1071,7 @@ Rectangle {
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.rightMargin: 8
-                    width: 76 // 32 + 12 + 32 (mismo spacing que el layout principal)
+                    width: 68 // 32 + 4 + 32
                     height: 32
                     color: "transparent"
                     opacity: isInDeleteMode ? 1.0 : 0.0
@@ -949,14 +1109,14 @@ Rectangle {
 
                         // Posición y tamaño con efecto elástico
                         x: {
-                            let minX = Math.min(idx1X, idx2X) * 44 + activeButtonMargin; // 32 + 12 spacing
+                            let minX = Math.min(idx1X, idx2X) * 36 + activeButtonMargin; // 32 + 4 spacing
                             return minX;
                         }
 
                         y: activeButtonMargin
 
                         width: {
-                            let stretchX = Math.abs(idx1X - idx2X) * 44 + 32 - activeButtonMargin * 2; // 32 + 12 spacing
+                            let stretchX = Math.abs(idx1X - idx2X) * 36 + 32 - activeButtonMargin * 2; // 32 + 4 spacing
                             return stretchX;
                         }
 
@@ -979,7 +1139,7 @@ Rectangle {
                     Row {
                         id: actionButtons
                         anchors.fill: parent
-                        spacing: 12
+                        spacing: 4
 
                         // Botón cancelar (cruz)
                         Rectangle {
@@ -1070,7 +1230,7 @@ Rectangle {
                         return Colors.adapter.primary;
                     }
                 }
-                opacity: root.deleteMode ? 1.0 : 0.2
+                opacity: (root.deleteMode || root.renameMode) ? 1.0 : 0.2
                 radius: Config.roundness > 0 ? Config.roundness + 4 : 0
                 visible: root.selectedIndex >= 0
 
@@ -1127,8 +1287,24 @@ Rectangle {
                 event.accepted = true;
             }
         } else if (root.renameMode) {
-            // En modo renombrar, solo manejar Escape para cancelar (Enter es manejado por el TextInput)
-            if (event.key === Qt.Key_Escape) {
+            // En modo renombrar, manejar navegación entre botones y acciones
+            if (event.key === Qt.Key_Left) {
+                root.renameButtonIndex = 0; // Cancelar (cruz)
+                event.accepted = true;
+            } else if (event.key === Qt.Key_Right) {
+                root.renameButtonIndex = 1; // Confirmar (check)
+                event.accepted = true;
+            } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Space) {
+                // Ejecutar acción del botón seleccionado
+                if (root.renameButtonIndex === 0) {
+                    console.log("DEBUG: Enter/Space pressed - canceling rename");
+                    root.cancelRenameMode();
+                } else {
+                    console.log("DEBUG: Enter/Space pressed - confirming rename");
+                    root.confirmRenameSession();
+                }
+                event.accepted = true;
+            } else if (event.key === Qt.Key_Escape) {
                 console.log("DEBUG: Escape pressed in rename mode - canceling rename");
                 root.cancelRenameMode();
                 event.accepted = true;
