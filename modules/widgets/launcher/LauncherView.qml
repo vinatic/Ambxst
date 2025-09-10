@@ -19,6 +19,15 @@ Item {
         property int currentTab: 0  // Siempre iniciar en la primera página
     }
 
+    // Función para hacer foco en el search input del tab actual
+    function focusSearchInput() {
+        Qt.callLater(() => {
+            if (stack.currentItem && stack.currentItem.focusSearchInput) {
+                stack.currentItem.focusSearchInput();
+            }
+        });
+    }
+
     implicitWidth: 480
     implicitHeight: Math.min(stack.currentItem ? stack.currentItem.implicitHeight : 368, 368)
 
@@ -26,11 +35,7 @@ Item {
     Component.onCompleted: {
         root.state.currentTab = 0;
         GlobalStates.launcherCurrentTab = 0;
-        Qt.callLater(() => {
-            if (stack.currentItem && stack.currentItem.focusSearchInput) {
-                stack.currentItem.focusSearchInput();
-            }
-        });
+        focusSearchInput();
     }
 
     Row {
@@ -182,11 +187,7 @@ Item {
                         GlobalStates.launcherCurrentTab = index;
 
                         // Auto-focus search input when switching tabs
-                        Qt.callLater(() => {
-                            if (stack.currentItem && stack.currentItem.focusSearchInput) {
-                                stack.currentItem.focusSearchInput();
-                            }
-                        });
+                        focusSearchInput();
                     }
                 }
 

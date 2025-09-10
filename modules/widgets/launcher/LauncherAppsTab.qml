@@ -257,10 +257,7 @@ Rectangle {
     }
 
     Component.onCompleted: {
-        // Only focus the input, don't clear the search on component creation
-        // This allows state to persist when moving between monitors
-        Qt.callLater(() => {
-            focusSearchInput();
-        });
+        // Focus the input when component is ready
+        focusSearchInput();
     }
 }

@@ -157,10 +157,10 @@ PanelWindow {
             if (screenVisibilities.launcher) {
                 notchContainer.stackView.push(launcherViewComponent);
                 Qt.callLater(() => {
-                    // Additional focus to ensure search input gets focus
+                    // Focus the launcher properly when it opens
                     let currentItem = notchContainer.stackView.currentItem;
-                    if (currentItem && currentItem.children[0] && currentItem.children[0].focusSearchInput) {
-                        currentItem.children[0].focusSearchInput();
+                    if (currentItem && currentItem.focusSearchInput) {
+                        currentItem.focusSearchInput();
                     }
                 });
             } else {

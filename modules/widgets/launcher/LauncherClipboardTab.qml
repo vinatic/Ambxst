@@ -236,245 +236,296 @@ Rectangle {
             }
         }
 
-        // Sección de imágenes horizontal
-        Item {
+        // Contenedor de resultados del clipboard
+        ColumnLayout {
             Layout.fillWidth: true
-            Layout.preferredHeight: root.imgSize
-            visible: root.imageItems.length > 0
+            spacing: 4
 
-            ClippingRectangle {
-                anchors.fill: parent
-                color: "transparent"
-                border.color: root.isImageSectionFocused ? Colors.adapter.primary : Colors.adapter.outline
-                border.width: 0
-                radius: Config.roundness > 0 ? Config.roundness + 4 : 0
+            // Sección de imágenes horizontal
+            Item {
+                Layout.fillWidth: true
+                Layout.preferredHeight: root.imgSize
+                visible: root.imageItems.length > 0
 
-                Behavior on border.color {
-                    ColorAnimation {
-                        duration: Config.animDuration / 2
-                        easing.type: Easing.OutQuart
-                    }
-                }
-
-                ListView {
-                    id: imageResultsList
+                ClippingRectangle {
                     anchors.fill: parent
-                    anchors.margins: 0
-                    orientation: ListView.Horizontal
-                    spacing: 8
-                    clip: true
+                    color: "transparent"
+                    border.color: root.isImageSectionFocused ? Colors.adapter.primary : Colors.adapter.outline
+                    border.width: 0
+                    radius: Config.roundness > 0 ? Config.roundness + 4 : 0
 
-                    model: root.imageItems
-                    currentIndex: root.selectedImageIndex
-
-                    onCurrentIndexChanged: {
-                        if (currentIndex !== root.selectedImageIndex && root.isImageSectionFocused) {
-                            root.selectedImageIndex = currentIndex;
+                    Behavior on border.color {
+                        ColorAnimation {
+                            duration: Config.animDuration / 2
+                            easing.type: Easing.OutQuart
                         }
                     }
 
-                    delegate: ClippingRectangle {
-                        required property var modelData
-                        required property int index
+                    ListView {
+                        id: imageResultsList
+                        anchors.fill: parent
+                        anchors.margins: 0
+                        orientation: ListView.Horizontal
+                        spacing: 8
+                        clip: true
 
-                        width: root.imgSize
-                        height: width
-                        color: root.isImageSectionFocused && root.selectedImageIndex === index ? Colors.adapter.primary : Colors.adapter.surface
-                        radius: Config.roundness > 0 ? Config.roundness + 4 : 0
+                        model: root.imageItems
+                        currentIndex: root.selectedImageIndex
 
-                        Behavior on color {
-                            ColorAnimation {
-                                duration: Config.animDuration / 2
-                                easing.type: Easing.OutQuart
+                        onCurrentIndexChanged: {
+                            if (currentIndex !== root.selectedImageIndex && root.isImageSectionFocused) {
+                                root.selectedImageIndex = currentIndex;
                             }
                         }
 
-                        MouseArea {
-                            anchors.fill: parent
-                            hoverEnabled: true
+                        delegate: ClippingRectangle {
+                            required property var modelData
+                            required property int index
 
-                            onEntered: {
-                                if (!root.isImageSectionFocused) {
-                                    root.isImageSectionFocused = true;
-                                    root.selectedIndex = -1;
-                                    textResultsList.currentIndex = -1;
-                                }
-                                root.selectedImageIndex = index;
-                                imageResultsList.currentIndex = index;
-                            }
-
-                            onClicked: {
-                                root.copyToClipboard(modelData.id);
-                            }
-                        }
-
-                        // Preview de imagen real o placeholder
-                        Item {
-                            anchors.centerIn: parent
                             width: root.imgSize
                             height: width
-
-                            // Imagen real si está disponible
-                            Image {
-                                id: imagePreview
-                                anchors.fill: parent
-                                fillMode: Image.PreserveAspectCrop
-                                visible: status === Image.Ready
-                                source: {
-                                    // Forzar re-evaluación cuando el cache cambia
-                                    ClipboardService.revision;
-                                    return ClipboardService.getImageData(modelData.id);
-                                }
-                                clip: true
-
-                                Component.onCompleted: {
-                                    // Cargar imagen on-demand si no está en cache
-                                    if (!ClipboardService.getImageData(modelData.id)) {
-                                        ClipboardService.decodeToDataUrl(modelData.id, modelData.mime);
-                                    }
-                                }
-
-                                onStatusChanged: {
-                                    if (status === Image.Error) {
-                                        console.log("Error loading image for ID:", modelData.id);
-                                    }
-                                }
-                            }
-
-                            // Placeholder cuando la imagen no está disponible
-                            Rectangle {
-                                anchors.fill: parent
-                                color: Colors.adapter.primary
-                                radius: Config.roundness > 0 ? Config.roundness - 4 : 0
-                                visible: imagePreview.status !== Image.Ready
-
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: Icons.image
-                                    font.family: Icons.font
-                                    font.pixelSize: 24
-                                    color: Colors.adapter.overPrimary
-                                }
-                            }
-
-                            // Indicador de carga
-                            Rectangle {
-                                anchors.fill: parent
-                                color: Colors.adapter.surface
-                                radius: Config.roundness > 0 ? Config.roundness - 4 : 0
-                                visible: imagePreview.status === Image.Loading
-                                opacity: 0.8
-
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: "..."
-                                    font.family: Config.theme.font
-                                    font.pixelSize: 16
-                                    color: Colors.adapter.overSurface
-                                }
-                            }
-                        }
-
-                        // Highlight cuando está seleccionado
-                        Rectangle {
-                            anchors.fill: parent
-                            color: "transparent"
-                            border.color: Colors.adapter.primary
-                            border.width: 0
+                            color: root.isImageSectionFocused && root.selectedImageIndex === index ? Colors.adapter.primary : Colors.adapter.surface
                             radius: Config.roundness > 0 ? Config.roundness + 4 : 0
 
-                            Behavior on border.width {
-                                NumberAnimation {
+                            Behavior on color {
+                                ColorAnimation {
                                     duration: Config.animDuration / 2
                                     easing.type: Easing.OutQuart
                                 }
                             }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+
+                                onEntered: {
+                                    if (!root.isImageSectionFocused) {
+                                        root.isImageSectionFocused = true;
+                                        root.selectedIndex = -1;
+                                        textResultsList.currentIndex = -1;
+                                    }
+                                    root.selectedImageIndex = index;
+                                    imageResultsList.currentIndex = index;
+                                }
+
+                                onClicked: {
+                                    root.copyToClipboard(modelData.id);
+                                }
+                            }
+
+                            // Preview de imagen real o placeholder
+                            Item {
+                                anchors.centerIn: parent
+                                width: root.imgSize
+                                height: width
+
+                                // Imagen real si está disponible
+                                Image {
+                                    id: imagePreview
+                                    anchors.fill: parent
+                                    fillMode: Image.PreserveAspectCrop
+                                    visible: status === Image.Ready
+                                    source: {
+                                        // Forzar re-evaluación cuando el cache cambia
+                                        ClipboardService.revision;
+                                        return ClipboardService.getImageData(modelData.id);
+                                    }
+                                    clip: true
+
+                                    Component.onCompleted: {
+                                        // Cargar imagen on-demand si no está en cache
+                                        if (!ClipboardService.getImageData(modelData.id)) {
+                                            ClipboardService.decodeToDataUrl(modelData.id, modelData.mime);
+                                        }
+                                    }
+
+                                    onStatusChanged: {
+                                        if (status === Image.Error) {
+                                            console.log("Error loading image for ID:", modelData.id);
+                                        }
+                                    }
+                                }
+
+                                // Placeholder cuando la imagen no está disponible
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: Colors.adapter.primary
+                                    radius: Config.roundness > 0 ? Config.roundness - 4 : 0
+                                    visible: imagePreview.status !== Image.Ready
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: Icons.image
+                                        font.family: Icons.font
+                                        font.pixelSize: 24
+                                        color: Colors.adapter.overPrimary
+                                    }
+                                }
+
+                                // Indicador de carga
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: Colors.adapter.surface
+                                    radius: Config.roundness > 0 ? Config.roundness - 4 : 0
+                                    visible: imagePreview.status === Image.Loading
+                                    opacity: 0.8
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "..."
+                                        font.family: Config.theme.font
+                                        font.pixelSize: 16
+                                        color: Colors.adapter.overSurface
+                                    }
+                                }
+                            }
+
+                            // Highlight cuando está seleccionado
+                            Rectangle {
+                                anchors.fill: parent
+                                color: "transparent"
+                                border.color: Colors.adapter.primary
+                                border.width: 0
+                                radius: Config.roundness > 0 ? Config.roundness + 4 : 0
+
+                                Behavior on border.width {
+                                    NumberAnimation {
+                                        duration: Config.animDuration / 2
+                                        easing.type: Easing.OutQuart
+                                    }
+                                }
+                            }
+                        }
+
+                        highlight: Rectangle {
+                            color: "transparent"
+                            z: 100
+                            border.color: Colors.adapter.primary
+                            border.width: 4
+                            radius: Config.roundness > 0 ? Config.roundness + 4 : 0
+                            visible: root.isImageSectionFocused
+                        }
+
+                        highlightMoveDuration: Config.animDuration / 2
+                        highlightMoveVelocity: -1
+                    }
+                }
+            }
+
+            // Scrollbar separador para imágenes
+            ScrollBar {
+                id: imageScrollBar
+                Layout.fillWidth: true
+                Layout.preferredHeight: 10
+                visible: root.imageItems.length > 0
+                orientation: Qt.Horizontal
+
+                size: imageResultsList.width / imageResultsList.contentWidth
+                position: imageResultsList.contentX / imageResultsList.contentWidth
+
+                background: Rectangle {
+                    color: Colors.surface
+                    radius: Config.roundness
+                }
+
+                contentItem: Rectangle {
+                    color: Colors.adapter.primary
+                    radius: Config.roundness
+                }
+
+                onPositionChanged: {
+                    if (pressed) {
+                        imageResultsList.contentX = position * imageResultsList.contentWidth;
+                    }
+                }
+            }
+
+            // Lista de textos vertical
+            ListView {
+                id: textResultsList
+                Layout.fillWidth: true
+                Layout.preferredHeight: 3 * 48
+                visible: true
+                clip: true
+
+                model: root.textItems
+                currentIndex: root.selectedIndex
+
+                onCurrentIndexChanged: {
+                    if (currentIndex !== root.selectedIndex && !root.isImageSectionFocused) {
+                        root.selectedIndex = currentIndex;
+                    }
+                }
+
+                delegate: Rectangle {
+                    required property var modelData
+                    required property int index
+
+                    width: textResultsList.width
+                    height: 48
+                    color: "transparent"
+                    radius: 16
+
+                    MouseArea {
+                        id: mouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+
+                        onEntered: {
+                            if (root.isImageSectionFocused) {
+                                root.isImageSectionFocused = false;
+                                root.selectedImageIndex = -1;
+                            }
+                            root.selectedIndex = index;
+                            textResultsList.currentIndex = index;
+                        }
+                        onClicked: {
+                            root.copyToClipboard(modelData.id);
                         }
                     }
 
-                    highlight: Rectangle {
-                        color: "transparent"
-                        z: 100
-                        border.color: Colors.adapter.primary
-                        border.width: 2
-                        radius: Config.roundness > 0 ? Config.roundness + 4 : 0
-                        visible: root.isImageSectionFocused
-                    }
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: 8
+                        spacing: 12
 
-                    highlightMoveDuration: Config.animDuration / 2
-                    highlightMoveVelocity: -1
-                }
-            }
-        }
+                        Rectangle {
+                            Layout.preferredWidth: 32
+                            Layout.preferredHeight: 32
+                            color: root.selectedIndex === index && !root.isImageSectionFocused ? Colors.adapter.overPrimary : Colors.surface
+                            radius: Config.roundness > 0 ? Config.roundness - 4 : 0
 
-        // Lista de textos vertical
-        ListView {
-            id: textResultsList
-            Layout.fillWidth: true
-            Layout.preferredHeight: 3 * 48
-            visible: true
-            clip: true
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: Config.animDuration / 2
+                                    easing.type: Easing.OutQuart
+                                }
+                            }
 
-            model: root.textItems
-            currentIndex: root.selectedIndex
+                            Text {
+                                anchors.centerIn: parent
+                                text: Icons.clip
+                                color: root.selectedIndex === index && !root.isImageSectionFocused ? Colors.adapter.primary : Colors.adapter.overBackground
+                                font.family: Icons.font
+                                font.pixelSize: 16
 
-            onCurrentIndexChanged: {
-                if (currentIndex !== root.selectedIndex && !root.isImageSectionFocused) {
-                    root.selectedIndex = currentIndex;
-                }
-            }
-
-            delegate: Rectangle {
-                required property var modelData
-                required property int index
-
-                width: textResultsList.width
-                height: 48
-                color: "transparent"
-                radius: 16
-
-                MouseArea {
-                    id: mouseArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-
-                    onEntered: {
-                        if (root.isImageSectionFocused) {
-                            root.isImageSectionFocused = false;
-                            root.selectedImageIndex = -1;
-                        }
-                        root.selectedIndex = index;
-                        textResultsList.currentIndex = index;
-                    }
-                    onClicked: {
-                        root.copyToClipboard(modelData.id);
-                    }
-                }
-
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.margins: 8
-                    spacing: 12
-
-                    Rectangle {
-                        Layout.preferredWidth: 32
-                        Layout.preferredHeight: 32
-                        color: root.selectedIndex === index && !root.isImageSectionFocused ? Colors.adapter.overPrimary : Colors.surface
-                        radius: Config.roundness > 0 ? Config.roundness - 4 : 0
-
-                        Behavior on color {
-                            ColorAnimation {
-                                duration: Config.animDuration / 2
-                                easing.type: Easing.OutQuart
+                                Behavior on color {
+                                    ColorAnimation {
+                                        duration: Config.animDuration / 2
+                                        easing.type: Easing.OutQuart
+                                    }
+                                }
                             }
                         }
 
                         Text {
-                            anchors.centerIn: parent
-                            text: Icons.clip
-                            color: root.selectedIndex === index && !root.isImageSectionFocused ? Colors.adapter.primary : Colors.adapter.overBackground
-                            font.family: Icons.font
-                            font.pixelSize: 16
+                            Layout.fillWidth: true
+                            text: modelData.preview
+                            color: root.selectedIndex === index && !root.isImageSectionFocused ? Colors.adapter.overPrimary : Colors.adapter.overBackground
+                            font.family: Config.theme.font
+                            font.pixelSize: Config.theme.fontSize
+                            font.weight: Font.Bold
+                            elide: Text.ElideRight
 
                             Behavior on color {
                                 ColorAnimation {
@@ -484,34 +535,17 @@ Rectangle {
                             }
                         }
                     }
-
-                    Text {
-                        Layout.fillWidth: true
-                        text: modelData.preview
-                        color: root.selectedIndex === index && !root.isImageSectionFocused ? Colors.adapter.overPrimary : Colors.adapter.overBackground
-                        font.family: Config.theme.font
-                        font.pixelSize: Config.theme.fontSize
-                        font.weight: Font.Bold
-                        elide: Text.ElideRight
-
-                        Behavior on color {
-                            ColorAnimation {
-                                duration: Config.animDuration / 2
-                                easing.type: Easing.OutQuart
-                            }
-                        }
-                    }
                 }
-            }
 
-            highlight: Rectangle {
-                color: Colors.adapter.primary
-                radius: Config.roundness > 0 ? Config.roundness + 4 : 0
-                visible: root.selectedIndex >= 0 && !root.isImageSectionFocused
-            }
+                highlight: Rectangle {
+                    color: Colors.adapter.primary
+                    radius: Config.roundness > 0 ? Config.roundness + 4 : 0
+                    visible: root.selectedIndex >= 0 && !root.isImageSectionFocused
+                }
 
-            highlightMoveDuration: Config.animDuration / 2
-            highlightMoveVelocity: -1
+                highlightMoveDuration: Config.animDuration / 2
+                highlightMoveVelocity: -1
+            }
         }
 
         // Mensaje cuando no hay elementos
