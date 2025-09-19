@@ -77,6 +77,7 @@ PanelWindow {
             // Esquinas visibles hacia fuera de la barra. Para bottom se invierten a BottomLeft/BottomRight y se posicionan arriba de la barra.
             RoundCorner {
                 id: cornerLeft
+                visible: Config.theme.enableCorners
                 size: Config.roundness > 0 ? Config.roundness + 4 : 0
                 x: 0
                 y: panel.position === "top" ? parent.height : -size
@@ -86,6 +87,7 @@ PanelWindow {
 
             RoundCorner {
                 id: cornerRight
+                visible: Config.theme.enableCorners
                 size: Config.roundness > 0 ? Config.roundness + 4 : 0
                 x: parent.width - size
                 y: panel.position === "top" ? parent.height : -size
@@ -117,6 +119,7 @@ PanelWindow {
 
             RoundCorner {
                 id: shadowCornerLeft
+                visible: Config.theme.enableCorners
                 size: Config.roundness > 0 ? Config.roundness + 4 : 0
                 x: 0
                 y: panel.position === "top" ? parent.height : -size
@@ -126,6 +129,7 @@ PanelWindow {
 
             RoundCorner {
                 id: shadowCornerRight
+                visible: Config.theme.enableCorners
                 size: Config.roundness > 0 ? Config.roundness + 4 : 0
                 x: parent.width - size
                 y: panel.position === "top" ? parent.height : -size

@@ -20,7 +20,7 @@ IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.webp', '.tif', '.tiff', '.bmp'}
 GIF_EXTENSIONS = {'.gif'}
 
 # Default thumbnail size
-THUMBNAIL_SIZE = "320x240"
+THUMBNAIL_SIZE = "140x140"
 
 class ThumbnailGenerator:
     def __init__(self, config_path: str):

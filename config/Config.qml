@@ -28,6 +28,7 @@ Singleton {
                 property int fontSize: 14
                 property bool fillIcons: false
                 property string currentTheme: "default"
+                property bool enableCorners: true
                 property int animDuration: 300
                 property real shadowOpacity: 0.5
                 property int shadowXOffset: 0

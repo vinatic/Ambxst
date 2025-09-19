@@ -12,7 +12,7 @@ FocusScope {
     property alias actions: repeater.model
     property string layout: "row" // "row" or "grid"
     property int buttonSize: 48
-    property int iconSize: 24
+    property int iconSize: 20
     property int spacing: 4
     property int columns: 3 // para layout grid
 

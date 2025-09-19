@@ -9,8 +9,8 @@ ActionGrid {
     signal itemSelected
 
     layout: "row"
-    buttonSize: 52
-    iconSize: 24
+    buttonSize: 48
+    iconSize: 20
     spacing: 8
 
     // Forzar foco al abrir

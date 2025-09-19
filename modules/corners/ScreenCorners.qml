@@ -7,6 +7,8 @@ import qs.config
 PanelWindow {
     id: screenCorners
 
+    visible: Config.theme.enableCorners
+
     color: "transparent"
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.namespace: "quickshell:screenCorners"
