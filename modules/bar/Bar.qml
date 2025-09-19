@@ -64,8 +64,8 @@ PanelWindow {
         anchors.right: parent.right
         // Control vertical manual para evitar efectos colaterales de anchors dinámicos.
         property int barHeight: 44
-        height: barHeight
-        y: panel.position === "top" ? 0 : parent.height - barHeight
+        height: Visibilities.contextMenuOpen ? Screen.height : barHeight
+        y: panel.position === "top" ? 0 : parent.height - height
         color: "transparent"
 
         Rectangle {

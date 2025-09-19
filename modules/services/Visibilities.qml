@@ -13,6 +13,7 @@ Singleton {
     property var bars: ({})  // Registry for bar containers
     property string currentActiveModule: ""
     property string lastFocusedScreen: ""
+    property bool contextMenuOpen: false
 
     function getForScreen(screenName) {
         if (!screens[screenName]) {
@@ -48,6 +49,10 @@ Singleton {
 
     function getBarForScreen(screenName) {
         return bars[screenName] || null;
+    }
+
+    function setContextMenuOpen(isOpen) {
+        contextMenuOpen = isOpen;
     }
 
     function setActiveModule(moduleName, skipFocusRestore) {

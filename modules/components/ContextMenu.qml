@@ -3,6 +3,7 @@ import QtQuick.Controls
 import Quickshell
 import qs.modules.theme
 import qs.modules.components
+import qs.modules.services
 import qs.config
 
 OptionsMenu {
@@ -157,6 +158,7 @@ OptionsMenu {
         console.log("Has menu:", !!menuHandle);
 
         isOpen = true;
+        Visibilities.setContextMenuOpen(true);
         popup();
     }
 
@@ -164,5 +166,6 @@ OptionsMenu {
         console.log("Closing context menu");
         isOpen = false;
         visible = false;
+        Visibilities.setContextMenuOpen(false);
     }
 }
