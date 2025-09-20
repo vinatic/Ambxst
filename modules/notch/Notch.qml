@@ -133,7 +133,15 @@ Item {
                 id: stackViewInternal
                 anchors.fill: parent
                 anchors.margins: 16
+                anchors.topMargin: (hasActiveNotifications && stackViewInternal.currentItem && stackViewInternal.currentItem.hovered) ? 0 : 16
                 initialItem: hasActiveNotifications ? notificationViewComponent : defaultViewComponent
+
+                Behavior on anchors.topMargin {
+                    NumberAnimation {
+                        duration: Config.animDuration / 2
+                        easing.type: Easing.OutQuart
+                    }
+                }
 
                 // Activar blur al inicio de transición y animarlo a nítido
                 onBusyChanged: {

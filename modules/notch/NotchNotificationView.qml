@@ -14,24 +14,41 @@ Item {
     id: root
 
     implicitWidth: hovered ? 420 : 320
-    implicitHeight: {
-        let baseHeight = hovered ? contentItem.height + 12 : 40;  // Altura base para icono y textos
-        let actionsHeight = 0;
-
-        if (hovered && currentNotification && currentNotification.actions.length > 0) {
-            actionsHeight = 40;  // Altura para botones de acción + márgenes
-        }
-
-        let controlsHeight = hovered ? dashboardAccessHeight : 0;
-
-        return baseHeight + actionsHeight + controlsHeight;
-    }
+    implicitHeight: mainColumn.implicitHeight - (hovered ? 16 : 0)
+    // implicitHeight: {
+    //     let compactHeight = 24;
+    //     let expandedHeight = 0;
+    //
+    //     // Fila superior (controles)
+    //     if (hovered) {
+    //         expandedHeight += 24;
+    //     }
+    //
+    //     // Fila media (contenido principal) - siempre presente
+    //     expandedHeight += hovered ? 32 : 24;
+    //
+    //     // Fila inferior (botones de acción)
+    //     if (hovered && currentNotification && currentNotification.actions.length > 0) {
+    //         expandedHeight += 24;
+    //     }
+    //
+    //     // Spacing entre filas
+    //     if (hovered) {
+    //         let visibleRows = 1; // Fila media siempre visible
+    //         visibleRows += 1; // Fila superior
+    //         if (currentNotification && currentNotification.actions.length > 0) {
+    //             visibleRows += 1; // Fila inferior
+    //         }
+    //         expandedHeight += (visibleRows - 1) * 4; // Spacing entre filas
+    //     }
+    //
+    //     return hovered ? expandedHeight : compactHeight;
+    // }
 
     property var currentNotification: Notifications.popupList.length > 0 ? Notifications.popupList[0] : null
-    property bool notchHovered: false  // Propiedad para recibir hover del notch completo
+    property bool notchHovered: false
     property bool hovered: notchHovered || mouseArea.containsMouse || anyButtonHovered
     property bool anyButtonHovered: false
-    property int dashboardAccessHeight: 24
 
     // MouseArea para detectar hover en toda el área
     MouseArea {
@@ -39,32 +56,40 @@ Item {
         anchors.fill: parent
         hoverEnabled: true
         acceptedButtons: Qt.NoButton
-        z: -1  // Detrás de elementos interactivos
+        z: -1
     }
 
     // Manejo del hover - pausa/reanuda timers de timeout de notificación
     onHoveredChanged: {
         if (hovered) {
-            // Pausar timer de timeout de la notificación
             if (currentNotification) {
                 Notifications.pauseGroupTimers(currentNotification.appName);
             }
         } else {
-            // Reanudar timer de timeout de la notificación
             if (currentNotification) {
                 Notifications.resumeGroupTimers(currentNotification.appName);
             }
         }
     }
 
-    // Vista única de la notificación
+    // Nueva estructura de 3 filas
     Column {
+        id: mainColumn
         anchors.fill: parent
+        spacing: hovered ? 8 : 0
 
-        // Fila de control superior con revealer
+        Behavior on spacing {
+            NumberAnimation {
+                duration: Config.animDuration / 2
+                easing.type: Easing.OutQuart
+            }
+        }
+
+        // FILA 1: Controles superiores (solo visible con hover)
         Item {
+            id: topControlsRow
             width: parent.width
-            height: hovered ? dashboardAccessHeight : 0
+            height: hovered ? 24 : 0
             clip: true
 
             Behavior on height {
@@ -76,17 +101,9 @@ Item {
 
             RowLayout {
                 anchors.fill: parent
-                anchors.topMargin: 0
                 spacing: 8
 
-                Behavior on anchors.topMargin {
-                    NumberAnimation {
-                        duration: Config.animDuration / 2
-                        easing.type: Easing.OutQuart
-                    }
-                }
-
-                // Botón de copiar (izquierda)
+                // Botón de copiar
                 Button {
                     Layout.fillHeight: true
                     Layout.preferredWidth: 40
@@ -126,18 +143,20 @@ Item {
                     onClicked: {
                         if (currentNotification) {
                             console.log("Copy:", currentNotification.body);
-                            // TODO: Implementar copia al portapapeles
                         }
                     }
                 }
 
-                // Rectángulo de acceso al dashboard (centro)
+                // Botón del dashboard (centro)
                 Rectangle {
                     id: dashboardAccess
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    color: dashboardAccessMouse.containsMouse ? Colors.adapter.primary : "transparent"
-                    radius: 8
+                    color: dashboardAccessMouse.containsMouse ? Colors.surfaceBright : Colors.surface
+                    topLeftRadius: 0
+                    topRightRadius: 0
+                    bottomLeftRadius: Config.roundness
+                    bottomRightRadius: Config.roundness
 
                     Behavior on color {
                         ColorAnimation {
@@ -150,7 +169,6 @@ Item {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        propagateComposedEvents: true
 
                         onHoveredChanged: {
                             root.anyButtonHovered = containsMouse;
@@ -167,7 +185,7 @@ Item {
                         text: Icons.caretDown
                         font.family: Icons.font
                         font.pixelSize: 16
-                        color: dashboardAccessMouse.containsMouse ? Colors.adapter.overPrimary : Colors.adapter.outline
+                        color: dashboardAccessMouse.containsMouse ? Colors.adapter.overBackground : Colors.adapter.surfaceBright
 
                         Behavior on color {
                             ColorAnimation {
@@ -177,7 +195,7 @@ Item {
                     }
                 }
 
-                // Botón de descartar (derecha)
+                // Botón de descartar
                 Button {
                     Layout.fillHeight: true
                     Layout.preferredWidth: 40
@@ -223,170 +241,165 @@ Item {
             }
         }
 
-        // Contenido principal de la notificación
-        Item {
-            id: contentItem
+        // FILA 2: Contenido principal (siempre visible)
+        RowLayout {
+            id: mainContentRow
             width: parent.width
-            height: parent.height
+            height: hovered ? 48 : 32
+            spacing: 8
 
+            Behavior on height {
+                NumberAnimation {
+                    duration: Config.animDuration / 2
+                    easing.type: Easing.OutQuart
+                }
+            }
+
+            // App icon
+            NotificationAppIcon {
+                id: appIcon
+                Layout.preferredWidth: hovered ? 48 : 32
+                Layout.preferredHeight: hovered ? 48 : 32
+                size: hovered ? 48 : 32
+                radius: Config.roundness + 4
+                visible: currentNotification && (currentNotification.appIcon !== "" || currentNotification.image !== "")
+                appIcon: currentNotification ? currentNotification.appIcon : ""
+                image: currentNotification ? currentNotification.image : ""
+                summary: currentNotification ? currentNotification.summary : ""
+                urgency: currentNotification ? currentNotification.urgency : NotificationUrgency.Normal
+
+                Behavior on size {
+                    NumberAnimation {
+                        duration: Config.animDuration / 2
+                        easing.type: Easing.OutQuart
+                    }
+                }
+            }
+
+            // Textos de la notificación
             Column {
-                anchors.fill: parent
-                anchors.margins: 0
-                anchors.topMargin: hovered ? 8 : 0
-                spacing: hovered ? 8 : 0
+                Layout.fillWidth: true
+                // Layout.fillHeight: true
+                Layout.preferredHeight: appIcon.Layout.preferredHeight
+                spacing: hovered ? 4 : 0
 
-                Behavior on anchors.leftMargin {
-                    NumberAnimation {
-                        duration: Config.animDuration / 2
-                    }
-                }
-                Behavior on anchors.rightMargin {
-                    NumberAnimation {
-                        duration: Config.animDuration / 2
-                    }
-                }
-                Behavior on anchors.topMargin {
-                    NumberAnimation {
-                        duration: Config.animDuration / 2
-                    }
-                }
-                Behavior on anchors.bottomMargin {
-                    NumberAnimation {
-                        duration: Config.animDuration / 2
-                    }
-                }
                 Behavior on spacing {
                     NumberAnimation {
                         duration: Config.animDuration / 2
+                        easing.type: Easing.OutQuart
                     }
                 }
 
-                // Fila principal: icono + textos
-                RowLayout {
+                Text {
                     width: parent.width
-                    spacing: 8
+                    text: currentNotification ? currentNotification.summary : ""
+                    font.family: Config.theme.font
+                    font.pixelSize: hovered ? Config.theme.fontSize : Config.theme.fontSize - 1
+                    font.weight: Font.Bold
+                    color: Colors.adapter.primary
+                    elide: Text.ElideRight
+                    maximumLineCount: hovered ? 2 : 1
+                    wrapMode: hovered ? Text.Wrap : Text.NoWrap
+                    verticalAlignment: hovered ? Text.AlignTop : Text.AlignVCenter
 
-                    Behavior on spacing {
+                    Behavior on font.pixelSize {
                         NumberAnimation {
                             duration: Config.animDuration / 2
-                        }
-                    }
-
-                    // App icon (izquierda)
-                    NotificationAppIcon {
-                        Layout.preferredWidth: hovered ? 48 : 36
-                        Layout.preferredHeight: hovered ? 48 : 36
-                        size: hovered ? 48 : 36
-                        visible: currentNotification && (currentNotification.appIcon !== "" || currentNotification.image !== "")
-                        appIcon: currentNotification ? currentNotification.appIcon : ""
-                        image: currentNotification ? currentNotification.image : ""
-                        summary: currentNotification ? currentNotification.summary : ""
-                        urgency: currentNotification ? currentNotification.urgency : NotificationUrgency.Normal
-
-                        Behavior on size {
-                            NumberAnimation {
-                                duration: Config.animDuration / 2
-                            }
-                        }
-                    }
-
-                    // Textos de la notificación
-                    Column {
-                        Layout.fillWidth: true
-                        spacing: hovered ? 2 : 1
-
-                        Behavior on spacing {
-                            NumberAnimation {
-                                duration: Config.animDuration / 2
-                            }
-                        }
-
-                        Text {
-                            width: parent.width
-                            text: currentNotification ? currentNotification.summary : ""
-                            font.family: Config.theme.font
-                            font.pixelSize: Config.theme.fontSize
-                            font.weight: Font.Bold
-                            color: Colors.adapter.primary
-                            elide: Text.ElideRight
-                        }
-
-                        Text {
-                            width: parent.width
-                            text: currentNotification ? processNotificationBody(currentNotification.body, currentNotification.appName) : ""
-                            font.family: Config.theme.font
-                            font.pixelSize: Config.theme.fontSize - 1
-                            color: Colors.adapter.overBackground
-                            wrapMode: Text.Wrap
-                            maximumLineCount: hovered ? 3 : 2
-                            elide: Text.ElideRight
+                            easing.type: Easing.OutQuart
                         }
                     }
                 }
 
-                // Botones de acción con revealer (fila separada)
-                Item {
+                Text {
                     width: parent.width
-                    height: (hovered && currentNotification && currentNotification.actions.length > 0) ? 28 : 0
-                    clip: true
-                    visible: height > 0
+                    text: currentNotification ? processNotificationBody(currentNotification.body, currentNotification.appName) : ""
+                    font.family: Config.theme.font
+                    font.pixelSize: hovered ? Config.theme.fontSize - 1 : Config.theme.fontSize - 2
+                    color: Colors.adapter.overBackground
+                    wrapMode: hovered ? Text.Wrap : Text.NoWrap
+                    maximumLineCount: hovered ? 2 : 1
+                    elide: Text.ElideRight
+                    visible: hovered || text !== ""
+                    opacity: hovered ? 1.0 : 0.8
 
-                    Behavior on height {
+                    Behavior on font.pixelSize {
                         NumberAnimation {
                             duration: Config.animDuration / 2
                             easing.type: Easing.OutQuart
                         }
                     }
 
-                    RowLayout {
-                        anchors.fill: parent
-                        spacing: 6
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: Config.animDuration / 2
+                            easing.type: Easing.OutQuart
+                        }
+                    }
+                }
+            }
+        }
 
-                        Repeater {
-                            model: currentNotification ? currentNotification.actions : []
+        // FILA 3: Botones de acción (solo visible con hover)
+        Item {
+            id: actionButtonsRow
+            width: parent.width
+            height: (hovered && currentNotification && currentNotification.actions.length > 0) ? 24 : 0
+            clip: true
 
-                            Button {
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 28
+            Behavior on height {
+                NumberAnimation {
+                    duration: Config.animDuration / 2
+                    easing.type: Easing.OutQuart
+                }
+            }
 
-                                text: modelData.text
-                                font.family: Config.theme.font
-                                font.pixelSize: Config.theme.fontSize - 2
-                                hoverEnabled: true
+            RowLayout {
+                anchors.fill: parent
+                spacing: 4
 
-                                onHoveredChanged: {
-                                    root.anyButtonHovered = hovered;
-                                }
+                Repeater {
+                    model: currentNotification ? currentNotification.actions : []
 
-                                background: Rectangle {
-                                    color: parent.pressed ? Colors.adapter.primary : (parent.hovered ? Colors.surfaceBright : Colors.surfaceContainerHigh)
-                                    radius: Config.roundness
+                    Button {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 24
 
-                                    Behavior on color {
-                                        ColorAnimation {
-                                            duration: Config.animDuration / 2
-                                        }
-                                    }
-                                }
+                        text: modelData.text
+                        font.family: Config.theme.font
+                        font.pixelSize: Config.theme.fontSize - 2
+                        hoverEnabled: true
 
-                                contentItem: Text {
-                                    text: parent.text
-                                    font: parent.font
-                                    color: parent.pressed ? Colors.adapter.overPrimary : (parent.hovered ? Colors.adapter.overBackground : Colors.adapter.primary)
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignVCenter
+                        onHoveredChanged: {
+                            root.anyButtonHovered = hovered;
+                        }
 
-                                    Behavior on color {
-                                        ColorAnimation {
-                                            duration: Config.animDuration / 2
-                                        }
-                                    }
-                                }
+                        background: Rectangle {
+                            color: parent.pressed ? Colors.adapter.primary : (parent.hovered ? Colors.surfaceBright : Colors.surfaceContainerHigh)
+                            radius: Config.roundness
 
-                                onClicked: {
-                                    Notifications.attemptInvokeAction(currentNotification.id, modelData.identifier);
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: Config.animDuration / 2
                                 }
                             }
+                        }
+
+                        contentItem: Text {
+                            text: parent.text
+                            font: parent.font
+                            color: parent.pressed ? Colors.adapter.overPrimary : (parent.hovered ? Colors.adapter.overBackground : Colors.adapter.primary)
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: Config.animDuration / 2
+                                }
+                            }
+                        }
+
+                        onClicked: {
+                            Notifications.attemptInvokeAction(currentNotification.id, modelData.identifier);
                         }
                     }
                 }
