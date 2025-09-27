@@ -10,7 +10,7 @@ Rectangle {
     Rectangle {
         anchors.fill: parent
         color: Colors.surface
-        radius: Config.theme.roundness
+        radius: Config.roundness + 4
 
         Text {
             anchors.centerIn: parent

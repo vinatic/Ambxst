@@ -168,13 +168,6 @@ NotchAnimationBehavior {
                         }
 
                         onClicked: stack.navigateToTab(index)
-
-                        Behavior on scale {
-                            NumberAnimation {
-                                duration: Config.animDuration / 2
-                                easing.type: Easing.OutCubic
-                            }
-                        }
                     }
                 }
             }
@@ -227,7 +220,6 @@ NotchAnimationBehavior {
                     }
                 }
 
-                // Transiciones personalizadas para swipe vertical con scale y opacity
                 pushEnter: Transition {
                     PropertyAnimation {
                         property: "y"
@@ -242,14 +234,6 @@ NotchAnimationBehavior {
                         to: 1
                         duration: Config.animDuration
                         easing.type: Easing.OutQuart
-                    }
-                    PropertyAnimation {
-                        property: "scale"
-                        from: 0.8
-                        to: 1.0
-                        duration: Config.animDuration
-                        easing.type: Easing.OutBack
-                        easing.overshoot: 1.2
                     }
                 }
 
@@ -268,14 +252,6 @@ NotchAnimationBehavior {
                         duration: Config.animDuration
                         easing.type: Easing.OutQuart
                     }
-                    PropertyAnimation {
-                        property: "scale"
-                        from: 1.0
-                        to: 0.8
-                        duration: Config.animDuration
-                        easing.type: Easing.OutBack
-                        easing.overshoot: 1.2
-                    }
                 }
 
                 popEnter: Transition {
@@ -293,14 +269,6 @@ NotchAnimationBehavior {
                         duration: Config.animDuration
                         easing.type: Easing.OutQuart
                     }
-                    PropertyAnimation {
-                        property: "scale"
-                        from: 0.8
-                        to: 1.0
-                        duration: Config.animDuration
-                        easing.type: Easing.OutBack
-                        easing.overshoot: 1.2
-                    }
                 }
 
                 popExit: Transition {
@@ -317,14 +285,6 @@ NotchAnimationBehavior {
                         to: 0
                         duration: Config.animDuration
                         easing.type: Easing.OutQuart
-                    }
-                    PropertyAnimation {
-                        property: "scale"
-                        from: 1.0
-                        to: 0.8
-                        duration: Config.animDuration
-                        easing.type: Easing.OutBack
-                        easing.overshoot: 1.2
                     }
                 }
 

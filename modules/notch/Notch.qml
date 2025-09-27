@@ -72,8 +72,8 @@ Item {
 
         topLeftRadius: Config.notchTheme === "default" ? 0 : (Config.notchTheme === "island" ? islandRadius : 0)
         topRightRadius: Config.notchTheme === "default" ? 0 : (Config.notchTheme === "island" ? islandRadius : 0)
-        bottomLeftRadius: defaultRadius
-        bottomRightRadius: defaultRadius
+        bottomLeftRadius: Config.notchTheme === "island" ? islandRadius : defaultRadius
+        bottomRightRadius: Config.notchTheme === "island" ? islandRadius : defaultRadius
         clip: true
 
         // MouseArea para hover en todo el notch cuando hay notificaciones
