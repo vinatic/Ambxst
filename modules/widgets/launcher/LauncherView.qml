@@ -88,7 +88,7 @@ Item {
                 id: tabHighlight
                 width: parent.width
                 radius: Config.roundness > 0 ? Config.roundness + 4 : 0
-                color: Colors.adapter.primary
+                color: Colors.primary
                 z: 0
 
                 property real idx1: root.state.currentTab
@@ -136,7 +136,7 @@ Item {
 
                         contentItem: Text {
                             text: parent.text
-                            color: root.state.currentTab === index ? Colors.adapter.overPrimary : Colors.adapter.overBackground
+                            color: root.state.currentTab === index ? Colors.overPrimary : Colors.overBackground
                             font.family: Icons.font
                             font.pixelSize: 20
                             font.weight: Font.Medium

@@ -44,9 +44,9 @@ Menu {
     property int menuRadius: Config.roundness
     
     // Propiedades de highlight por defecto
-    property color defaultHighlightColor: Colors.adapter.primary
-    property color defaultTextColor: Colors.adapter.overPrimary
-    property color normalTextColor: Colors.adapter.overBackground
+    property color defaultHighlightColor: Colors.primary
+    property color defaultTextColor: Colors.overPrimary
+    property color normalTextColor: Colors.overBackground
     
     // Propiedades internas
     property int hoveredIndex: -1

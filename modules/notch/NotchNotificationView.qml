@@ -151,7 +151,7 @@ Item {
                         text: Icons.caretDoubleDown
                         font.family: Icons.font
                         font.pixelSize: 16
-                        color: dashboardAccessMouse.containsMouse ? Colors.adapter.overBackground : Colors.adapter.surfaceBright
+                        color: dashboardAccessMouse.containsMouse ? Colors.overBackground : Colors.surfaceBright
 
                         Behavior on color {
                             ColorAnimation {
@@ -424,7 +424,7 @@ Item {
                                                     font.family: Config.theme.font
                                                     font.pixelSize: Config.theme.fontSize
                                                     font.weight: Font.Bold
-                                                    color: Colors.adapter.primary
+                                                    color: Colors.primary
                                                     elide: Text.ElideRight
                                                     maximumLineCount: 1
                                                     wrapMode: Text.NoWrap
@@ -438,7 +438,7 @@ Item {
                                                     font.family: Config.theme.font
                                                     font.pixelSize: Config.theme.fontSize
                                                     font.weight: Font.Bold
-                                                    color: Colors.adapter.outline
+                                                    color: Colors.outline
                                                     elide: Text.ElideRight
                                                     maximumLineCount: 1
                                                     wrapMode: Text.NoWrap
@@ -454,7 +454,7 @@ Item {
                                                 font.family: Config.theme.font
                                                 font.pixelSize: Config.theme.fontSize
                                                 font.weight: Font.Bold
-                                                color: Colors.adapter.outline
+                                                color: Colors.outline
                                                 verticalAlignment: Text.AlignVCenter
                                                 visible: text !== ""
                                                 anchors.verticalCenter: parent.verticalCenter
@@ -467,7 +467,7 @@ Item {
                                             font.family: Config.theme.font
                                             font.pixelSize: Config.theme.fontSize
                                             font.weight: Font.Normal
-                                            color: Colors.adapter.overBackground
+                                            color: Colors.overBackground
                                             wrapMode: hovered ? Text.Wrap : Text.NoWrap
                                             maximumLineCount: hovered ? 3 : 1
                                             elide: Text.ElideRight
@@ -492,7 +492,7 @@ Item {
                                             hoverEnabled: true
 
                                             background: Rectangle {
-                                                color: parent.pressed ? Colors.adapter.error : (parent.hovered ? Colors.surfaceBright : Colors.surface)
+                                                color: parent.pressed ? Colors.error : (parent.hovered ? Colors.surfaceBright : Colors.surface)
                                                 radius: Config.roundness > 0 ? Config.roundness + 4 : 0
 
                                                 Behavior on color {
@@ -506,7 +506,7 @@ Item {
                                                 text: Icons.cancel
                                                 font.family: Icons.font
                                                 font.pixelSize: 20
-                                                color: parent.pressed ? Colors.adapter.overError : (parent.hovered ? Colors.adapter.overBackground : Colors.adapter.error)
+                                                color: parent.pressed ? Colors.overError : (parent.hovered ? Colors.overBackground : Colors.error)
                                                 horizontalAlignment: Text.AlignHCenter
                                                 verticalAlignment: Text.AlignVCenter
 
@@ -555,7 +555,7 @@ Item {
                                             // Ya no necesita gestionar anyButtonHovered porque mouseArea principal maneja el hover
 
                                             background: Rectangle {
-                                                color: parent.pressed ? Colors.adapter.primary : (parent.hovered ? Colors.surfaceBright : Colors.surface)
+                                                color: parent.pressed ? Colors.primary : (parent.hovered ? Colors.surfaceBright : Colors.surface)
                                                 radius: Config.roundness > 0 ? Config.roundness + 4 : 0
 
                                                 Behavior on color {
@@ -568,7 +568,7 @@ Item {
                                             contentItem: Text {
                                                 text: parent.text
                                                 font: parent.font
-                                                color: parent.pressed ? Colors.adapter.overPrimary : (parent.hovered ? Colors.adapter.primary : Colors.adapter.overBackground)
+                                                color: parent.pressed ? Colors.overPrimary : (parent.hovered ? Colors.primary : Colors.overBackground)
                                                 horizontalAlignment: Text.AlignHCenter
                                                 verticalAlignment: Text.AlignVCenter
                                                 elide: Text.ElideRight
@@ -643,7 +643,7 @@ Item {
                             width: 8
                             height: 8
                             radius: 4
-                            color: index === root.currentIndex ? Colors.adapter.primary : Colors.surfaceBright
+                            color: index === root.currentIndex ? Colors.primary : Colors.surfaceBright
 
                             Behavior on color {
                                 ColorAnimation {

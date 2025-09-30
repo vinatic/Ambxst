@@ -15,7 +15,7 @@ Rectangle {
         shadowHorizontalOffset: 0
         shadowVerticalOffset: 0
         shadowBlur: 1
-        shadowColor: Colors.adapter.shadow
+        shadowColor: Colors.shadow
         shadowOpacity: Config.theme.shadowOpacity
     }
 }

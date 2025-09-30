@@ -80,7 +80,7 @@ Item {
         height: contentColumn.implicitHeight + padding * 2
         radius: 8
         visible: root.isValid
-        color: (notificationObject.urgency == NotificationUrgency.Critical) ? Colors.adapter.error : "transparent"
+        color: (notificationObject.urgency == NotificationUrgency.Critical) ? Colors.error : "transparent"
 
         Behavior on height {
             NumberAnimation {
@@ -150,7 +150,7 @@ Item {
                                     font.family: Config.theme.font
                                     font.pixelSize: Config.theme.fontSize
                                     font.weight: Font.Bold
-                                    color: Colors.adapter.primary
+                                    color: Colors.primary
                                     elide: Text.ElideRight
                                     maximumLineCount: 1
                                     wrapMode: Text.NoWrap
@@ -164,7 +164,7 @@ Item {
                                     font.family: Config.theme.font
                                     font.pixelSize: Config.theme.fontSize
                                     font.weight: Font.Bold
-                                    color: Colors.adapter.outline
+                                    color: Colors.outline
                                     elide: Text.ElideRight
                                     maximumLineCount: 1
                                     wrapMode: Text.NoWrap
@@ -180,7 +180,7 @@ Item {
                                 font.family: Config.theme.font
                                 font.pixelSize: Config.theme.fontSize
                                 font.weight: Font.Bold
-                                color: Colors.adapter.outline
+                                color: Colors.outline
                                 verticalAlignment: Text.AlignVCenter
                                 visible: text !== ""
                                 Layout.alignment: Qt.AlignVCenter
@@ -192,7 +192,7 @@ Item {
                              text: notificationObject ? processNotificationBody(notificationObject.body, notificationObject.appName) : ""
                              font.family: Config.theme.font
                              font.pixelSize: Config.theme.fontSize
-                             color: Colors.adapter.overBackground
+                             color: Colors.overBackground
                              wrapMode: onlyNotification ? Text.Wrap : Text.NoWrap
                              maximumLineCount: onlyNotification ? 3 : 1
                              elide: Text.ElideRight
@@ -214,7 +214,7 @@ Item {
                         visible: onlyNotification
 
                         background: Rectangle {
-                            color: parent.pressed ? Colors.adapter.error : (parent.hovered ? Colors.surfaceBright : Colors.surface)
+                            color: parent.pressed ? Colors.error : (parent.hovered ? Colors.surfaceBright : Colors.surface)
                             radius: Config.roundness > 0 ? Config.roundness + 4 : 0
 
                             Behavior on color {
@@ -228,7 +228,7 @@ Item {
                             text: Icons.cancel
                             font.family: Icons.font
                             font.pixelSize: 16
-                            color: parent.pressed ? Colors.adapter.overError : (parent.hovered ? Colors.adapter.overBackground : Colors.adapter.error)
+                            color: parent.pressed ? Colors.overError : (parent.hovered ? Colors.overBackground : Colors.error)
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
 
@@ -293,7 +293,7 @@ Item {
                                     font.family: Config.theme.font
                                     font.pixelSize: Config.theme.fontSize
                                     font.weight: Font.Bold
-                                    color: Colors.adapter.primary
+                                    color: Colors.primary
                                     elide: Text.ElideRight
                                 }
 
@@ -302,7 +302,7 @@ Item {
                                     text: processNotificationBody(notificationObject.body || "")
                                     font.family: Config.theme.font
                                     font.pixelSize: root.fontSize
-                                    color: Colors.adapter.overBackground
+                                    color: Colors.overBackground
                                     wrapMode: Text.Wrap
                                     maximumLineCount: 3
                                     elide: Text.ElideRight
@@ -322,7 +322,7 @@ Item {
                                 font.family: Config.theme.font
                                 font.pixelSize: Config.theme.fontSize
                                 font.weight: Font.Bold
-                                color: Colors.adapter.primary
+                                color: Colors.primary
                                 elide: Text.ElideRight
                             }
 
@@ -331,7 +331,7 @@ Item {
                                 font.family: Config.theme.font
                                 font.pixelSize: Config.theme.fontSize
                                 font.weight: Font.Bold
-                                color: Colors.adapter.outline
+                                color: Colors.outline
                                 visible: notificationObject.body && notificationObject.body.length > 0
                             }
 
@@ -339,7 +339,7 @@ Item {
                                 text: processNotificationBody(notificationObject.body || "").replace(/\n/g, ' ')
                                 font.family: Config.theme.font
                                 font.pixelSize: root.fontSize
-                                color: Colors.adapter.overBackground
+                                color: Colors.overBackground
                                 wrapMode: Text.NoWrap
                                 elide: Text.ElideRight
                                 Layout.fillWidth: true
@@ -361,7 +361,7 @@ Item {
                         visible: expanded
 
                         background: Rectangle {
-                            color: parent.pressed ? Colors.adapter.error : (parent.hovered ? Colors.surfaceBright : Colors.surface)
+                            color: parent.pressed ? Colors.error : (parent.hovered ? Colors.surfaceBright : Colors.surface)
                             radius: Config.roundness > 0 ? Config.roundness + 4 : 0
 
                             Behavior on color {
@@ -375,7 +375,7 @@ Item {
                             text: Icons.cancel
                             font.family: Icons.font
                             font.pixelSize: 16
-                            color: parent.pressed ? Colors.adapter.overError : (parent.hovered ? Colors.adapter.overBackground : Colors.adapter.error)
+                            color: parent.pressed ? Colors.overError : (parent.hovered ? Colors.overBackground : Colors.error)
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
 
@@ -421,7 +421,7 @@ Item {
                             hoverEnabled: true
 
                             background: Rectangle {
-                                color: parent.pressed ? Colors.adapter.primary : (parent.hovered ? Colors.surfaceBright : Colors.surface)
+                                color: parent.pressed ? Colors.primary : (parent.hovered ? Colors.surfaceBright : Colors.surface)
                                 radius: Config.roundness > 0 ? Config.roundness + 4 : 0
 
                                 Behavior on color {
@@ -434,7 +434,7 @@ Item {
                             contentItem: Text {
                                 text: parent.text
                                 font: parent.font
-                                color: parent.pressed ? Colors.adapter.overPrimary : (parent.hovered ? Colors.adapter.primary : Colors.adapter.overBackground)
+                                color: parent.pressed ? Colors.overPrimary : (parent.hovered ? Colors.primary : Colors.overBackground)
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
                                 elide: Text.ElideRight

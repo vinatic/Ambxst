@@ -156,7 +156,7 @@ Item {
                 easing.type: Easing.OutQuad
             }
         }
-        color: Colors.adapter.primary
+        color: Colors.primary
         anchors.verticalCenter: parent.verticalCenter
 
         property real idx1: workspaceIndexInGroup
@@ -228,7 +228,7 @@ Item {
                         font.pixelSize: Styling.fontSize - ((text.length - 1) * (text !== "10") * 2)
                         text: `${button.workspaceValue}`
                         elide: Text.ElideRight
-                        color: (monitor?.activeWorkspace?.id == button.workspaceValue) ? Colors.background : (workspaceOccupied[index] ? Colors.adapter.overBackground : Colors.adapter.overSecondaryFixedVariant)
+                        color: (monitor?.activeWorkspace?.id == button.workspaceValue) ? Colors.background : (workspaceOccupied[index] ? Colors.overBackground : Colors.overSecondaryFixedVariant)
 
                         Behavior on opacity {
                             NumberAnimation {
@@ -244,7 +244,7 @@ Item {
                         width: workspaceButtonWidth * 0.2
                         height: width
                         radius: width / 2
-                        color: (monitor?.activeWorkspace?.id == button.workspaceValue) ? Colors.background : (workspaceOccupied[index] ? Colors.adapter.overBackground : Colors.adapter.overSecondaryFixedVariant)
+                        color: (monitor?.activeWorkspace?.id == button.workspaceValue) ? Colors.background : (workspaceOccupied[index] ? Colors.overBackground : Colors.overSecondaryFixedVariant)
 
                         Behavior on opacity {
                             NumberAnimation {

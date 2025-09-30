@@ -10,7 +10,7 @@ QtObject {
     property Process hyprctlProcess: Process {}
 
     function getColorValue(colorName) {
-        return Colors.adapter[colorName] || Colors.adapter.primary;
+        return Colors[colorName] || Colors.primary;
     }
 
     function formatColorForHyprland(color) {

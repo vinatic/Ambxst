@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Quickshell.Widgets
 import qs.modules.theme
 import qs.modules.services
 import qs.modules.notifications
@@ -25,7 +26,7 @@ Rectangle {
             Text {
                 anchors.centerIn: parent
                 text: "Widgets"
-                color: Colors.adapter.overSurfaceVariant
+                color: Colors.overSurfaceVariant
                 font.family: Config.theme.font
                 font.pixelSize: 16
                 font.weight: Font.Medium
@@ -33,7 +34,7 @@ Rectangle {
         }
 
         // Right panel - Notification history
-        Rectangle {
+        ClippingRectangle {
             Layout.preferredWidth: 340
             Layout.fillHeight: true
             color: Colors.surface

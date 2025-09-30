@@ -440,7 +440,7 @@ Rectangle {
                 radius: searchInput.radius
                 color: {
                     if (root.clearButtonConfirmState) {
-                        return Colors.adapter.error;
+                        return Colors.error;
                     } else if (root.clearButtonFocused || clearButtonMouseArea.containsMouse) {
                         return Colors.surfaceBright;
                     } else {
@@ -498,7 +498,7 @@ Rectangle {
                         text: root.clearButtonConfirmState ? Icons.xeyes : Icons.broom
                         font.family: Icons.font
                         font.pixelSize: 20
-                        color: root.clearButtonConfirmState ? Colors.adapter.overError : Colors.adapter.primary
+                        color: root.clearButtonConfirmState ? Colors.overError : Colors.primary
                         horizontalAlignment: Text.AlignHCenter
 
                         Behavior on color {
@@ -515,7 +515,7 @@ Rectangle {
                         font.family: Config.theme.font
                         font.weight: Font.Bold
                         font.pixelSize: Config.theme.fontSize
-                        color: Colors.adapter.overError
+                        color: Colors.overError
                         opacity: root.clearButtonConfirmState ? 1.0 : 0.0
                         visible: opacity > 0
 
@@ -619,7 +619,7 @@ Rectangle {
                             id: emojiText
                             anchors.centerIn: parent
                             text: modelData.emoji
-                            color: Colors.adapter.overBackground
+                            color: Colors.overBackground
                             font.pixelSize: 24
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
@@ -627,7 +627,7 @@ Rectangle {
                     }
 
                     highlight: Rectangle {
-                        color: Colors.adapter.primary
+                        color: Colors.primary
                         radius: Config.roundness > 0 ? Config.roundness + 4 : 0
                         visible: root.isRecentFocused
                     }
@@ -690,7 +690,7 @@ Rectangle {
                             Layout.preferredWidth: emojiIcon.implicitWidth + 6 // Ancho variable basado en el emoji
                             Layout.preferredHeight: 32
                             radius: Config.roundness > 0 ? Config.roundness - 4 : 0
-                            color: root.selectedIndex === index && !root.isRecentFocused ? Colors.adapter.overPrimary : Colors.surface
+                            color: root.selectedIndex === index && !root.isRecentFocused ? Colors.overPrimary : Colors.surface
 
                             Behavior on color {
                                 ColorAnimation {
@@ -702,7 +702,7 @@ Rectangle {
                             Text {
                                 id: emojiIcon
                                 anchors.centerIn: parent
-                                color: root.selectedIndex === index && !root.isRecentFocused ? Colors.adapter.overPrimary : Colors.adapter.overBackground
+                                color: root.selectedIndex === index && !root.isRecentFocused ? Colors.overPrimary : Colors.overBackground
                                 // Layout.preferredWidth: implicitWidth + 8 // Ancho variable basado en el emoji
                                 // Layout.preferredHeight: 32
                                 text: modelData.emoji
@@ -715,7 +715,7 @@ Rectangle {
                         Text {
                             Layout.fillWidth: true
                             text: modelData.search
-                            color: root.selectedIndex === index && !root.isRecentFocused ? Colors.adapter.overPrimary : Colors.adapter.overBackground
+                            color: root.selectedIndex === index && !root.isRecentFocused ? Colors.overPrimary : Colors.overBackground
                             font.family: Config.theme.font
                             font.weight: Font.Bold
                             font.pixelSize: Config.theme.fontSize
@@ -732,7 +732,7 @@ Rectangle {
                 }
 
                 highlight: Rectangle {
-                    color: Colors.adapter.primary
+                    color: Colors.primary
                     radius: Config.roundness > 0 ? Config.roundness + 4 : 0
                     visible: root.selectedIndex >= 0 && !root.isRecentFocused
                 }

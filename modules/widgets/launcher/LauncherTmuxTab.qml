@@ -601,8 +601,8 @@ Rectangle {
                         {
                             text: "Rename",
                             icon: Icons.edit,
-                            highlightColor: Colors.adapter.secondary,
-                            textColor: Colors.adapter.overSecondary,
+                            highlightColor: Colors.secondary,
+                            textColor: Colors.overSecondary,
                             onTriggered: function () {
                                 root.enterRenameMode(modelData.name);
                             }
@@ -610,8 +610,8 @@ Rectangle {
                         {
                             text: "Quit",
                             icon: Icons.alert,
-                            highlightColor: Colors.adapter.errorContainer,
-                            textColor: Colors.adapter.error,
+                            highlightColor: Colors.errorContainer,
+                            textColor: Colors.error,
                             onTriggered: function () {
                                 root.enterDeleteMode(modelData.name);
                             }
@@ -650,7 +650,7 @@ Rectangle {
 
                         Rectangle {
                         id: renameHighlight
-                        color: Colors.adapter.overSecondary
+                        color: Colors.overSecondary
                         radius: Config.roundness > 4 ? Config.roundness - 4 : 0
                         visible: isInRenameMode
                         z: 0
@@ -700,7 +700,7 @@ Rectangle {
                             color: "transparent"
                             radius: 6
                             border.width: 0
-                            border.color: Colors.adapter.outline
+                            border.color: Colors.outline
                             z: 1
 
                             property bool isHighlighted: root.renameButtonIndex === 0
@@ -718,7 +718,7 @@ Rectangle {
                             Text {
                                 anchors.centerIn: parent
                                 text: Icons.cancel
-                                color: renameCancelButton.isHighlighted ? Colors.adapter.secondary : Colors.adapter.overSecondary
+                                color: renameCancelButton.isHighlighted ? Colors.secondary : Colors.overSecondary
                                 font.pixelSize: 14
                                 font.family: Icons.font
 
@@ -754,7 +754,7 @@ Rectangle {
                             Text {
                                 anchors.centerIn: parent
                                 text: Icons.accept
-                                color: renameConfirmButton.isHighlighted ? Colors.adapter.secondary : Colors.adapter.overSecondary
+                                color: renameConfirmButton.isHighlighted ? Colors.secondary : Colors.overSecondary
                                 font.pixelSize: 14
                                 font.family: Icons.font
 
@@ -788,13 +788,13 @@ Rectangle {
                         Layout.preferredHeight: 32
                         color: {
                             if (isInDeleteMode) {
-                                return Colors.adapter.overError;
+                                return Colors.overError;
                             } else if (isInRenameMode) {
-                                return Colors.adapter.overSecondary;
+                                return Colors.overSecondary;
                             } else if (root.selectedIndex === index) {
-                                return Colors.adapter.overPrimary;
+                                return Colors.overPrimary;
                             } else if (modelData.isCreateButton) {
-                                return Colors.adapter.primary;
+                                return Colors.primary;
                             } else {
                                 return Colors.surface;
                             }
@@ -823,15 +823,15 @@ Rectangle {
                             }
                             color: {
                                 if (isInDeleteMode) {
-                                    return Colors.adapter.error;
+                                    return Colors.error;
                                 } else if (isInRenameMode) {
-                                    return Colors.adapter.secondary;
+                                    return Colors.secondary;
                                 } else if (root.selectedIndex === index) {
-                                    return Colors.adapter.primary;
+                                    return Colors.primary;
                                 } else if (modelData.isCreateButton) {
                                     return Colors.background;
                                 } else {
-                                    return Colors.adapter.overSurface;
+                                    return Colors.overSurface;
                                 }
                             }
                             font.family: Icons.font
@@ -871,7 +871,7 @@ Rectangle {
                                         return modelData.name;
                                     }
                                 }
-                                color: isInDeleteMode ? Colors.adapter.overError : (root.selectedIndex === index ? Colors.adapter.overPrimary : Colors.adapter.overBackground)
+                                color: isInDeleteMode ? Colors.overError : (root.selectedIndex === index ? Colors.overPrimary : Colors.overBackground)
                                 font.family: Config.theme.font
                                 font.pixelSize: Config.theme.fontSize
                                 font.weight: isInDeleteMode ? Font.Bold : (modelData.isCreateButton ? Font.Medium : Font.Bold)
@@ -890,9 +890,9 @@ Rectangle {
                             id: renameTextInput
                             TextField {
                                 text: root.newSessionName
-                                color: Colors.adapter.overSecondary
-                                selectionColor: Colors.adapter.overSecondary
-                                selectedTextColor: Colors.adapter.secondary
+                                color: Colors.overSecondary
+                                selectionColor: Colors.overSecondary
+                                selectedTextColor: Colors.secondary
                                 font.family: Config.theme.font
                                 font.pixelSize: Config.theme.fontSize
                                 font.weight: Font.Bold
@@ -958,7 +958,7 @@ Rectangle {
 
                         Rectangle {
                         id: deleteHighlight
-                        color: Colors.adapter.overError
+                        color: Colors.overError
                         radius: Config.roundness > 4 ? Config.roundness - 4 : 0
                         visible: isInDeleteMode
                         z: 0
@@ -1008,7 +1008,7 @@ Rectangle {
                             color: "transparent"
                             radius: 6
                             border.width: 0
-                            border.color: Colors.adapter.outline
+                            border.color: Colors.outline
                             z: 1
 
                             property bool isHighlighted: root.deleteButtonIndex === 0
@@ -1026,7 +1026,7 @@ Rectangle {
                             Text {
                                 anchors.centerIn: parent
                                 text: Icons.cancel
-                                color: cancelButton.isHighlighted ? Colors.adapter.error : Colors.adapter.overError
+                                color: cancelButton.isHighlighted ? Colors.error : Colors.overError
                                 font.pixelSize: 14
                                 font.family: Icons.font
 
@@ -1062,7 +1062,7 @@ Rectangle {
                             Text {
                                 anchors.centerIn: parent
                                 text: Icons.accept
-                                color: confirmButton.isHighlighted ? Colors.adapter.error : Colors.adapter.overError
+                                color: confirmButton.isHighlighted ? Colors.error : Colors.overError
                                 font.pixelSize: 14
                                 font.family: Icons.font
 
@@ -1081,11 +1081,11 @@ Rectangle {
             highlight: Rectangle {
                 color: {
                     if (root.deleteMode) {
-                        return Colors.adapter.error;
+                        return Colors.error;
                     } else if (root.renameMode) {
-                        return Colors.adapter.secondary;
+                        return Colors.secondary;
                     } else {
-                        return Colors.adapter.primary;
+                        return Colors.primary;
                     }
                 }
                 radius: Config.roundness > 0 ? Config.roundness + 4 : 0

@@ -179,13 +179,13 @@ Rectangle {
                 height: parent.height - wallpaperSearchInput.height - 12
                 color: Colors.surface
                 radius: Config.roundness > 0 ? Config.roundness + 4 : 0
-                border.color: Colors.adapter.outline
+                border.color: Colors.outline
                 border.width: 0
 
                 Text {
                     anchors.centerIn: parent
                     text: "Placeholder\nfor future\noptions"
-                    color: Colors.adapter.overSurfaceVariant
+                    color: Colors.overSurfaceVariant
                     font.family: Config.theme.font
                     font.pixelSize: Config.theme.fontSize
                     horizontalAlignment: Text.AlignHCenter
@@ -201,7 +201,7 @@ Rectangle {
             height: parent.height
             color: "transparent"
             radius: Config.roundness > 0 ? Config.roundness + 4 : 0
-            border.color: Colors.adapter.outline
+            border.color: Colors.outline
             border.width: 0
             clip: true
 
@@ -273,7 +273,7 @@ Rectangle {
                             width: parent.width - wallpaperGridContainer.wallpaperMargin * 2
                             height: parent.height - wallpaperGridContainer.wallpaperMargin * 2
                             color: "transparent"
-                            border.color: Colors.adapter.primary
+                            border.color: Colors.primary
                             border.width: 2
                             visible: selectedIndex >= 0
                             radius: Config.roundness > 0 ? Config.roundness + 4 : 0
@@ -335,7 +335,7 @@ Rectangle {
                                                 }
                                                 return "";
                                             }
-                                            color: parent.parent.isCurrentWallpaper ? Colors.adapter.primary : Colors.adapter.overBackground
+                                            color: parent.parent.isCurrentWallpaper ? Colors.primary : Colors.overBackground
                                             font.family: Config.theme.font
                                             font.pixelSize: Config.theme.fontSize
                                             font.weight: Font.Bold
@@ -455,7 +455,7 @@ Rectangle {
                                             anchors.centerIn: parent
                                             text: "⏳"
                                             font.pixelSize: 24
-                                            color: Colors.adapter.overSurfaceVariant
+                                            color: Colors.overSurfaceVariant
                                         }
                                     }
                                 }
@@ -599,7 +599,7 @@ Rectangle {
                             return "🎞️";
                         }
                         font.pixelSize: 24
-                        color: Colors.adapter.overSurfaceVariant
+                        color: Colors.overSurfaceVariant
                     }
                 }
             }
@@ -640,7 +640,7 @@ Rectangle {
                             return "📹";
                         }
                         font.pixelSize: 24
-                        color: Colors.adapter.overSurfaceVariant
+                        color: Colors.overSurfaceVariant
                     }
                 }
             }

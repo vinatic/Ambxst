@@ -101,7 +101,7 @@ NotchAnimationBehavior {
                 id: tabHighlight
                 width: parent.width
                 radius: Config.roundness > 0 ? Config.roundness + 4 : 0
-                color: Colors.adapter.primary
+                color: Colors.primary
                 z: 0
 
                 property real idx1: root.state.currentTab
@@ -150,7 +150,7 @@ NotchAnimationBehavior {
 
                         contentItem: Text {
                             text: parent.text
-                            color: root.state.currentTab === index ? Colors.adapter.overPrimary : Colors.adapter.overBackground
+                            color: root.state.currentTab === index ? Colors.overPrimary : Colors.overBackground
                             // font.family: Config.theme.font
                             font.family: Icons.font
                             // font.pixelSize: Config.theme.fontSize

@@ -465,7 +465,7 @@ Rectangle {
                 radius: searchInput.radius
                 color: {
                     if (root.clearButtonConfirmState) {
-                        return Colors.adapter.error;
+                        return Colors.error;
                     } else if (root.clearButtonFocused || clearButtonMouseArea.containsMouse) {
                         return Colors.surfaceBright;
                     } else {
@@ -523,7 +523,7 @@ Rectangle {
                         text: root.clearButtonConfirmState ? Icons.alert : Icons.trash
                         font.family: Icons.font
                         font.pixelSize: 20
-                        color: root.clearButtonConfirmState ? Colors.adapter.overError : Colors.adapter.primary
+                        color: root.clearButtonConfirmState ? Colors.overError : Colors.primary
                         horizontalAlignment: Text.AlignHCenter
 
                         Behavior on color {
@@ -540,7 +540,7 @@ Rectangle {
                         font.family: Config.theme.font
                         font.weight: Font.Bold
                         font.pixelSize: Config.theme.fontSize
-                        color: Colors.adapter.overError
+                        color: Colors.overError
                         opacity: root.clearButtonConfirmState ? 1.0 : 0.0
                         visible: opacity > 0
 
@@ -590,7 +590,7 @@ Rectangle {
                 ClippingRectangle {
                     anchors.fill: parent
                     color: "transparent"
-                    border.color: root.isImageSectionFocused ? Colors.adapter.primary : Colors.adapter.outline
+                    border.color: root.isImageSectionFocused ? Colors.primary : Colors.outline
                     border.width: 0
                     radius: Config.roundness > 0 ? Config.roundness + 4 : 0
 
@@ -627,11 +627,11 @@ Rectangle {
                             height: width
                             color: {
                                 if (root.imageDeleteMode && modelData.id === root.imageToDelete) {
-                                    return Colors.adapter.overError;
+                                    return Colors.overError;
                                 } else if (root.isImageSectionFocused && root.selectedImageIndex === index) {
-                                    return Colors.adapter.primary;
+                                    return Colors.primary;
                                 } else {
-                                    return Colors.adapter.surface;
+                                    return Colors.surface;
                                 }
                             }
                             radius: Config.roundness > 0 ? Config.roundness + 4 : 0
@@ -771,8 +771,8 @@ Rectangle {
                                         {
                                             text: "Copy",
                                             icon: Icons.copy,
-                                            highlightColor: Colors.adapter.primary,
-                                            textColor: Colors.adapter.overPrimary,
+                                            highlightColor: Colors.primary,
+                                            textColor: Colors.overPrimary,
                                             onTriggered: function () {
                                                 console.log("DEBUG: Copy clicked from Image ContextMenu");
                                                 root.copyToClipboard(modelData.id);
@@ -781,8 +781,8 @@ Rectangle {
                                         {
                                             text: "Delete",
                                             icon: Icons.trash,
-                                            highlightColor: Colors.adapter.overError,
-                                            textColor: Colors.adapter.error,
+                                            highlightColor: Colors.overError,
+                                            textColor: Colors.error,
                                             onTriggered: function () {
                                                 console.log("DEBUG: Delete clicked from Image ContextMenu");
                                                 root.enterImageDeleteMode(modelData.id);
@@ -828,7 +828,7 @@ Rectangle {
                                 // Placeholder cuando la imagen no está disponible
                                 Rectangle {
                                     anchors.fill: parent
-                                    color: Colors.adapter.primary
+                                    color: Colors.primary
                                     radius: Config.roundness > 0 ? Config.roundness - 4 : 0
                                     visible: imagePreview.status !== Image.Ready
 
@@ -837,14 +837,14 @@ Rectangle {
                                         text: Icons.image
                                         font.family: Icons.font
                                         font.pixelSize: 24
-                                        color: Colors.adapter.overPrimary
+                                        color: Colors.overPrimary
                                     }
                                 }
 
                                 // Indicador de carga
                                 Rectangle {
                                     anchors.fill: parent
-                                    color: Colors.adapter.surface
+                                    color: Colors.surface
                                     radius: Config.roundness > 0 ? Config.roundness - 4 : 0
                                     visible: imagePreview.status === Image.Loading
                                     opacity: 0.8
@@ -854,7 +854,7 @@ Rectangle {
                                         text: "..."
                                         font.family: Config.theme.font
                                         font.pixelSize: 16
-                                        color: Colors.adapter.overSurface
+                                        color: Colors.overSurface
                                     }
                                 }
                             }
@@ -863,7 +863,7 @@ Rectangle {
                             Rectangle {
                                 anchors.fill: parent
                                 color: "transparent"
-                                border.color: Colors.adapter.primary
+                                border.color: Colors.primary
                                 border.width: 0
                                 radius: Config.roundness > 0 ? Config.roundness + 4 : 0
 
@@ -887,7 +887,7 @@ Rectangle {
                                 anchors.margins: -36
                                 anchors.bottomMargin: root.imageDeleteMode ? 0 : -36
                                 color: "transparent"
-                                border.color: root.imageDeleteMode ? Colors.adapter.error : Colors.adapter.primary
+                                border.color: root.imageDeleteMode ? Colors.error : Colors.primary
                                 border.width: 40
                                 radius: Config.roundness > 0 ? Config.roundness + 40 : 0
 
@@ -938,7 +938,7 @@ Rectangle {
                                     // Highlight elástico que se estira entre botones
                                     Rectangle {
                                         id: imageDeleteHighlight
-                                        color: Colors.adapter.overError
+                                        color: Colors.overError
                                         radius: Config.roundness > 0 ? Config.roundness - 4 : 0
                                         visible: root.imageDeleteMode
 
@@ -988,7 +988,7 @@ Rectangle {
                                             color: "transparent"
                                             radius: Config.roundness
                                             border.width: 0
-                                            border.color: Colors.adapter.outline
+                                            border.color: Colors.outline
 
                                             property bool isHighlighted: root.imageDeleteButtonIndex === 0
 
@@ -1005,7 +1005,7 @@ Rectangle {
                                             Text {
                                                 anchors.centerIn: parent
                                                 text: Icons.cancel
-                                                color: imageCancelButton.isHighlighted ? Colors.adapter.error : Colors.adapter.overError
+                                                color: imageCancelButton.isHighlighted ? Colors.error : Colors.overError
                                                 font.pixelSize: 16
                                                 font.family: Icons.font
 
@@ -1041,7 +1041,7 @@ Rectangle {
                                             Text {
                                                 anchors.centerIn: parent
                                                 text: Icons.trash
-                                                color: imageConfirmButton.isHighlighted ? Colors.adapter.error : Colors.adapter.overError
+                                                color: imageConfirmButton.isHighlighted ? Colors.error : Colors.overError
                                                 font.pixelSize: 16
                                                 font.family: Icons.font
 
@@ -1098,7 +1098,7 @@ Rectangle {
                 }
 
                 contentItem: Rectangle {
-                    color: Colors.adapter.primary
+                    color: Colors.primary
                     radius: Config.roundness
                 }
 
@@ -1275,7 +1275,7 @@ Rectangle {
                                 // Highlight elástico que se estira entre botones
                                 Rectangle {
                                     id: deleteHighlight
-                                    color: Colors.adapter.overError
+                                    color: Colors.overError
                                     radius: Config.roundness > 4 ? Config.roundness - 4 : 0
                                     visible: mouseArea.isInDeleteMode
                                     z: 0
@@ -1326,7 +1326,7 @@ Rectangle {
                                         color: "transparent"
                                         radius: 6
                                         border.width: 0
-                                        border.color: Colors.adapter.outline
+                                        border.color: Colors.outline
                                         z: 1
 
                                         property bool isHighlighted: root.deleteButtonIndex === 0
@@ -1344,7 +1344,7 @@ Rectangle {
                                         Text {
                                             anchors.centerIn: parent
                                             text: Icons.cancel
-                                            color: cancelButton.isHighlighted ? Colors.adapter.error : Colors.adapter.overError
+                                            color: cancelButton.isHighlighted ? Colors.error : Colors.overError
                                             font.pixelSize: 14
                                             font.family: Icons.font
 
@@ -1381,7 +1381,7 @@ Rectangle {
                                         Text {
                                             anchors.centerIn: parent
                                             text: Icons.accept
-                                            color: confirmButton.isHighlighted ? Colors.adapter.error : Colors.adapter.overError
+                                            color: confirmButton.isHighlighted ? Colors.error : Colors.overError
                                             font.pixelSize: 14
                                             font.family: Icons.font
 
@@ -1430,8 +1430,8 @@ Rectangle {
                                 {
                                     text: "Copy",
                                     icon: Icons.copy,
-                                    highlightColor: Colors.adapter.primary,
-                                    textColor: Colors.adapter.overPrimary,
+                                    highlightColor: Colors.primary,
+                                    textColor: Colors.overPrimary,
                                     onTriggered: function () {
                                         console.log("DEBUG: Copy clicked from ContextMenu");
                                         root.copyToClipboard(modelData.id);
@@ -1440,8 +1440,8 @@ Rectangle {
                                 {
                                     text: "Delete",
                                     icon: Icons.trash,
-                                    highlightColor: Colors.adapter.overError,
-                                    textColor: Colors.adapter.error,
+                                    highlightColor: Colors.overError,
+                                    textColor: Colors.error,
                                     onTriggered: function () {
                                         console.log("DEBUG: Delete clicked from ContextMenu");
                                         root.enterDeleteMode(modelData.id);
@@ -1468,9 +1468,9 @@ Rectangle {
                                 Layout.preferredHeight: 32
                                 color: {
                                     if (mouseArea.isInDeleteMode) {
-                                        return Colors.adapter.overError;
+                                        return Colors.overError;
                                     } else if (root.selectedIndex === index && !root.isImageSectionFocused) {
-                                        return Colors.adapter.overPrimary;
+                                        return Colors.overPrimary;
                                     } else {
                                         return Colors.surface;
                                     }
@@ -1489,11 +1489,11 @@ Rectangle {
                                     text: mouseArea.isInDeleteMode ? Icons.trash : Icons.clip
                                     color: {
                                         if (mouseArea.isInDeleteMode) {
-                                            return Colors.adapter.error;
+                                            return Colors.error;
                                         } else if (root.selectedIndex === index && !root.isImageSectionFocused) {
-                                            return Colors.adapter.primary;
+                                            return Colors.primary;
                                         } else {
-                                            return Colors.adapter.overBackground;
+                                            return Colors.overBackground;
                                         }
                                     }
                                     font.family: Icons.font
@@ -1513,11 +1513,11 @@ Rectangle {
                                 text: mouseArea.isInDeleteMode ? ("Delete \"" + modelData.preview.substring(0, 20) + (modelData.preview.length > 20 ? '...' : '') + "\"?") : modelData.preview
                                 color: {
                                     if (mouseArea.isInDeleteMode) {
-                                        return Colors.adapter.overError;
+                                        return Colors.overError;
                                     } else if (root.selectedIndex === index && !root.isImageSectionFocused) {
-                                        return Colors.adapter.overPrimary;
+                                        return Colors.overPrimary;
                                     } else {
-                                        return Colors.adapter.overBackground;
+                                        return Colors.overBackground;
                                     }
                                 }
                                 font.family: Config.theme.font
@@ -1536,7 +1536,7 @@ Rectangle {
                     }
 
                     highlight: Rectangle {
-                        color: root.deleteMode ? Colors.adapter.error : Colors.adapter.primary
+                        color: root.deleteMode ? Colors.error : Colors.primary
                         radius: Config.roundness > 0 ? Config.roundness + 4 : 0
                         visible: root.selectedIndex >= 0 && !root.isImageSectionFocused && (root.textOptionsMenuOpen ? root.selectedIndex === root.textMenuItemIndex : true)
 
@@ -1588,7 +1588,7 @@ Rectangle {
                         font.family: Config.theme.font
                         font.pixelSize: Config.theme.fontSize + 2
                         font.weight: Font.Bold
-                        color: Colors.adapter.overBackground
+                        color: Colors.overBackground
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
 

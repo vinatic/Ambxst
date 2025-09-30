@@ -22,7 +22,7 @@ BgRect {
         Text {
             id: weatherDisplay
             text: clockContainer.weatherText
-            color: Colors.adapter.overBackground
+            color: Colors.overBackground
             font.pixelSize: Config.theme.fontSize
             font.family: Config.theme.font
             font.bold: true
@@ -31,7 +31,7 @@ BgRect {
 
         Text {
             text: "•"
-            color: Colors.adapter.outline
+            color: Colors.outline
             font.pixelSize: Config.theme.fontSize
             font.family: Config.theme.font
             font.bold: true
@@ -41,7 +41,7 @@ BgRect {
         Text {
             id: timeDisplay
             text: clockContainer.currentTime
-            color: Colors.adapter.overBackground
+            color: Colors.overBackground
             font.pixelSize: Config.theme.fontSize
             font.family: Config.theme.font
             font.bold: true

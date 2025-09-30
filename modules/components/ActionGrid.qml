@@ -83,14 +83,14 @@ FocusScope {
                 // Buscar si algún botón está presionado
                 for (let i = 0; i < repeater.count; i++) {
                     if (repeater.itemAt(i) && repeater.itemAt(i).pressed) {
-                        return Colors.adapter.overPrimary;
+                        return Colors.overPrimary;
                     }
                 }
-                return Colors.adapter.primary;
+                return Colors.primary;
             }
             radius: Config.roundness > 0 ? Config.roundness + 4 : 0
             border.width: 0
-            border.color: Colors.adapter.primary
+            border.color: Colors.primary
             z: 0 // Por debajo de los botones
             visible: repeater.count > 0
 
@@ -187,7 +187,7 @@ FocusScope {
                         text: modelData.icon || ""
                         font.family: Icons.font
                         font.pixelSize: root.iconSize
-                        color: actionButton.pressed ? Colors.adapter.primary : (index === root.currentIndex ? Colors.adapter.overPrimary : Colors.adapter.overBackground)
+                        color: actionButton.pressed ? Colors.primary : (index === root.currentIndex ? Colors.overPrimary : Colors.overBackground)
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
 

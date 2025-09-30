@@ -19,7 +19,7 @@ Item {
     property int workspacesShown: rows * columns
     property real workspaceSpacing: Config.overview.workspaceSpacing
     property real workspacePadding: 8
-    property color activeBorderColor: Colors.adapter.primary
+    property color activeBorderColor: Colors.primary
 
     // Use the screen's monitor instead of focused monitor for multi-monitor support
     property var currentScreen: null  // This will be set from parent
@@ -127,7 +127,7 @@ Item {
                             property int workspaceValue: overviewRoot.workspaceGroup * workspacesShown + rowIndex * overviewRoot.columns + colIndex + 1
                             property color defaultWorkspaceColor: Colors.background
                             property color hoveredWorkspaceColor: Colors.surfaceContainer
-                            property color hoveredBorderColor: Colors.adapter.outline
+                            property color hoveredBorderColor: Colors.outline
                             property bool hoveredWhileDragging: false
 
                             implicitWidth: overviewRoot.workspaceImplicitWidth + workspacePadding

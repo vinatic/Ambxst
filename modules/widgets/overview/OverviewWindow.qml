@@ -116,7 +116,7 @@ Item {
         anchors.fill: parent
         radius: Math.max(0, Config.roundness - workspaceSpacing - 2)
         color: pressed ? Colors.surfaceBright : hovered ? Colors.surface : Colors.background
-        border.color: hovered ? Colors.adapter.primary : Colors.surfaceContainerHighest
+        border.color: hovered ? Colors.primary : Colors.surfaceContainerHighest
         border.width: 2
         visible: !windowPreview.hasContent || !Config.performance.windowPreview || !Config.performance.windowPreview
         clip: true
@@ -172,7 +172,7 @@ Item {
             font.family: Config.theme.font
             font.pixelSize: Math.max(8, Math.min(12, root.targetWindowHeight * 0.1))
             font.weight: Font.Medium
-            color: Colors.adapter.overSurface
+            color: Colors.overSurface
             opacity: root.compactMode ? 0 : 0.8
             width: Math.min(implicitWidth, root.targetWindowWidth - 8)
             elide: Text.ElideRight
@@ -192,7 +192,7 @@ Item {
         anchors.fill: parent
         radius: Math.max(0, Config.roundness - workspaceSpacing - 2)
         color: pressed ? Qt.rgba(Colors.surfaceContainerHighest.r, Colors.surfaceContainerHighest.g, Colors.surfaceContainerHighest.b, 0.5) : hovered ? Qt.rgba(Colors.surfaceContainer.r, Colors.surfaceContainer.g, Colors.surfaceContainer.b, 0.2) : "transparent"
-        border.color: hovered ? Colors.adapter.primary : Colors.surfaceContainerHighest
+        border.color: hovered ? Colors.primary : Colors.surfaceContainerHighest
         border.width: 2
         visible: windowPreview.hasContent && Config.performance.windowPreview
         z: 5
@@ -234,7 +234,7 @@ Item {
         width: 6
         height: 6
         radius: 3
-        color: Colors.adapter.error
+        color: Colors.error
         z: 10
     }
 
@@ -318,7 +318,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         width: tooltipText.implicitWidth + 16
         height: tooltipText.implicitHeight + 8
-        color: Colors.adapter.inverseSurface
+        color: Colors.inverseSurface
         radius: Config.roundness / 2
         opacity: 0.9
         z: 1000
@@ -329,7 +329,7 @@ Item {
             text: `${root.windowData?.title || ""}\n[${root.windowData?.class || ""}]${root.windowData?.xwayland ? " [XWayland]" : ""}`
             font.family: Config.theme.font
             font.pixelSize: 10
-            color: Colors.adapter.inverseOnSurface
+            color: Colors.inverseOnSurface
             horizontalAlignment: Text.AlignHCenter
         }
     }

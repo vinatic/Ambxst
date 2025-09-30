@@ -17,7 +17,7 @@ Button {
     implicitHeight: 36
 
     background: BgRect {
-        color: root.pressed ? Colors.adapter.primary : (root.hovered ? Colors.adapter.surfaceContainerHighest : Colors.background)
+        color: root.pressed ? Colors.primary : (root.hovered ? Colors.surfaceContainerHighest : Colors.background)
     }
 
     contentItem: Text {
@@ -25,7 +25,7 @@ Button {
         textFormat: Text.RichText
         font.family: Icons.font
         font.pixelSize: 20
-        color: root.pressed ? Colors.background : Colors.adapter.primary
+        color: root.pressed ? Colors.background : Colors.primary
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
     }

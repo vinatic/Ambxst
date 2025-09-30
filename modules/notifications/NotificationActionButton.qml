@@ -12,8 +12,8 @@ Button {
     text: buttonText
 
     background: Rectangle {
-        color: root.pressed ? Colors.adapter.primary : (root.hovered ? Colors.surfaceContainerHighest : Colors.surfaceBright)
-        border.color: (root.urgency == NotificationUrgency.Critical) ? Colors.adapter.error : Colors.adapter.outline
+        color: root.pressed ? Colors.primary : (root.hovered ? Colors.surfaceContainerHighest : Colors.surfaceBright)
+        border.color: (root.urgency == NotificationUrgency.Critical) ? Colors.error : Colors.outline
         border.width: 0
         radius: 8
 

@@ -46,17 +46,17 @@ PaneRect {
             text: root.iconText
             font.family: Config.theme.font
             font.pixelSize: 20
-            color: Colors.adapter.primary
+            color: Colors.primary
             visible: root.iconText.length > 0
         }
 
         TextField {
             id: textField
             Layout.fillWidth: true
-            placeholderTextColor: Colors.adapter.outline
+            placeholderTextColor: Colors.outline
             font.family: Config.theme.font
             font.pixelSize: Config.theme.fontSize
-            color: Colors.adapter.overBackground
+            color: Colors.overBackground
             background: null
 
             onTextChanged: {

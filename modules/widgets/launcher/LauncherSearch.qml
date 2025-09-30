@@ -212,7 +212,7 @@ Rectangle {
                         Rectangle {
                             anchors.fill: parent
                             color: "transparent"
-                            border.color: Colors.adapter.outline
+                            border.color: Colors.outline
                             border.width: parent.status === Image.Error ? 1 : 0
                             radius: 4
 
@@ -220,7 +220,7 @@ Rectangle {
                                 anchors.centerIn: parent
                                 text: "?"
                                 visible: parent.parent.status === Image.Error
-                                color: Colors.adapter.overBackground
+                                color: Colors.overBackground
                                 font.family: Config.theme.font
                             }
                         }
@@ -229,7 +229,7 @@ Rectangle {
                     Text {
                         Layout.fillWidth: true
                         text: modelData.name
-                        color: Colors.adapter.overBackground
+                        color: Colors.overBackground
                         font.family: Config.theme.font
                         font.pixelSize: Config.theme.fontSize
                         font.weight: Font.Bold
@@ -239,7 +239,7 @@ Rectangle {
             }
 
             highlight: Rectangle {
-                color: Colors.adapter.primary
+                color: Colors.primary
                 opacity: 0.2
                 radius: Config.roundness > 0 ? Config.roundness + 4 : 0
                 visible: root.selectedIndex >= 0

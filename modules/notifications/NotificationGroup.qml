@@ -212,7 +212,7 @@ Item {
                             text: Icons.info
                             font.family: Icons.font
                             font.pixelSize: 16
-                            color: topRow.showAppName ? Colors.adapter.outline : Colors.adapter.primary
+                            color: topRow.showAppName ? Colors.outline : Colors.primary
                             visible: !groupSmallAppIcon.visible
                         }
 
@@ -224,7 +224,7 @@ Item {
                             font.family: Config.theme.font
                             font.pixelSize: Config.theme.fontSize
                             font.weight: Font.Bold
-                            color: topRow.showAppName ? Colors.adapter.outline : Colors.adapter.primary
+                            color: topRow.showAppName ? Colors.outline : Colors.primary
                         }
                         Text {
                             id: timeText
@@ -233,7 +233,7 @@ Item {
                             text: root.multipleNotifications ? "" : NotificationUtils.getFriendlyNotifTimeString(notificationGroup?.time)
                             font.family: Config.theme.font
                             font.pixelSize: Config.theme.fontSize
-                            color: Colors.adapter.overBackground
+                            color: Colors.overBackground
                             visible: text !== ""
                         }
                     }
