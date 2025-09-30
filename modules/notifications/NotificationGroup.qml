@@ -274,6 +274,7 @@ Item {
                         summary: modelData.summary || ""
                         expanded: root.expanded
                         onlyNotification: root.expanded ? (modelData.notifications ? modelData.notifications.length === 1 : modelData.length === 1) : false
+                        appNameAlreadyShown: root.multipleNotifications
                         opacity: 1
                         visible: true
                         anchors.left: parent?.left

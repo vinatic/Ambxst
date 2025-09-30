@@ -17,6 +17,7 @@ Item {
     property real fontSize: Config.theme.fontSize
     property real padding: onlyNotification || expanded ? 8 : 0
     property bool onlyNotification: false
+    property bool appNameAlreadyShown: false
 
     property var sortedNotifications: notifications.slice().sort((a, b) => a.time - b.time) // antiguo a reciente
     property var latestNotification: sortedNotifications.length > 0 ? sortedNotifications[sortedNotifications.length - 1] : null
@@ -179,7 +180,7 @@ Item {
                                     maximumLineCount: 1
                                     wrapMode: Text.NoWrap
                                     verticalAlignment: Text.AlignVCenter
-                                    visible: text !== ""
+                                    visible: text !== "" && !root.appNameAlreadyShown
                                 }
                             }
 
@@ -193,7 +194,7 @@ Item {
                                 color: Colors.adapter.outline
                                 verticalAlignment: Text.AlignVCenter
                                 visible: text !== ""
-                                Layout.alignment: Qt.AlignVCenter
+                                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                             }
                         }
 
@@ -312,15 +313,15 @@ Item {
                                          elide: Text.ElideRight
                                      }
 
-                                     Text {
-                                         text: latestNotification ? NotificationUtils.getFriendlyNotifTimeString(latestNotification.time) : ""
-                                         font.family: Config.theme.font
-                                         font.pixelSize: Config.theme.fontSize
-                                         font.weight: Font.Bold
-                                         color: Colors.adapter.outline
-                                         visible: text !== ""
-                                         Layout.alignment: Qt.AlignVCenter
-                                     }
+                                      Text {
+                                          text: latestNotification ? NotificationUtils.getFriendlyNotifTimeString(latestNotification.time) : ""
+                                          font.family: Config.theme.font
+                                          font.pixelSize: Config.theme.fontSize
+                                          font.weight: Font.Bold
+                                          color: Colors.adapter.outline
+                                          visible: text !== ""
+                                          Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                                      }
                                  }
 
                                 // Mostrar todos los body ordenados antiguo a reciente con spacing 4
