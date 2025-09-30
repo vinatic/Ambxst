@@ -168,6 +168,9 @@ PanelWindow {
     Component.onCompleted: {
         GlobalStates.wallpaperManager = wallpaper;
 
+        // Verificar si existe wallpapers.json, si no, crear con fallback
+        checkWallpapersJson.running = true;
+
         // Ejecutar script de generación de thumbnails
         thumbnailGeneratorScript.running = true;
 
@@ -229,6 +232,21 @@ PanelWindow {
     Keys.onRightPressed: {
         if (wallpaperPaths.length > 0) {
             nextWallpaper();
+        }
+    }
+
+    Process {
+        id: checkWallpapersJson
+        running: false
+        command: ["test", "-f", Quickshell.cacheDir + "/wallpapers.json"]
+
+        onExited: function (exitCode) {
+            if (exitCode !== 0) {
+                console.log("wallpapers.json does not exist, creating with fallbackDir");
+                wallpaperConfig.adapter.wallPath = fallbackDir;
+            } else {
+                console.log("wallpapers.json exists");
+            }
         }
     }
 
@@ -444,6 +462,8 @@ PanelWindow {
                                 wallpaperConfig.adapter.currentWall = wallpaperPaths[0];
                             }
                             initialLoadCompleted = true;
+                            // Ejecutar Matugen con el primer wallpaper del fallback
+                            runMatugenForCurrentWallpaper();
                         }
                     }
                 }
