@@ -166,24 +166,24 @@ Singleton {
     }
 
     function limitNotificationsPerSummary(notifications) {
-        const groups = {};
+        const groups = new Map();
         // Agrupar por appName y summary
         notifications.forEach(notif => {
             const key = notif.appName + '|' + (notif.summary || '');
-            if (!groups[key]) {
-                groups[key] = [];
+            if (!groups.has(key)) {
+                groups.set(key, []);
             }
-            groups[key].push(notif);
+            groups.get(key).push(notif);
         });
 
         // Limitar cada grupo a 5 notificaciones, manteniendo las más recientes
         const limitedNotifications = [];
-        Object.values(groups).forEach(group => {
+        for (const group of groups.values()) {
             // Ordenar por tiempo descendente (más recientes primero)
             group.sort((a, b) => b.time - a.time);
             // Tomar solo las primeras 5
             limitedNotifications.push(...group.slice(0, 5));
-        });
+        }
 
         return limitedNotifications;
     }
@@ -441,60 +441,64 @@ Singleton {
     // Función para cachear imágenes como base64
     function cacheImageAsBase64(imageUrl, callback) {
         if (!imageUrl || imageUrl.startsWith("data:")) {
-            // Ya es un data URL o URL vacío
             callback(imageUrl);
             return;
         }
 
-        // Solo cachear URLs HTTP/HTTPS, no archivos locales o iconos del sistema
+        // Solo cachear URLs HTTP/HTTPS válidas
         if (!imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) {
-            // Para iconos del sistema (image://) o archivos locales, devolver la URL original
             callback(imageUrl);
             return;
         }
 
-        // Usar XMLHttpRequest para descargar la imagen
+        // Evitar URLs demasiado largas o inválidas
+        if (imageUrl.length > 2048) {
+            callback(imageUrl);
+            return;
+        }
+
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", imageUrl);
+        xhr.open("GET", imageUrl, true);
         xhr.responseType = "arraybuffer";
+        xhr.timeout = 5000; // 5 segundos timeout
 
         xhr.onload = function() {
-            if (xhr.status === 200) {
+            if (xhr.status === 200 && xhr.response) {
                 try {
-                    // Convertir ArrayBuffer a base64
                     var arrayBuffer = xhr.response;
                     var bytes = new Uint8Array(arrayBuffer);
                     var binary = '';
-                    for (var i = 0; i < bytes.byteLength; i++) {
+                    var len = Math.min(bytes.byteLength, 1024 * 1024); // Limitar a 1MB
+                    for (var i = 0; i < len; i++) {
                         binary += String.fromCharCode(bytes[i]);
                     }
                     var base64 = btoa(binary);
 
-                    // Determinar el tipo MIME basado en la URL
-                    var mimeType = "image/png"; // default
-                    if (imageUrl.toLowerCase().includes(".jpg") || imageUrl.toLowerCase().includes(".jpeg")) {
+                    var mimeType = "image/png";
+                    var lowerUrl = imageUrl.toLowerCase();
+                    if (lowerUrl.includes(".jpg") || lowerUrl.includes(".jpeg")) {
                         mimeType = "image/jpeg";
-                    } else if (imageUrl.toLowerCase().includes(".gif")) {
+                    } else if (lowerUrl.includes(".gif")) {
                         mimeType = "image/gif";
-                    } else if (imageUrl.toLowerCase().includes(".webp")) {
+                    } else if (lowerUrl.includes(".webp")) {
                         mimeType = "image/webp";
                     }
 
-                    var dataUrl = "data:" + mimeType + ";base64," + base64;
-                    callback(dataUrl);
+                    callback("data:" + mimeType + ";base64," + base64);
                 } catch (e) {
-                    console.log("Error converting image to base64:", e);
-                    callback(imageUrl); // fallback to original URL
+                    callback(imageUrl);
                 }
             } else {
-                console.log("Failed to download image:", imageUrl, "status:", xhr.status);
-                callback(imageUrl); // fallback to original URL
+                callback(imageUrl);
             }
         };
 
         xhr.onerror = function() {
-            console.log("Error downloading image:", imageUrl);
-            callback(imageUrl); // fallback to original URL
+            callback(imageUrl);
+        };
+
+        xhr.ontimeout = function() {
+            callback(imageUrl);
         };
 
         xhr.send();

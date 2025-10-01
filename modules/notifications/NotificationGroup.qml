@@ -8,7 +8,7 @@ import qs.modules.theme
 import qs.modules.services
 import qs.config
 import "./NotificationAnimation.qml"
-import "./NotificationSummaryGroup.qml"
+import "./NotificationDelegate.qml"
 import "./notification_utils.js" as NotificationUtils
 
 Item {
@@ -265,7 +265,7 @@ Item {
 
                     model: expanded ? root.groupedNotifications : [{ notifications: root.validNotifications, isCompactGroup: true }]
 
-                    delegate: NotificationSummaryGroup {
+                    delegate: NotificationDelegate {
                         required property int index
                         required property var modelData
                         notifications: modelData.notifications || modelData

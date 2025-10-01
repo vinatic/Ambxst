@@ -7,10 +7,14 @@ import qs.modules.theme
 import qs.modules.services
 import qs.config
 import "./NotificationAnimation.qml"
+import "./NotificationAppIcon.qml"
+import "./NotificationDismissButton.qml"
+import "./NotificationActionButtons.qml"
 import "./notification_utils.js" as NotificationUtils
 
 Item {
     id: root
+    property var notificationObject: null
     property var notifications: []
     property string summary: ""
     property bool expanded: false
@@ -19,39 +23,16 @@ Item {
     property bool onlyNotification: false
     property bool appNameAlreadyShown: false
 
+    // Computed properties
     property var sortedNotifications: notifications.slice().sort((a, b) => a.time - b.time) // antiguo a reciente
-    property var latestNotification: sortedNotifications.length > 0 ? sortedNotifications[sortedNotifications.length - 1] : null
-    property var earliestNotification: sortedNotifications.length > 0 ? sortedNotifications[0] : null
-
-    property bool isValid: notifications.length > 0 && latestNotification && (latestNotification.summary !== null && latestNotification.summary.length > 0)
+    property var latestNotification: sortedNotifications.length > 0 ? sortedNotifications[sortedNotifications.length - 1] : notificationObject
+    property var earliestNotification: sortedNotifications.length > 0 ? sortedNotifications[0] : notificationObject
+    property bool multipleNotifications: notifications.length > 1
+    property bool isValid: latestNotification && (latestNotification.summary || latestNotification.body)
 
     signal destroyRequested
 
     implicitHeight: background.height
-
-    function processNotificationBody(body, appName) {
-        if (!body)
-            return "";
-
-        let processedBody = body;
-
-        // Limpiar notificaciones de navegadores basados en Chromium
-        if (appName) {
-            const lowerApp = appName.toLowerCase();
-            const chromiumBrowsers = ["brave", "chrome", "chromium", "vivaldi", "opera", "microsoft edge"];
-
-            if (chromiumBrowsers.some(name => lowerApp.includes(name))) {
-                const lines = body.split('\n\n');
-
-                if (lines.length > 1 && lines[0].startsWith('<a')) {
-                    processedBody = lines.slice(1).join('\n\n');
-                }
-            }
-        }
-
-        // No reemplazar saltos de línea con espacios
-        return processedBody;
-    }
 
     function destroyWithAnimation() {
         notificationAnimation.startDestroy();
@@ -64,9 +45,13 @@ Item {
         parentWidth: root.width
 
         onDestroyFinished: {
-            // Usar discard masivo para mejor rendimiento
-            const ids = root.notifications.map(notif => notif.id);
-            Notifications.discardNotifications(ids);
+            if (root.notifications.length > 0) {
+                // Discard multiple
+                const ids = root.notifications.map(notif => notif.id);
+                Notifications.discardNotifications(ids);
+            } else if (root.notificationObject) {
+                Notifications.discardNotification(root.notificationObject.id);
+            }
         }
     }
 
@@ -191,22 +176,21 @@ Item {
                                 color: Colors.outline
                                 verticalAlignment: Text.AlignVCenter
                                 visible: text !== ""
-                                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                                Layout.alignment: Qt.AlignVCenter
                             }
                         }
 
-                         // Body: mostrar solo el más reciente cuando no expanded
-                         Text {
-                             width: parent.width
-                             text: latestNotification ? processNotificationBody(latestNotification.body, latestNotification.appName) : ""
-                             font.family: Config.theme.font
-                             font.pixelSize: Config.theme.fontSize
-                             color: Colors.overBackground
-                             wrapMode: onlyNotification ? Text.Wrap : Text.NoWrap
-                             maximumLineCount: onlyNotification ? 3 : 1
-                             elide: Text.ElideRight
-                             visible: onlyNotification || text !== ""
-                         }
+                        Text {
+                            width: parent.width
+                            text: latestNotification ? NotificationUtils.processNotificationBody(latestNotification.body, latestNotification.appName) : ""
+                            font.family: Config.theme.font
+                            font.pixelSize: Config.theme.fontSize
+                            color: Colors.overBackground
+                            wrapMode: onlyNotification ? Text.Wrap : Text.NoWrap
+                            maximumLineCount: onlyNotification ? 3 : 1
+                            elide: Text.ElideRight
+                            visible: onlyNotification || text !== ""
+                        }
                     }
                 }
 
@@ -216,41 +200,9 @@ Item {
                     Layout.preferredHeight: 32
                     Layout.alignment: Qt.AlignTop
 
-                    Button {
-                        id: dismissButton
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        visible: onlyNotification
-
-                        background: Rectangle {
-                            color: parent.pressed ? Colors.error : (parent.hovered ? Colors.surfaceBright : Colors.surface)
-                            radius: Config.roundness > 0 ? Config.roundness + 4 : 0
-
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: Config.animDuration
-                                }
-                            }
-                        }
-
-                        contentItem: Text {
-                            text: Icons.cancel
-                            font.family: Icons.font
-                            font.pixelSize: 16
-                            color: parent.pressed ? Colors.overError : (parent.hovered ? Colors.overBackground : Colors.error)
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: Config.animDuration
-                                }
-                            }
-                        }
-
-                        onClicked: {
-                            root.destroyWithAnimation();
-                        }
+                    NotificationDismissButton {
+                        visibleWhen: onlyNotification
+                        onClicked: root.destroyWithAnimation()
                     }
                 }
             }
@@ -290,35 +242,35 @@ Item {
                             spacing: 8
                             visible: expanded
 
-                             Column {
-                                 Layout.fillWidth: true
-                                 spacing: 4
+                            Column {
+                                Layout.fillWidth: true
+                                spacing: 4
 
-                                 // Fila del summary y timestamp
-                                 RowLayout {
-                                     width: parent.width
-                                     spacing: 4
+                                // Fila del summary y timestamp
+                                RowLayout {
+                                    width: parent.width
+                                    spacing: 4
 
-                                     Text {
-                                         Layout.maximumWidth: parent.width * 0.7
-                                         text: latestNotification ? latestNotification.summary : ""
-                                         font.family: Config.theme.font
-                                         font.pixelSize: Config.theme.fontSize
-                                         font.weight: Font.Bold
-                                         color: Colors.primary
-                                         elide: Text.ElideRight
-                                     }
+                                    Text {
+                                        Layout.maximumWidth: parent.width * 0.7
+                                        text: root.summary || (latestNotification ? latestNotification.summary : "")
+                                        font.family: Config.theme.font
+                                        font.pixelSize: Config.theme.fontSize
+                                        font.weight: Font.Bold
+                                        color: Colors.primary
+                                        elide: Text.ElideRight
+                                    }
 
-                                      Text {
-                                          text: latestNotification ? NotificationUtils.getFriendlyNotifTimeString(latestNotification.time) : ""
-                                          font.family: Config.theme.font
-                                          font.pixelSize: Config.theme.fontSize
-                                          font.weight: Font.Bold
-                                          color: Colors.outline
-                                          visible: text !== ""
-                                          Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                                      }
-                                 }
+                                    Text {
+                                        text: latestNotification ? NotificationUtils.getFriendlyNotifTimeString(latestNotification.time) : ""
+                                        font.family: Config.theme.font
+                                        font.pixelSize: Config.theme.fontSize
+                                        font.weight: Font.Bold
+                                        color: Colors.outline
+                                        visible: text !== ""
+                                        Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                                    }
+                                }
 
                                 // Mostrar todos los body ordenados antiguo a reciente con spacing 4
                                 Column {
@@ -330,7 +282,7 @@ Item {
 
                                         Text {
                                             width: parent.width
-                                            text: processNotificationBody(modelData.body || "", modelData.appName)
+                                            text: NotificationUtils.processNotificationBody(modelData.body || "", modelData.appName)
                                             font.family: Config.theme.font
                                             font.pixelSize: root.fontSize
                                             color: Colors.overBackground
@@ -350,15 +302,15 @@ Item {
                             spacing: 4
                             visible: !expanded
 
-                              Text {
-                                  Layout.maximumWidth: parent.width * 0.4
-                                  text: root.summary || (latestNotification ? latestNotification.summary : "")
-                                  font.family: Config.theme.font
-                                  font.pixelSize: Config.theme.fontSize
-                                  font.weight: Font.Bold
-                                  color: Colors.primary
-                                  elide: Text.ElideRight
-                              }
+                            Text {
+                                Layout.maximumWidth: parent.width * 0.4
+                                text: root.summary || (latestNotification ? latestNotification.summary : "")
+                                font.family: Config.theme.font
+                                font.pixelSize: Config.theme.fontSize
+                                font.weight: Font.Bold
+                                color: Colors.primary
+                                elide: Text.ElideRight
+                            }
 
                             Text {
                                 text: "•"
@@ -370,7 +322,7 @@ Item {
                             }
 
                             Text {
-                                text: latestNotification ? processNotificationBody(latestNotification.body || "").replace(/\n/g, ' ') : ""
+                                text: latestNotification ? NotificationUtils.processNotificationBody(latestNotification.body || "").replace(/\n/g, ' ') : ""
                                 font.family: Config.theme.font
                                 font.pixelSize: root.fontSize
                                 color: Colors.overBackground
@@ -379,112 +331,29 @@ Item {
                                 Layout.fillWidth: true
                                 visible: text.length > 0
                             }
-                         }
-                     }
-                 }
-
-                 // Botón de descartar
-                 Item {
-                     Layout.preferredWidth: expanded ? 32 : 0
-                     Layout.minimumWidth: 0
-                     Layout.preferredHeight: 32
-                     Layout.alignment: Qt.AlignTop
-
-                     Button {
-                         anchors.fill: parent
-                         hoverEnabled: true
-                         visible: expanded
-
-                        background: Rectangle {
-                            color: parent.pressed ? Colors.error : (parent.hovered ? Colors.surfaceBright : Colors.surface)
-                            radius: Config.roundness > 0 ? Config.roundness + 4 : 0
-
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: Config.animDuration
-                                }
-                            }
                         }
+                    }
+                }
 
-                        contentItem: Text {
-                            text: Icons.cancel
-                            font.family: Icons.font
-                            font.pixelSize: 16
-                            color: parent.pressed ? Colors.overError : (parent.hovered ? Colors.overBackground : Colors.error)
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
+                // Botón de descartar
+                Item {
+                    Layout.preferredWidth: expanded ? 32 : 0
+                    Layout.minimumWidth: 0
+                    Layout.preferredHeight: 32
+                    Layout.alignment: Qt.AlignTop
 
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: Config.animDuration
-                                }
-                            }
-                        }
-
-                        onClicked: {
-                            root.destroyWithAnimation();
-                        }
+                    NotificationDismissButton {
+                        visibleWhen: expanded
+                        onClicked: root.destroyWithAnimation()
                     }
                 }
             }
 
-            // Botones de acción (solo del último mensaje)
-            Item {
-                id: actionButtonsRow
-                Layout.fillWidth: true
-                implicitHeight: ((onlyNotification || expanded) && latestNotification && latestNotification.actions.length > 0 && !latestNotification.isCached) ? 32 : 0
-                height: implicitHeight
-                clip: true
-
-                RowLayout {
-                    anchors.fill: parent
-                    spacing: 4
-
-                    Repeater {
-                        model: latestNotification ? latestNotification.actions : []
-
-                        Button {
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 32
-
-                            text: modelData.text
-                            font.family: Config.theme.font
-                            font.pixelSize: Config.theme.fontSize
-                            font.weight: Font.Bold
-                            hoverEnabled: true
-
-                            background: Rectangle {
-                                color: parent.pressed ? Colors.primary : (parent.hovered ? Colors.surfaceBright : Colors.surface)
-                                radius: Config.roundness > 0 ? Config.roundness + 4 : 0
-
-                                Behavior on color {
-                                    ColorAnimation {
-                                        duration: Config.animDuration
-                                    }
-                                }
-                            }
-
-                            contentItem: Text {
-                                text: parent.text
-                                font: parent.font
-                                color: parent.pressed ? Colors.overPrimary : (parent.hovered ? Colors.primary : Colors.overBackground)
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                                elide: Text.ElideRight
-
-                                Behavior on color {
-                                    ColorAnimation {
-                                        duration: Config.animDuration
-                                    }
-                                }
-                            }
-
-                            onClicked: {
-                                Notifications.attemptInvokeAction(latestNotification.id, modelData.identifier);
-                            }
-                        }
-                    }
-                }
+            // Botones de acción (para notificaciones individuales o expandidas)
+            NotificationActionButtons {
+                showWhen: (onlyNotification || expanded) && latestNotification && latestNotification.actions.length > 0 && !latestNotification.isCached
+                actions: latestNotification ? latestNotification.actions : []
+                notificationObject: latestNotification
             }
         }
     }
