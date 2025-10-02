@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Qt5Compat.GraphicalEffects
 import Quickshell
 import Quickshell.Services.Notifications
 import qs.modules.theme
@@ -70,15 +71,53 @@ Item {
     Rectangle {
         id: background
         width: parent.width
-        height: contentColumn.implicitHeight + padding * 2
+        height: contentColumn.implicitHeight
         radius: 8
         visible: root.isValid
-        color: (latestNotification && latestNotification.urgency == NotificationUrgency.Critical) ? Colors.error : "transparent"
+        color: "transparent"
 
         Behavior on height {
             NumberAnimation {
                 duration: Config.animDuration
                 easing.type: Easing.OutCubic
+            }
+        }
+
+        Item {
+            anchors.fill: parent
+            visible: latestNotification && latestNotification.urgency == NotificationUrgency.Critical
+            clip: true
+            layer.enabled: true
+            layer.effect: OpacityMask {
+                maskSource: Rectangle {
+                    width: background.width
+                    height: background.height
+                    radius: Config.roundness > 4 ? Config.roundness + 4 : 0
+                }
+            }
+
+            Repeater {
+                model: Math.ceil((parent.width + parent.height) / 8)
+
+                Rectangle {
+                    width: 8
+                    height: parent.height * 3
+                    rotation: -45
+                    color: Colors.overError
+                    opacity: 1
+                    x: ((index * 20) - (animationOffset % 20)) - 20
+                    y: -parent.height
+
+                    property real animationOffset: 0
+
+                    NumberAnimation on animationOffset {
+                        from: 0
+                        to: 20
+                        duration: 1000
+                        loops: Animation.Infinite
+                        running: parent.parent.visible
+                    }
+                }
             }
         }
 
@@ -220,10 +259,10 @@ Item {
 
                     NotificationAppIcon {
                         id: groupedAppIcon
-                        Layout.preferredWidth: expanded ? 48 : 24
-                        Layout.preferredHeight: expanded ? 48 : 24
+                        Layout.preferredWidth: expanded ? 48 : 32
+                        Layout.preferredHeight: expanded ? 48 : 32
                         Layout.alignment: Qt.AlignTop
-                        size: expanded ? 48 : 24
+                        size: expanded ? 48 : 32
                         radius: Config.roundness > 0 ? Config.roundness + 4 : 0
                         visible: latestNotification && (latestNotification.appIcon !== "" || latestNotification.image !== "")
                         appIcon: latestNotification ? (latestNotification.cachedAppIcon || latestNotification.appIcon) : ""

@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Qt5Compat.GraphicalEffects
 import Quickshell
 import Quickshell.Services.Notifications
 import qs.modules.theme
@@ -373,105 +374,189 @@ Item {
                             spacing: hovered ? 8 : 0
 
                             // Contenido principal de la notificación
-                            RowLayout {
-                                id: mainContentRow
+                            Item {
                                 width: parent.width
-                                implicitHeight: Math.max(hovered ? 48 : 32, textColumn.implicitHeight)
-                                height: implicitHeight
-                                spacing: 8
+                                implicitHeight: mainContentRow.implicitHeight
 
-                                // Contenido principal
-                                RowLayout {
-                                    Layout.fillWidth: true
-                                    spacing: 8
-
-                                    // App icon
-                                    NotificationAppIcon {
-                                        id: appIcon
-                                        Layout.preferredWidth: hovered ? 48 : 32
-                                        Layout.preferredHeight: hovered ? 48 : 32
-                                        Layout.alignment: Qt.AlignTop
-                                        size: hovered ? 48 : 32
-                                        radius: Config.roundness > 0 ? Config.roundness + 4 : 0
-                                        visible: notification && (notification.appIcon !== "" || notification.image !== "")
-                                        appIcon: notification ? (notification.cachedAppIcon || notification.appIcon) : ""
-                                        image: notification ? (notification.cachedImage || notification.image) : ""
-                                        summary: notification ? notification.summary : ""
-                                        urgency: notification ? notification.urgency : NotificationUrgency.Normal
+                                Item {
+                                    anchors.fill: parent
+                                    visible: notification && notification.urgency == NotificationUrgency.Critical
+                                    clip: true
+                                    layer.enabled: true
+                                    layer.effect: OpacityMask {
+                                        maskSource: Rectangle {
+                                            width: mainContentRow.width
+                                            height: mainContentRow.height
+                                            radius: Config.roundness > 4 ? Config.roundness + 4 : 0
+                                        }
                                     }
 
-                                    // Textos de la notificación
-                                    Column {
-                                        id: textColumn
-                                        Layout.fillWidth: true
-                                        Layout.alignment: Qt.AlignVCenter
-                                        spacing: hovered ? 4 : 0
+                                    Repeater {
+                                        model: Math.ceil((parent.width + parent.height) / 8)
 
-                                        // Fila del summary, app name y timestamp
-                                        Row {
+                                        Rectangle {
+                                            width: 8
+                                            height: parent.height * 3
+                                            rotation: -45
+                                            color: Colors.overError
+                                            opacity: 1
+                                            x: ((index * 20) - (animationOffset % 20)) - 20
+                                            y: -parent.height
+
+                                            property real animationOffset: 0
+
+                                            NumberAnimation on animationOffset {
+                                                from: 0
+                                                to: 20
+                                                duration: 1000
+                                                loops: Animation.Infinite
+                                                running: parent.parent.visible
+                                            }
+                                        }
+                                    }
+                                }
+
+                                RowLayout {
+                                    id: mainContentRow
+                                    width: parent.width
+                                    implicitHeight: Math.max(hovered ? 48 : 32, textColumn.implicitHeight)
+                                    height: implicitHeight
+                                    spacing: 8
+
+                                    // Contenido principal
+                                    RowLayout {
+                                        Layout.fillWidth: true
+                                        spacing: 8
+
+                                        // App icon
+                                        NotificationAppIcon {
+                                            id: appIcon
+                                            Layout.preferredWidth: hovered ? 48 : 32
+                                            Layout.preferredHeight: hovered ? 48 : 32
+                                            Layout.alignment: Qt.AlignTop
+                                            size: hovered ? 48 : 32
+                                            radius: Config.roundness > 0 ? Config.roundness + 4 : 0
+                                            visible: notification && (notification.appIcon !== "" || notification.image !== "")
+                                            appIcon: notification ? (notification.cachedAppIcon || notification.appIcon) : ""
+                                            image: notification ? (notification.cachedImage || notification.image) : ""
+                                            summary: notification ? notification.summary : ""
+                                            urgency: notification ? notification.urgency : NotificationUrgency.Normal
+                                        }
+
+                                     // Textos de la notificación
+                                    Item {
+                                        Layout.fillWidth: true
+                                        implicitHeight: hovered ? textColumnExpanded.implicitHeight : textRowCollapsed.implicitHeight
+
+                                        Column {
+                                            id: textColumnExpanded
                                             width: parent.width
                                             spacing: 4
+                                            visible: hovered
 
-                                            // Contenedor izquierdo para summary y app name
+                                            // Fila del summary, app name y timestamp
                                             Row {
-                                                width: parent.width - (timestampText.visible ? timestampText.implicitWidth + parent.spacing : 0)
+                                                width: parent.width
                                                 spacing: 4
 
-                                                Text {
-                                                    id: summaryText
-                                                    width: Math.min(implicitWidth, parent.width - (appNameText.visible ? appNameText.width + parent.spacing : 0))
-                                                    text: notification ? notification.summary : ""
-                                                    font.family: Config.theme.font
-                                                    font.pixelSize: Config.theme.fontSize
-                                                    font.weight: Font.Bold
-                                                    color: Colors.primary
-                                                    elide: Text.ElideRight
-                                                    maximumLineCount: 1
-                                                    wrapMode: Text.NoWrap
-                                                    verticalAlignment: Text.AlignVCenter
+                                                // Contenedor izquierdo para summary y app name
+                                                Row {
+                                                    width: parent.width - (timestampText.visible ? timestampText.implicitWidth + parent.spacing : 0)
+                                                    spacing: 4
+
+                                                    Text {
+                                                        id: summaryText
+                                                        width: Math.min(implicitWidth, parent.width - (appNameText.visible ? appNameText.width + parent.spacing : 0))
+                                                        text: notification ? notification.summary : ""
+                                                        font.family: Config.theme.font
+                                                        font.pixelSize: Config.theme.fontSize
+                                                        font.weight: Font.Bold
+                                                        color: Colors.primary
+                                                        elide: Text.ElideRight
+                                                        maximumLineCount: 1
+                                                        wrapMode: Text.NoWrap
+                                                        verticalAlignment: Text.AlignVCenter
+                                                    }
+
+                                                    Text {
+                                                        id: appNameText
+                                                        width: Math.min(implicitWidth, Math.max(60, parent.width * 0.3))
+                                                        text: notification ? "• " + notification.appName : ""
+                                                        font.family: Config.theme.font
+                                                        font.pixelSize: Config.theme.fontSize
+                                                        font.weight: Font.Bold
+                                                        color: Colors.outline
+                                                        elide: Text.ElideRight
+                                                        maximumLineCount: 1
+                                                        wrapMode: Text.NoWrap
+                                                        verticalAlignment: Text.AlignVCenter
+                                                        visible: text !== ""
+                                                    }
                                                 }
 
+                                                // Timestamp a la derecha
                                                 Text {
-                                                    id: appNameText
-                                                    width: Math.min(implicitWidth, Math.max(60, parent.width * 0.3))
-                                                    text: notification ? "• " + notification.appName : ""
+                                                    id: timestampText
+                                                    text: notification ? NotificationUtils.getFriendlyNotifTimeString(notification.time) : ""
                                                     font.family: Config.theme.font
                                                     font.pixelSize: Config.theme.fontSize
                                                     font.weight: Font.Bold
                                                     color: Colors.outline
-                                                    elide: Text.ElideRight
-                                                    maximumLineCount: 1
-                                                    wrapMode: Text.NoWrap
                                                     verticalAlignment: Text.AlignVCenter
                                                     visible: text !== ""
+                                                    anchors.verticalCenter: parent.verticalCenter
                                                 }
                                             }
 
-                                            // Timestamp a la derecha
                                             Text {
-                                                id: timestampText
-                                                text: notification ? NotificationUtils.getFriendlyNotifTimeString(notification.time) : ""
+                                                width: parent.width
+                                                text: notification ? processNotificationBody(notification.body, notification.appName) : ""
+                                                font.family: Config.theme.font
+                                                font.pixelSize: Config.theme.fontSize
+                                                font.weight: Font.Normal
+                                                color: Colors.overBackground
+                                                wrapMode: Text.Wrap
+                                                maximumLineCount: 3
+                                                elide: Text.ElideRight
+                                                visible: text !== ""
+                                            }
+                                        }
+
+                                        RowLayout {
+                                            id: textRowCollapsed
+                                            width: parent.width
+                                            spacing: 4
+                                            visible: !hovered
+
+                                            Text {
+                                                Layout.maximumWidth: parent.width * 0.4
+                                                text: notification ? notification.summary : ""
+                                                font.family: Config.theme.font
+                                                font.pixelSize: Config.theme.fontSize
+                                                font.weight: Font.Bold
+                                                color: Colors.primary
+                                                elide: Text.ElideRight
+                                            }
+
+                                            Text {
+                                                text: "•"
                                                 font.family: Config.theme.font
                                                 font.pixelSize: Config.theme.fontSize
                                                 font.weight: Font.Bold
                                                 color: Colors.outline
-                                                verticalAlignment: Text.AlignVCenter
-                                                visible: text !== ""
-                                                anchors.verticalCenter: parent.verticalCenter
+                                                visible: notification && notification.body && notification.body.length > 0
                                             }
-                                        }
 
-                                        Text {
-                                            width: parent.width
-                                            text: notification ? processNotificationBody(notification.body, notification.appName) : ""
-                                            font.family: Config.theme.font
-                                            font.pixelSize: Config.theme.fontSize
-                                            font.weight: Font.Normal
-                                            color: Colors.overBackground
-                                            wrapMode: hovered ? Text.Wrap : Text.NoWrap
-                                            maximumLineCount: hovered ? 3 : 1
-                                            elide: Text.ElideRight
-                                            visible: hovered || text !== ""
+                                            Text {
+                                                text: notification ? processNotificationBody(notification.body || "").replace(/\n/g, ' ') : ""
+                                                font.family: Config.theme.font
+                                                font.pixelSize: Config.theme.fontSize
+                                                color: Colors.overBackground
+                                                wrapMode: Text.NoWrap
+                                                elide: Text.ElideRight
+                                                Layout.fillWidth: true
+                                                visible: text.length > 0
+                                            }
                                         }
                                     }
                                 }
@@ -517,17 +602,18 @@ Item {
                                                 }
                                             }
 
-                                            onClicked: {
-                                                if (notification) {
-                                                    Notifications.discardNotification(notification.id);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                                             onClicked: {
+                                                 if (notification) {
+                                                     Notifications.discardNotification(notification.id);
+                                                 }
+                                             }
+                                         }
+                                     }
+                                 }
+                                 }
+                             }
 
-                            // Botones de acción (solo visible con hover)
+                             // Botones de acción (solo visible con hover)
                             Item {
                                 id: actionButtonsRow
                                 width: parent.width
