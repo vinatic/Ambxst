@@ -68,7 +68,7 @@ Singleton {
 
             property JsonObject hyprland: JsonObject {
                  property string activeBorderColor: "primary"
-                 property string inactiveBorderColor: "background"
+                 property string inactiveBorderColor: "surface"
                  property int borderSize: 2
                  property int rounding: 16
                  property bool syncRoundness: true
@@ -79,7 +79,7 @@ Singleton {
                  property int gapsIn: 2
                  property int gapsOut: 4
                  property bool shadowEnabled: true
-                 property int shadowRange: 4
+                 property int shadowRange: 8
                  property int shadowRenderPower: 3
                  property bool shadowSharp: false
                  property bool shadowIgnoreWindow: true
@@ -89,17 +89,17 @@ Singleton {
                  property string shadowOffset: "0 0"
                  property real shadowScale: 1.0
                  property bool blurEnabled: true
-                 property int blurSize: 8
-                 property int blurPasses: 1
+                 property int blurSize: 4
+                 property int blurPasses: 2
                  property bool blurIgnoreOpacity: true
                  property bool blurNewOptimizations: true
                  property bool blurXray: false
-                 property real blurNoise: 0.0117
-                 property real blurContrast: 0.8916
-                 property real blurBrightness: 0.8172
-                 property real blurVibrancy: 0.1696
+                 property real blurNoise: 0.0
+                 property real blurContrast: 1.0
+                 property real blurBrightness: 1.0
+                 property real blurVibrancy: 0.0
                  property real blurVibrancyDarkness: 0.0
-                 property bool blurSpecial: false
+                 property bool blurSpecial: true
                  property bool blurPopups: false
                  property real blurPopupsIgnorealpha: 0.2
                  property bool blurInputMethods: false
