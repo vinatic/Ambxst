@@ -12,7 +12,9 @@ Item {
     id: root
     anchors.top: parent.top
 
-    implicitWidth: Math.round(hasActiveNotifications ? (notificationHoverHandler.hovered ? 420 + 48 : 320 + 48) : (root.notchHovered ? 420 : 200 + userInfo.width + separator1.width + separator2.width + notifIndicator.width + (mainRow.spacing * 4) + 32))
+    readonly property real mainRowContentWidth: 200 + userInfo.width + separator1.width + separator2.width + notifIndicator.width + (mainRow.spacing * 4) + 32
+
+    implicitWidth: Math.round(hasActiveNotifications ? Math.max(notificationHoverHandler.hovered ? 420 + 32 : 320 + 32, mainRowContentWidth) : (root.notchHovered ? 420 + 32 : mainRowContentWidth))
     implicitHeight: hasActiveNotifications ? (mainRow.height + (notificationHoverHandler.hovered ? notificationView.implicitHeight + 32 : notificationView.implicitHeight + 16)) : mainRow.height
 
     Behavior on implicitHeight {
@@ -547,27 +549,13 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.top: parent.top
-                anchors.leftMargin: notificationHoverHandler.hovered ? 24 : 24
-                anchors.rightMargin: notificationHoverHandler.hovered ? 24 : 24
+                anchors.leftMargin: 20
+                anchors.rightMargin: 20
                 anchors.bottomMargin: 8
                 opacity: hasActiveNotifications ? 1 : 0
                 notchHovered: notificationHoverHandler.hovered
 
                 Behavior on opacity {
-                    NumberAnimation {
-                        duration: Config.animDuration
-                        easing.type: Easing.OutQuart
-                    }
-                }
-
-                Behavior on anchors.leftMargin {
-                    NumberAnimation {
-                        duration: Config.animDuration
-                        easing.type: Easing.OutQuart
-                    }
-                }
-
-                Behavior on anchors.rightMargin {
                     NumberAnimation {
                         duration: Config.animDuration
                         easing.type: Easing.OutQuart
