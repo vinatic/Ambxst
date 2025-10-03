@@ -58,7 +58,7 @@ PanelWindow {
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.layer: WlrLayer.Top
     mask: Region {
-        item: notchContainer
+        item: notchRegionContainer
     }
 
     Component.onCompleted: {
@@ -107,33 +107,111 @@ PanelWindow {
         NotchNotificationView {}
     }
 
-    // Center notch
-    Notch {
-        id: notchContainer
+    Item {
+        id: notchRegionContainer
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
+        width: Math.max(notchContainer.width, notificationPopupContainer.visible ? notificationPopupContainer.width : 0)
+        height: notchContainer.height + (notificationPopupContainer.visible ? notificationPopupContainer.height + notificationPopupContainer.anchors.topMargin : 0)
 
-        anchors.topMargin: Config.notchTheme === "default" ? 0 : (Config.notchTheme === "island" ? 4 : 0)
+        // Center notch
+        Notch {
+            id: notchContainer
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: parent.top
 
-        layer.enabled: true
-        layer.effect: Shadow {}
+            anchors.topMargin: Config.notchTheme === "default" ? 0 : (Config.notchTheme === "island" ? 4 : 0)
 
-        defaultViewComponent: defaultViewComponent
-        launcherViewComponent: launcherViewComponent
-        dashboardViewComponent: dashboardViewComponent
-        overviewViewComponent: overviewViewComponent
-        powermenuViewComponent: powermenuViewComponent
-        notificationViewComponent: notificationViewComponent
-        visibilities: screenVisibilities
+            layer.enabled: true
+            layer.effect: Shadow {}
 
-        // Handle global keyboard events
-        Keys.onPressed: event => {
-            if (event.key === Qt.Key_Escape && (screenVisibilities.launcher || screenVisibilities.dashboard || screenVisibilities.overview || screenVisibilities.powermenu)) {
-                if (screenVisibilities.launcher) {
-                    GlobalStates.clearLauncherState();
+            defaultViewComponent: defaultViewComponent
+            launcherViewComponent: launcherViewComponent
+            dashboardViewComponent: dashboardViewComponent
+            overviewViewComponent: overviewViewComponent
+            powermenuViewComponent: powermenuViewComponent
+            notificationViewComponent: notificationViewComponent
+            visibilities: screenVisibilities
+
+            // Handle global keyboard events
+            Keys.onPressed: event => {
+                if (event.key === Qt.Key_Escape && (screenVisibilities.launcher || screenVisibilities.dashboard || screenVisibilities.overview || screenVisibilities.powermenu)) {
+                    if (screenVisibilities.launcher) {
+                        GlobalStates.clearLauncherState();
+                    }
+                    Visibilities.setActiveModule("");
+                    event.accepted = true;
                 }
-                Visibilities.setActiveModule("");
-                event.accepted = true;
+            }
+        }
+
+        // Popup de notificaciones debajo del notch
+        BgRect {
+            id: notificationPopupContainer
+            anchors.top: notchContainer.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.topMargin: 4
+            width: Math.round(popupHovered ? 420 + 48 : 320 + 48)
+            height: shouldShowNotificationPopup ? (popupHovered ? notificationPopup.implicitHeight + 48 : notificationPopup.implicitHeight + 32) : 0
+            clip: false
+            visible: height > 0
+            z: 999
+            radius: Config.roundness > 0 ? Config.roundness + 20 : 0
+
+            layer.enabled: true
+            layer.effect: Shadow {}
+
+            property bool popupHovered: false
+
+            readonly property bool shouldShowNotificationPopup: {
+                // Mostrar solo si hay notificaciones y el notch está expandido
+                if (!Notifications.popupList.length || !(screenVisibilities.launcher || screenVisibilities.dashboard || screenVisibilities.overview || screenVisibilities.powermenu)) return false;
+                
+                // NO mostrar si estamos en la pestaña de widgets del dashboard (tab 0)
+                if (screenVisibilities.dashboard) {
+                    return GlobalStates.dashboardCurrentTab !== 0;
+                }
+                
+                return true;
+            }
+
+            Behavior on width {
+                NumberAnimation {
+                    duration: Config.animDuration
+                    easing.type: Easing.OutBack
+                    easing.overshoot: 1.2
+                }
+            }
+
+            Behavior on height {
+                NumberAnimation {
+                    duration: Config.animDuration
+                    easing.type: Easing.OutQuart
+                }
+            }
+
+            HoverHandler {
+                id: popupHoverHandler
+                enabled: notificationPopupContainer.shouldShowNotificationPopup
+
+                onHoveredChanged: {
+                    notificationPopupContainer.popupHovered = hovered;
+                }
+            }
+
+            NotchNotificationView {
+                id: notificationPopup
+                anchors.fill: parent
+                anchors.margins: 16
+                opacity: notificationPopupContainer.shouldShowNotificationPopup ? 1 : 0
+                notchHovered: notificationPopupContainer.popupHovered
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Config.animDuration
+                        easing.type: Easing.OutQuart
+                    }
+                }
             }
         }
     }

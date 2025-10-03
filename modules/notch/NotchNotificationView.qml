@@ -59,6 +59,7 @@ Item {
         anchors.fill: parent
         hoverEnabled: false
         acceptedButtons: Qt.MiddleButton
+        propagateComposedEvents: true
         z: 50
 
         // Navegación con rueda del ratón cuando hay múltiples notificaciones
@@ -83,6 +84,7 @@ Item {
                 }
                 Notifications.discardNotification(currentNotification.id);
             }
+            mouse.accepted = false;
         }
     }
 
