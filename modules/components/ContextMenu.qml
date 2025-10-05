@@ -23,7 +23,7 @@ PanelWindow {
     color: "transparent"
 
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
     exclusiveZone: 0
 
@@ -191,12 +191,14 @@ PanelWindow {
         console.log("Opening context menu");
         menuHandle = handle;
         visible = true;
+        WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive;
         cursorPos.running = true;
     }
 
     function close() {
         console.log("Closing context menu");
         visible = false;
+        WlrLayershell.keyboardFocus = WlrKeyboardFocus.None;
         menuHandle = null;
     }
 
