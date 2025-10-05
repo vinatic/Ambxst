@@ -4,6 +4,7 @@ pragma ComponentBehavior: Bound
 import QtQml.Models
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Services.Mpris
 import qs.config
 
@@ -22,6 +23,67 @@ Singleton {
     }
     property MprisPlayer activePlayer: trackedPlayer ?? filteredPlayers[0] ?? null
 
+    property string cacheFilePath: Quickshell.cacheDir + "/lastPlayer.json"
+    property bool isInitializing: true
+    property string cachedDbusName: ""
+    
+    FileView {
+        id: cacheFile
+        path: root.cacheFilePath
+        onLoaded: root.loadLastPlayer()
+    }
+
+    onFilteredPlayersChanged: {
+        if (root.isInitializing && root.cachedDbusName && root.filteredPlayers.length > 0) {
+            for (const player of root.filteredPlayers) {
+                if (player.dbusName === root.cachedDbusName) {
+                    root.trackedPlayer = player;
+                    root.isInitializing = false;
+                    return;
+                }
+            }
+        }
+    }
+
+    Component.onCompleted: {
+        cacheFile.reload();
+    }
+
+    function loadLastPlayer() {
+        try {
+            const data = cacheFile.text();
+            if (!data) {
+                root.isInitializing = false;
+                return;
+            }
+            
+            const obj = JSON.parse(data);
+            if (obj && obj.dbusName) {
+                root.cachedDbusName = obj.dbusName;
+                for (const player of root.filteredPlayers) {
+                    if (player.dbusName === obj.dbusName) {
+                        root.trackedPlayer = player;
+                        root.isInitializing = false;
+                        return;
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn("Error loading last player:", e);
+            root.isInitializing = false;
+        }
+    }
+
+    function saveLastPlayer() {
+        if (!root.trackedPlayer || root.isInitializing) return;
+        
+        const data = JSON.stringify({
+            dbusName: root.trackedPlayer.dbusName
+        });
+        
+        cacheFile.setText(data);
+    }
+
     Instantiator {
         model: Mpris.players
 
@@ -34,7 +96,7 @@ Singleton {
                 const shouldIgnore = !Config.bar.enableFirefoxPlayer && dbusName.includes("firefox");
                 
                 if (!shouldIgnore && (root.trackedPlayer == null || modelData.isPlaying)) {
-                    root.trackedPlayer = modelData
+                    root.trackedPlayer = modelData;
                 }
             }
 
@@ -101,7 +163,8 @@ Singleton {
     function setActivePlayer(player) {
         const targetPlayer = player ?? Mpris.players[0]
 
-        this.trackedPlayer = targetPlayer
+        this.trackedPlayer = targetPlayer;
+        this.saveLastPlayer();
     }
 
     function cyclePlayer(direction) {
@@ -118,5 +181,6 @@ Singleton {
         }
         
         this.trackedPlayer = players[newIndex];
+        this.saveLastPlayer();
     }
 }
