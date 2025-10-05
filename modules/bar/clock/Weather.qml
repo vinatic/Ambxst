@@ -138,7 +138,8 @@ BgRect {
     function updateWeather() {
         var location = Config.weather.location.trim();
         if (location.length === 0) {
-            weatherContainer.weatherVisible = false;
+            geoipProcess.command = ["curl", "-s", "https://ipapi.co/json/"];
+            geoipProcess.running = true;
             return;
         }
 
@@ -150,11 +151,9 @@ BgRect {
         if (isCoordinates) {
             cachedLat = coords[0].trim();
             cachedLon = coords[1].trim();
-            console.log("Weather: using coordinates", cachedLat + "," + cachedLon);
             fetchWeatherWithCoords(cachedLat, cachedLon);
         } else {
             var encodedCity = urlEncode(location);
-            console.log("Weather: geocoding location '" + location + "' -> '" + encodedCity + "'");
             var geocodeUrl = "https://geocoding-api.open-meteo.com/v1/search?name=" + encodedCity;
             geocodingProcess.command = ["curl", "-s", geocodeUrl];
             geocodingProcess.running = true;
@@ -177,6 +176,39 @@ BgRect {
     }
 
     Process {
+        id: geoipProcess
+        running: false
+        command: []
+
+        stdout: StdioCollector {
+            waitForEnd: true
+            onStreamFinished: {
+                var raw = text.trim();
+                if (raw.length > 0) {
+                    try {
+                        var data = JSON.parse(raw);
+                        if (data.latitude && data.longitude) {
+                            cachedLat = data.latitude.toString();
+                            cachedLon = data.longitude.toString();
+                            fetchWeatherWithCoords(cachedLat, cachedLon);
+                        } else {
+                            weatherContainer.weatherVisible = false;
+                        }
+                    } catch (e) {
+                        weatherContainer.weatherVisible = false;
+                    }
+                }
+            }
+        }
+
+        onExited: function (code) {
+            if (code !== 0) {
+                weatherContainer.weatherVisible = false;
+            }
+        }
+    }
+
+    Process {
         id: geocodingProcess
         running: false
         command: []
@@ -194,11 +226,9 @@ BgRect {
                             cachedLon = result.longitude.toString();
                             fetchWeatherWithCoords(cachedLat, cachedLon);
                         } else {
-                            console.log("Geocoding: no results for location");
                             weatherContainer.weatherVisible = false;
                         }
                     } catch (e) {
-                        console.log("Geocoding JSON parse error:", e);
                         weatherContainer.weatherVisible = false;
                     }
                 }
@@ -207,7 +237,6 @@ BgRect {
 
         onExited: function (code) {
             if (code !== 0) {
-                console.log("Geocoding fetch failed");
                 weatherContainer.weatherVisible = false;
             }
         }
@@ -261,7 +290,6 @@ BgRect {
 
         onExited: function (code) {
             if (code !== 0) {
-                console.log("Weather fetch failed");
                 weatherContainer.weatherVisible = false;
                 if (weatherContainer.weatherRetryCount < weatherContainer.weatherMaxRetries) {
                     weatherContainer.weatherRetryCount++;
