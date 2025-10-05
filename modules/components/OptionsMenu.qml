@@ -96,7 +96,7 @@ Menu {
         // Highlight animado que sigue al hover
         Rectangle {
             id: menuHighlight
-            width: root.menuWidth - 16 // Accounting for padding
+            width: root.menuWidth - 16
             height: root.itemHeight
             color: {
                 if (root.hoveredIndex === -1) return root.defaultHighlightColor;
@@ -107,7 +107,7 @@ Menu {
             visible: {
                 if (root.hoveredIndex === -1) return false;
                 let item = root.items[root.hoveredIndex];
-                return item && item.isSeparator === false;
+                return item && !item.isSeparator;
             }
             opacity: visible ? 1.0 : 0
             
@@ -177,7 +177,7 @@ Menu {
             
             // Manejo del hover - desactivado para separadores
             onHoveredChanged: {
-                if (isSeparatorItem) return; // No hover en separadores
+                if (isSeparatorItem) return;
                 
                 if (hovered) {
                     root.previousHoveredIndex = root.hoveredIndex;
