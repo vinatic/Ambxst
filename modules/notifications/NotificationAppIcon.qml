@@ -25,7 +25,23 @@ ClippingRectangle {
     radius: Config.roundness > 8 ? Config.roundness - 8 : 0
     color: "transparent"
 
-    // Solo mostrar appIcon si existe
+    Rectangle {
+        anchors.fill: parent
+        color: root.urgency == NotificationUrgency.Critical ? Colors.shadow : Colors.surfaceBright
+        border.width: root.urgency == NotificationUrgency.Critical ? 2 : 0
+        border.color: root.urgency == NotificationUrgency.Critical ? Colors.criticalRed : "transparent"
+        radius: root.radius
+        visible: root.image == "" && root.appIcon == ""
+
+        Text {
+            anchors.centerIn: parent
+            text: root.urgency == NotificationUrgency.Critical ? Icons.alert : Icons.bell
+            font.family: Icons.font
+            font.pixelSize: root.size * 0.5
+            color: root.urgency == NotificationUrgency.Critical ? Colors.criticalText : Colors.primary
+        }
+    }
+
     Loader {
         id: appIconLoader
         active: root.image == "" && root.appIcon != ""

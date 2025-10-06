@@ -134,7 +134,6 @@ Item {
                             Layout.alignment: Qt.AlignTop
                             size: onlyNotification ? 48 : 32
                             radius: Config.roundness > 0 ? Config.roundness + 4 : 0
-                            visible: latestNotification && (latestNotification.appIcon !== "" || latestNotification.image !== "")
                             appIcon: latestNotification ? (latestNotification.cachedAppIcon || latestNotification.appIcon) : ""
                             image: latestNotification ? (latestNotification.cachedImage || latestNotification.image) : ""
                             summary: latestNotification ? latestNotification.summary : ""
@@ -251,7 +250,6 @@ Item {
                             Layout.alignment: Qt.AlignTop
                             size: expanded ? 48 : 32
                             radius: Config.roundness > 0 ? Config.roundness + 4 : 0
-                            visible: latestNotification && (latestNotification.appIcon !== "" || latestNotification.image !== "")
                             appIcon: latestNotification ? (latestNotification.cachedAppIcon || latestNotification.appIcon) : ""
                             image: latestNotification ? (latestNotification.cachedImage || latestNotification.image) : ""
                             summary: latestNotification ? latestNotification.summary : ""

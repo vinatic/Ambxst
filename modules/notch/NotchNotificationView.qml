@@ -407,7 +407,6 @@ Item {
                                             Layout.alignment: Qt.AlignTop
                                             size: hovered ? 48 : 32
                                             radius: Config.roundness > 0 ? Config.roundness + 4 : 0
-                                            visible: notification && (notification.appIcon !== "" || notification.image !== "")
                                             appIcon: notification ? (notification.cachedAppIcon || notification.appIcon) : ""
                                             image: notification ? (notification.cachedImage || notification.image) : ""
                                             summary: notification ? notification.summary : ""
