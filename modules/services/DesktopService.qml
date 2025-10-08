@@ -9,9 +9,62 @@ Singleton {
 
     property string desktopDir: ""
     property bool initialLoadComplete: false
+    property string positionsFile: Quickshell.dataPath("desktop-positions.json")
+    property int maxRowsHint: 15
 
     property ListModel items: ListModel {
         id: itemsModel
+    }
+
+    property var iconPositions: ({})
+
+    function savePositions() {
+        var json = JSON.stringify(iconPositions, null, 2);
+        savePositionsProcess.command = ["sh", "-c", "echo '" + json.replace(/'/g, "'\\''") + "' > " + positionsFile];
+        savePositionsProcess.running = true;
+    }
+
+    function loadPositions() {
+        loadPositionsProcess.running = true;
+    }
+
+    function updateIconPosition(path, gridX, gridY) {
+        iconPositions[path] = { x: gridX, y: gridY };
+        savePositions();
+    }
+
+    function getIconPosition(path) {
+        return iconPositions[path] || null;
+    }
+
+    function calculateAutoPosition(index) {
+        var usedPositions = new Set();
+        
+        for (var key in iconPositions) {
+            var pos = iconPositions[key];
+            usedPositions.add(pos.x + "," + pos.y);
+        }
+        
+        var gridX = 0;
+        var gridY = 0;
+        var checked = 0;
+        
+        while (checked <= index) {
+            var posKey = gridX + "," + gridY;
+            if (!usedPositions.has(posKey)) {
+                if (checked === index) {
+                    return { x: gridX, y: gridY };
+                }
+                checked++;
+            }
+            gridY++;
+            if (gridY >= maxRowsHint) {
+                gridY = 0;
+                gridX++;
+            }
+        }
+        
+        return { x: gridX, y: gridY };
     }
 
     function getDesktopDir() {
@@ -76,6 +129,48 @@ Singleton {
     }
 
     Process {
+        id: savePositionsProcess
+        running: false
+        command: []
+
+        stderr: StdioCollector {
+            onStreamFinished: {
+                if (text.length > 0) {
+                    console.warn("Error saving positions:", text);
+                }
+            }
+        }
+    }
+
+    Process {
+        id: loadPositionsProcess
+        running: false
+        command: ["cat", positionsFile]
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim().length > 0) {
+                    try {
+                        root.iconPositions = JSON.parse(text);
+                        console.log("Loaded icon positions:", Object.keys(root.iconPositions).length, "items");
+                    } catch (e) {
+                        console.warn("Error parsing positions file:", e);
+                        root.iconPositions = {};
+                    }
+                } else {
+                    root.iconPositions = {};
+                }
+            }
+        }
+
+        stderr: StdioCollector {
+            onStreamFinished: {
+                root.iconPositions = {};
+            }
+        }
+    }
+
+    Process {
         id: getDesktopDirProcess
         running: false
         command: ["sh", "-c", "echo ${XDG_DESKTOP_DIR:-$HOME/Desktop}"]
@@ -84,6 +179,8 @@ Singleton {
             onStreamFinished: {
                 root.desktopDir = text.trim();
                 console.log("Desktop directory:", root.desktopDir);
+                console.log("Positions file:", root.positionsFile);
+                loadPositions();
                 scanDesktop();
                 directoryWatcher.path = root.desktopDir;
                 directoryWatcher.reload();
@@ -203,12 +300,17 @@ Singleton {
         items.clear();
         for (var i = 0; i < allItems.length; i++) {
             var item = allItems[i];
+            var savedPos = getIconPosition(item.path);
+            var pos = savedPos || calculateAutoPosition(i);
+            
             items.append({
                 name: item.name,
                 path: item.path,
                 type: item.type,
                 icon: item.icon,
-                isDesktopFile: item.isDesktopFile
+                isDesktopFile: item.isDesktopFile,
+                gridX: pos.x,
+                gridY: pos.y
             });
         }
         
@@ -224,6 +326,13 @@ Singleton {
         stdout: StdioCollector {
             onStreamFinished: {
                 var lines = text.split("\n");
+                if (currentDesktopFileIndex >= tempDesktopFiles.length) {
+                    console.warn("Desktop file index out of bounds:", currentDesktopFileIndex);
+                    currentDesktopFileIndex++;
+                    parseNextDesktopFile();
+                    return;
+                }
+                
                 var item = tempDesktopFiles[currentDesktopFileIndex];
                 var name = "";
                 var icon = "application-x-executable";
