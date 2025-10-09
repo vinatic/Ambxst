@@ -11,6 +11,9 @@ PanelWindow {
     id: contextWindow
 
     property var menuHandle: null
+    property var customItems: []
+    property int menuWidth: 160
+    property int itemHeight: 32
 
     anchors {
         top: true
@@ -66,8 +69,8 @@ PanelWindow {
         OptionsMenu {
             id: menu
 
-            menuWidth: 160
-            itemHeight: 32
+            menuWidth: contextWindow.menuWidth
+            itemHeight: contextWindow.itemHeight
 
             function cleanMenuText(text) {
                 if (!text || text === "") return "";
@@ -110,7 +113,26 @@ PanelWindow {
             }
 
             items: {
-                console.log("Building menu items...");
+                if (contextWindow.customItems && contextWindow.customItems.length > 0) {
+                    console.log("Using custom items:", contextWindow.customItems.length);
+                    return contextWindow.customItems.map(item => ({
+                        text: item.text || "",
+                        icon: item.icon || "",
+                        isImageIcon: item.isImageIcon || false,
+                        enabled: item.enabled !== false,
+                        isSeparator: item.isSeparator || false,
+                        highlightColor: item.highlightColor,
+                        textColor: item.textColor,
+                        onTriggered: function() {
+                            if (item.onTriggered) {
+                                item.onTriggered();
+                            }
+                            contextWindow.close();
+                        }
+                    }));
+                }
+
+                console.log("Building menu items from systray...");
                 console.log("menuHandle:", contextWindow.menuHandle);
                 console.log("menuOpener.children:", menuOpener.children);
 
@@ -190,6 +212,18 @@ PanelWindow {
     function openMenu(handle) {
         console.log("Opening context menu");
         menuHandle = handle;
+        customItems = [];
+        visible = true;
+        WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive;
+        cursorPos.running = true;
+    }
+
+    function openCustomMenu(items, width, height) {
+        console.log("Opening custom context menu with", items.length, "items");
+        menuHandle = null;
+        customItems = items;
+        if (width !== undefined) menuWidth = width;
+        if (height !== undefined) itemHeight = height;
         visible = true;
         WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive;
         cursorPos.running = true;
@@ -200,11 +234,13 @@ PanelWindow {
         visible = false;
         WlrLayershell.keyboardFocus = WlrKeyboardFocus.None;
         menuHandle = null;
+        customItems = [];
     }
 
     onVisibleChanged: {
         if (!visible) {
             menuHandle = null;
+            customItems = [];
         }
     }
 
