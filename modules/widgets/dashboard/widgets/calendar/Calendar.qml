@@ -172,6 +172,7 @@ PaneRect {
                     Layout.rightMargin: 8
                     Layout.preferredHeight: 2
                     color: Colors.surface
+                    radius: Config.roundness
                 }
 
                 Repeater {
