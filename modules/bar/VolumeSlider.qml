@@ -9,8 +9,22 @@ Item {
     Layout.preferredWidth: 128
     Layout.fillHeight: true
 
+    Component.onCompleted: volumeSlider.value = Audio.sink?.audio?.volume ?? 0
+
     BgRect {
         anchors.fill: parent
+
+        MouseArea {
+            anchors.fill: parent
+            onWheel: wheel => {
+                if (wheel.angleDelta.y > 0) {
+                    volumeSlider.value = Math.min(1, volumeSlider.value + 0.1);
+                } else {
+                    volumeSlider.value = Math.max(0, volumeSlider.value - 0.1);
+                }
+            }
+        }
+
         RowLayout {
             anchors.fill: parent
             anchors.margins: 8
@@ -18,22 +32,54 @@ Item {
 
             Text {
                 id: volumeIcon
-                text: Icons.speakerHigh
+                text: {
+                    if (Audio.sink?.audio?.muted)
+                        return Icons.speakerSlash;
+                    const vol = Audio.sink?.audio?.volume ?? 0;
+                    if (vol < 0.01)
+                        return Icons.speakerX;
+                    if (vol < 0.19)
+                        return Icons.speakerNone;
+                    if (vol < 0.49)
+                        return Icons.speakerLow;
+                    return Icons.speakerHigh;
+                }
                 font.family: Icons.font
                 font.pixelSize: 20
                 color: Colors.overBackground
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onEntered: volumeIcon.color = Colors.primary
+                    onExited: volumeIcon.color = Colors.overBackground
+                    onClicked: {
+                        if (Audio.sink?.audio) {
+                            Audio.sink.audio.muted = !Audio.sink.audio.muted;
+                        }
+                    }
+                }
             }
 
             StyledSlider {
                 id: volumeSlider
                 Layout.fillWidth: true
                 height: 4
-                value: Audio.sink?.audio?.volume ?? 0
+                value: 0
+                progressColor: Audio.sink?.audio?.muted ? Colors.outline : Colors.primary
 
                 onValueChanged: {
                     if (Audio.sink?.audio) {
                         Audio.sink.audio.volume = value;
                     }
+                }
+            }
+
+            Connections {
+                target: Audio.sink?.audio
+                function onVolumeChanged() {
+                    volumeSlider.value = Audio.sink.audio.volume;
                 }
             }
         }
