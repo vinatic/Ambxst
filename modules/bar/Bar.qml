@@ -161,6 +161,10 @@ PanelWindow {
                 Layout.fillWidth: true
             }
 
+            MicSlider {
+                bar: panel
+            }
+
             VolumeSlider {
                 id: volume
                 bar: panel
@@ -205,6 +209,10 @@ PanelWindow {
 
             Item {
                 Layout.fillHeight: true
+            }
+
+            MicSlider {
+                bar: panel
             }
 
             VolumeSlider {
