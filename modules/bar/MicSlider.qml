@@ -34,7 +34,7 @@ Item {
     states: [
          State {
              name: "hovered"
-             when: root.isHovered || micSlider.isDragging || root.externalVolumeChange
+             when: root.isHovered || micSlider.isDragging
             PropertyChanges {
                 target: root
                 implicitWidth: root.vertical ? 4 : 128
