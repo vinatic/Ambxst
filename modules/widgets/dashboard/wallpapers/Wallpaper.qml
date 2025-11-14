@@ -107,7 +107,7 @@ PanelWindow {
         // Para videos y GIFs, usar el frame cacheado
         if (fileType === 'video' || fileType === 'gif') {
             var fileName = filePath.split('/').pop();
-            var cachePath = Quickshell.dataDir + "/lockscreen_frames/" + fileName + "_frame.jpg";
+            var cachePath = Quickshell.dataDir + "/lockscreen/" + fileName + ".jpg";
             console.log("getLockscreenFramePath: using cached frame:", cachePath);
             return cachePath;
         }
@@ -117,34 +117,29 @@ PanelWindow {
     }
 
     function generateLockscreenFrame(filePath) {
-        if (!filePath) return;
+        if (!filePath) {
+            console.warn("generateLockscreenFrame: empty filePath");
+            return;
+        }
         
         var fileType = getFileType(filePath);
+        console.log("generateLockscreenFrame: filePath =", filePath);
+        console.log("generateLockscreenFrame: fileType =", fileType);
         
-        // Solo generar frame para videos y GIFs
-        if (fileType === 'video' || fileType === 'gif') {
-            console.log("Generating lockscreen frame for:", filePath);
-            
-            var fileName = filePath.split('/').pop();
-            var cacheDir = Quickshell.dataDir + "/lockscreen_frames";
-            var outputPath = cacheDir + "/" + fileName + "_frame.jpg";
-            
-            console.log("Lockscreen frame output path:", outputPath);
-            
-            // Crear directorio y extraer frame en secuencia
-            createLockscreenFramesDir.command = ["mkdir", "-p", cacheDir];
-            createLockscreenFramesDir.running = true;
-            
-            // Configurar ffmpeg pero no ejecutar todavía (esperar a que se cree el dir)
-            ffmpegExtractFrame.command = [
-                "ffmpeg", "-i", filePath,
-                "-vframes", "1",
-                "-q:v", "2",
-                "-y",
-                outputPath
-            ];
-            // ffmpegExtractFrame se ejecutará cuando createLockscreenFramesDir termine
-        }
+        var scriptPath = Qt.resolvedUrl("../../../../scripts/lockscreen_wallpaper.py").toString().replace("file://", "");
+        var dataPath = Quickshell.dataDir;
+        
+        console.log("generateLockscreenFrame: scriptPath =", scriptPath);
+        console.log("generateLockscreenFrame: dataPath =", dataPath);
+        
+        lockscreenWallpaperScript.command = [
+            "python3", scriptPath,
+            filePath,
+            dataPath
+        ];
+        
+        console.log("generateLockscreenFrame: Running command:", lockscreenWallpaperScript.command);
+        lockscreenWallpaperScript.running = true;
     }
 
     function getSubfolderFromPath(filePath) {
@@ -445,15 +440,16 @@ PanelWindow {
         }
     }
 
+    // Proceso para generar frame de lockscreen con el script de Python
     Process {
-        id: createLockscreenFramesDir
+        id: lockscreenWallpaperScript
         running: false
         command: []
 
         stdout: StdioCollector {
             onStreamFinished: {
                 if (text.length > 0) {
-                    console.log("mkdir stdout:", text);
+                    console.log("Lockscreen Wallpaper Generator:", text);
                 }
             }
         }
@@ -461,50 +457,16 @@ PanelWindow {
         stderr: StdioCollector {
             onStreamFinished: {
                 if (text.length > 0) {
-                    console.warn("mkdir stderr:", text);
+                    console.warn("Lockscreen Wallpaper Generator Error:", text);
                 }
             }
         }
 
         onExited: function (exitCode) {
             if (exitCode === 0) {
-                console.log("Lockscreen frames directory created/verified");
-                // Ahora ejecutar ffmpeg
-                if (ffmpegExtractFrame.command.length > 0) {
-                    ffmpegExtractFrame.running = true;
-                }
+                console.log("✅ Lockscreen wallpaper ready");
             } else {
-                console.warn("Failed to create lockscreen frames directory, exit code:", exitCode);
-            }
-        }
-    }
-
-    Process {
-        id: ffmpegExtractFrame
-        running: false
-        command: []
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                if (text.length > 0) {
-                    console.log("ffmpeg output:", text);
-                }
-            }
-        }
-
-        stderr: StdioCollector {
-            onStreamFinished: {
-                if (text.length > 0) {
-                    console.log("ffmpeg stderr:", text);
-                }
-            }
-        }
-
-        onExited: function (exitCode) {
-            if (exitCode === 0) {
-                console.log("✅ Lockscreen frame extracted successfully");
-            } else {
-                console.warn("⚠️ Failed to extract lockscreen frame, exit code:", exitCode);
+                console.warn("⚠️ Lockscreen wallpaper generation failed with code:", exitCode);
             }
         }
     }
