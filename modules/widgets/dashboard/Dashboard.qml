@@ -12,6 +12,9 @@ import qs.modules.widgets.dashboard.pins
 import qs.modules.widgets.dashboard.kanban
 import qs.modules.widgets.dashboard.wallpapers
 import qs.modules.widgets.dashboard.assistant
+import qs.modules.widgets.dashboard.tmux
+import qs.modules.widgets.dashboard.clipboard
+import qs.modules.widgets.dashboard.emoji
 import qs.config
 
 NotchAnimationBehavior {
@@ -21,7 +24,7 @@ NotchAnimationBehavior {
         property int currentTab: GlobalStates.dashboardCurrentTab
     }
 
-    readonly property var tabModel: [Icons.widgets, Icons.pins, Icons.kanban, Icons.wallpapers, Icons.assistant]
+    readonly property var tabModel: [Icons.widgets, Icons.pins, Icons.kanban, Icons.wallpapers, Icons.assistant, Icons.terminal, Icons.clipboard, Icons.emoji]
     readonly property int tabCount: tabModel.length
     readonly property int tabSpacing: 8
 
@@ -62,15 +65,20 @@ NotchAnimationBehavior {
         root.state.currentTab = GlobalStates.dashboardCurrentTab;
     }
 
-    // Focus search input when dashboard opens to wallpapers tab
+    // Focus search input when dashboard opens to wallpapers tab or widgets tab
     onIsVisibleChanged: {
         if (isVisible) {
             if (GlobalStates.dashboardCurrentTab === 0) {
                 Notifications.hideAllPopups();
-            }
-            if (GlobalStates.dashboardCurrentTab === 3) {
-                // Dar tiempo al StackView para que cargue el item
+                focusWidgetsTimer.restart();
+            } else if (GlobalStates.dashboardCurrentTab === 3) {
                 focusWallpapersTimer.restart();
+            } else if (GlobalStates.dashboardCurrentTab === 5) {
+                focusTmuxTimer.restart();
+            } else if (GlobalStates.dashboardCurrentTab === 6) {
+                focusClipboardTimer.restart();
+            } else if (GlobalStates.dashboardCurrentTab === 7) {
+                focusEmojiTimer.restart();
             }
         }
     }
@@ -83,6 +91,54 @@ NotchAnimationBehavior {
         onTriggered: {
             if (stack.currentItem && stack.currentItem.focusSearch) {
                 stack.currentItem.focusSearch();
+            }
+        }
+    }
+
+    // Timer para focus en widgets tab
+    Timer {
+        id: focusWidgetsTimer
+        interval: 50
+        repeat: false
+        onTriggered: {
+            if (stack.currentItem && stack.currentItem.focusAppSearch) {
+                stack.currentItem.focusAppSearch();
+            }
+        }
+    }
+
+    // Timer para focus en tmux tab
+    Timer {
+        id: focusTmuxTimer
+        interval: 50
+        repeat: false
+        onTriggered: {
+            if (stack.currentItem && stack.currentItem.focusSearchInput) {
+                stack.currentItem.focusSearchInput();
+            }
+        }
+    }
+
+    // Timer para focus en clipboard tab
+    Timer {
+        id: focusClipboardTimer
+        interval: 50
+        repeat: false
+        onTriggered: {
+            if (stack.currentItem && stack.currentItem.focusSearchInput) {
+                stack.currentItem.focusSearchInput();
+            }
+        }
+    }
+
+    // Timer para focus en emoji tab
+    Timer {
+        id: focusEmojiTimer
+        interval: 50
+        repeat: false
+        onTriggered: {
+            if (stack.currentItem && stack.currentItem.focusSearchInput) {
+                stack.currentItem.focusSearchInput();
             }
         }
     }
@@ -230,15 +286,25 @@ NotchAnimationBehavior {
                 anchors.fill: parent
 
                 // Array de componentes para cargar dinámicamente
-                property var components: [overviewComponent, systemComponent, quickSettingsComponent, wallpapersComponent, assistantComponent]
+                property var components: [overviewComponent, systemComponent, quickSettingsComponent, wallpapersComponent, assistantComponent, tmuxComponent, clipboardComponent, emojiComponent]
 
                 // Cargar directamente el componente correcto según GlobalStates
                 initialItem: components[GlobalStates.dashboardCurrentTab]
 
                 // Handler para cuando el item actual cambia
                 onCurrentItemChanged: {
-                    if (currentItem && root.state.currentTab === 3 && currentItem.focusSearch) {
-                        focusWallpapersTimer.restart();
+                    if (currentItem) {
+                        if (root.state.currentTab === 0 && currentItem.focusAppSearch) {
+                            focusWidgetsTimer.restart();
+                        } else if (root.state.currentTab === 3 && currentItem.focusSearch) {
+                            focusWallpapersTimer.restart();
+                        } else if (root.state.currentTab === 5 && currentItem.focusSearchInput) {
+                            focusTmuxTimer.restart();
+                        } else if (root.state.currentTab === 6 && currentItem.focusSearchInput) {
+                            focusClipboardTimer.restart();
+                        } else if (root.state.currentTab === 7 && currentItem.focusSearchInput) {
+                            focusEmojiTimer.restart();
+                        }
                     }
                 }
 
@@ -256,11 +322,15 @@ NotchAnimationBehavior {
 
                         if (index === 0) {
                             Notifications.hideAllPopups();
-                        }
-
-                        if (index === 3) {
-                            // Dar tiempo al StackView para que cargue el item
+                            focusWidgetsTimer.restart();
+                        } else if (index === 3) {
                             focusWallpapersTimer.restart();
+                        } else if (index === 5) {
+                            focusTmuxTimer.restart();
+                        } else if (index === 6) {
+                            focusClipboardTimer.restart();
+                        } else if (index === 7) {
+                            focusEmojiTimer.restart();
                         }
                     }
                 }
@@ -463,5 +533,20 @@ NotchAnimationBehavior {
     Component {
         id: assistantComponent
         AssistantTab {}
+    }
+
+    Component {
+        id: tmuxComponent
+        TmuxTab {}
+    }
+
+    Component {
+        id: clipboardComponent
+        ClipboardTab {}
+    }
+
+    Component {
+        id: emojiComponent
+        EmojiTab {}
     }
 }

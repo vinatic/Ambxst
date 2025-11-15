@@ -6,7 +6,6 @@ import Quickshell.Wayland
 import Quickshell.Hyprland
 import qs.modules.globals
 import qs.modules.theme
-import qs.modules.widgets.launcher
 import qs.modules.widgets.defaultview
 import qs.modules.widgets.overview
 import qs.modules.widgets.dashboard
@@ -44,7 +43,7 @@ PanelWindow {
     }
 
     // Notch state properties
-    readonly property bool screenNotchOpen: screenVisibilities ? (screenVisibilities.launcher || screenVisibilities.dashboard || screenVisibilities.overview || screenVisibilities.powermenu) : false
+    readonly property bool screenNotchOpen: screenVisibilities ? (screenVisibilities.dashboard || screenVisibilities.overview || screenVisibilities.powermenu) : false
     readonly property bool hasActiveNotifications: Notifications.popupList.length > 0
 
     HyprlandFocusGrab {
@@ -53,7 +52,7 @@ PanelWindow {
             let windowList = [notchPanel];
             // Agregar la barra de esta pantalla al focus grab cuando el notch esté abierto
             let barPanel = Visibilities.panels[screen.name];
-            if (barPanel && (screenVisibilities.launcher || screenVisibilities.dashboard || screenVisibilities.overview || screenVisibilities.powermenu)) {
+            if (barPanel && (screenVisibilities.dashboard || screenVisibilities.overview || screenVisibilities.powermenu)) {
                 windowList.push(barPanel);
             }
             return windowList;
@@ -61,9 +60,6 @@ PanelWindow {
         active: notchPanel.screenNotchOpen
 
         onCleared: {
-            if (screenVisibilities.launcher) {
-                GlobalStates.clearLauncherState();
-            }
             Visibilities.setActiveModule("");
         }
     }
@@ -88,12 +84,6 @@ PanelWindow {
     Component {
         id: defaultViewComponent
         DefaultView {}
-    }
-
-    // Launcher view component
-    Component {
-        id: launcherViewComponent
-        LauncherView {}
     }
 
     // Overview view component
@@ -141,7 +131,6 @@ PanelWindow {
             layer.effect: Shadow {}
 
             defaultViewComponent: defaultViewComponent
-            launcherViewComponent: launcherViewComponent
             dashboardViewComponent: dashboardViewComponent
             overviewViewComponent: overviewViewComponent
             powermenuViewComponent: powermenuViewComponent
@@ -151,9 +140,6 @@ PanelWindow {
             // Handle global keyboard events
             Keys.onPressed: event => {
                 if (event.key === Qt.Key_Escape && notchPanel.screenNotchOpen) {
-                    if (screenVisibilities.launcher) {
-                        GlobalStates.clearLauncherState();
-                    }
                     Visibilities.setActiveModule("");
                     event.accepted = true;
                 }
@@ -234,26 +220,9 @@ PanelWindow {
         }
     }
 
-    // Listen for launcher, dashboard, overview and powermenu state changes
+    // Listen for dashboard, overview and powermenu state changes
     Connections {
         target: screenVisibilities
-        function onLauncherChanged() {
-            if (screenVisibilities.launcher) {
-                notchContainer.stackView.push(launcherViewComponent);
-                Qt.callLater(() => {
-                    let currentItem = notchContainer.stackView.currentItem;
-                    if (currentItem && currentItem.focusSearchInput) {
-                        currentItem.focusSearchInput();
-                    }
-                });
-            } else {
-                if (notchContainer.stackView.depth > 1) {
-                    notchContainer.stackView.replace(defaultViewComponent);
-                    notchContainer.isShowingDefault = true;
-                    notchContainer.isShowingNotifications = false;
-                }
-            }
-        }
 
         function onDashboardChanged() {
             if (screenVisibilities.dashboard) {

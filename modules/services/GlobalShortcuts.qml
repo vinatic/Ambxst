@@ -17,20 +17,6 @@ Item {
         }
     }
 
-    function toggleLauncherTab(tabIndex) {
-        const isActive = Visibilities.currentActiveModule === "launcher";
-        if (isActive && GlobalStates.launcherCurrentTab === tabIndex) {
-            GlobalStates.clearLauncherState();
-            Visibilities.setActiveModule("");
-            return;
-        }
-
-        GlobalStates.launcherCurrentTab = tabIndex;
-        if (!isActive) {
-            Visibilities.setActiveModule("launcher");
-        }
-    }
-
     function toggleDashboardTab(tabIndex) {
         const isActive = Visibilities.currentActiveModule === "dashboard";
         if (isActive && GlobalStates.dashboardCurrentTab === tabIndex) {
@@ -73,36 +59,11 @@ Item {
         onPressed: toggleSimpleModule("powermenu")
     }
 
-    // Launcher tab shortcuts
-    GlobalShortcut {
-        appid: root.appId
-        name: "launcher-apps"
-        description: "Open launcher apps tab"
-
-        onPressed: toggleLauncherTab(0)
-    }
-
-    GlobalShortcut {
-        appid: root.appId
-        name: "launcher-tmux"
-        description: "Open launcher tmux tab"
-
-        onPressed: toggleLauncherTab(1)
-    }
-
-    GlobalShortcut {
-        appid: root.appId
-        name: "launcher-clipboard"
-        description: "Open launcher clipboard tab"
-
-        onPressed: toggleLauncherTab(2)
-    }
-
     // Dashboard tab shortcuts
     GlobalShortcut {
         appid: root.appId
         name: "dashboard-widgets"
-        description: "Open dashboard widgets tab"
+        description: "Open dashboard widgets tab (includes app launcher)"
 
         onPressed: toggleDashboardTab(0)
     }
@@ -141,10 +102,26 @@ Item {
 
     GlobalShortcut {
         appid: root.appId
-        name: "launcher-emoji"
-        description: "Open launcher emoji tab"
+        name: "dashboard-tmux"
+        description: "Open dashboard tmux sessions tab"
 
-        onPressed: toggleLauncherTab(3)
+        onPressed: toggleDashboardTab(5)
+    }
+
+    GlobalShortcut {
+        appid: root.appId
+        name: "dashboard-clipboard"
+        description: "Open dashboard clipboard tab"
+
+        onPressed: toggleDashboardTab(6)
+    }
+
+    GlobalShortcut {
+        appid: root.appId
+        name: "dashboard-emoji"
+        description: "Open dashboard emoji tab"
+
+        onPressed: toggleDashboardTab(7)
     }
 
     // Media player shortcuts
