@@ -451,7 +451,7 @@ Item {
         // Contenedor de resultados del clipboard con lista y preview
         Row {
             width: parent.width
-            height: parent.height - 56
+            height: parent.height - 58
             spacing: 8
 
             // Lista vertical (35% del ancho)

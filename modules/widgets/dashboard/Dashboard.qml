@@ -28,7 +28,7 @@ NotchAnimationBehavior {
     readonly property int tabCount: tabModel.length
     readonly property int tabSpacing: 8
 
-    readonly property int tabWidth: 48
+    readonly property int tabWidth: 42
     readonly property real nonAnimWidth: (state.currentTab === 0 ? 600 : 400) + tabWidth + 16 // widgets tab is wider
 
     implicitWidth: nonAnimWidth
