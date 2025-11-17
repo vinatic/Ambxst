@@ -387,6 +387,14 @@ Rectangle {
             }
         }
 
+        // Separator
+        Rectangle {
+            Layout.preferredWidth: 2
+            Layout.fillHeight: true
+            radius: Config.roundness
+            color: Colors.surface
+        }
+
         ClippingRectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true

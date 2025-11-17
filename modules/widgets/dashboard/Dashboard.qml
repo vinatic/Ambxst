@@ -273,13 +273,21 @@ NotchAnimationBehavior {
             }
         }
 
+        // Separator
+        Rectangle {
+            width: 2
+            height: parent.height
+            radius: Config.roundness
+            color: Colors.surface
+        }
+
         // Content area
         Rectangle {
             id: viewWrapper
 
             color: "transparent"
 
-            width: parent.width - root.tabWidth - 8 // Resto del ancho disponible
+            width: parent.width - root.tabWidth - 2 - 16 // Ancho total menos tabs, separador y spacings
             height: parent.height
 
             clip: true
