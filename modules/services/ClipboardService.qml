@@ -16,19 +16,49 @@ QtObject {
     readonly property string binaryDataDir: Quickshell.dataPath("clipboard-data")
     readonly property string schemaPath: Qt.resolvedUrl("clipboard_init.sql").toString().replace("file://", "")
     readonly property string insertScriptPath: Qt.resolvedUrl("../../scripts/clipboard_insert.sh").toString().replace("file://", "")
+    readonly property string checkScriptPath: Qt.resolvedUrl("../../scripts/clipboard_check.sh").toString().replace("file://", "")
+    readonly property string watchScriptPath: Qt.resolvedUrl("../../scripts/clipboard_watch.sh").toString().replace("file://", "")
 
     property bool _initialized: false
-    property string _lastTextHash: ""
-    property string _lastImageHash: ""
 
     signal listCompleted()
 
-    // Timer to poll clipboard
-    property Timer pollTimer: Timer {
-        interval: 1000
-        running: root._initialized && !root._operationInProgress
-        repeat: true
-        onTriggered: root.checkClipboard()
+    // Clipboard watcher using custom script that monitors changes
+    property Process clipboardWatcher: Process {
+        running: root._initialized
+        command: [watchScriptPath, checkScriptPath, dbPath, insertScriptPath, binaryDataDir]
+        
+        stdout: StdioCollector {
+            onStreamFinished: {
+                // When watcher outputs something, refresh the list
+                var lines = text.trim().split('\n');
+                for (var i = 0; i < lines.length; i++) {
+                    if (lines[i] === "REFRESH_LIST") {
+                        Qt.callLater(root.list);
+                    }
+                }
+            }
+        }
+        
+        stderr: StdioCollector {
+            onStreamFinished: {
+                if (text.length > 0 && !text.includes("No selection")) {
+                    console.warn("ClipboardService: watcher stderr:", text);
+                }
+            }
+        }
+        
+        onExited: function(code) {
+            // Watcher should keep running, restart if it exits
+            if (root._initialized) {
+                console.warn("ClipboardService: watcher exited with code:", code, "- restarting...");
+                Qt.callLater(function() {
+                    if (root._initialized) {
+                        clipboardWatcher.running = true;
+                    }
+                });
+            }
+        }
     }
 
     // Initialize database
@@ -51,101 +81,22 @@ QtObject {
         running: false
     }
 
-    // Check text clipboard
-    property Process checkTextProcess: Process {
+    // Single process to check and insert clipboard content (used for manual checks)
+    property Process checkAndInsertProcess: Process {
         running: false
-        command: ["sh", "-c", "tmpfile=$(mktemp); wl-paste --type text 2>/dev/null > \"$tmpfile\" && echo \"$tmpfile|$(md5sum < \"$tmpfile\" | cut -d' ' -f1)\" || rm -f \"$tmpfile\""]
         
-        stdout: StdioCollector {
-            waitForEnd: true
-            
+        stderr: StdioCollector {
             onStreamFinished: {
-                var line = text.trim();
-                if (line.length === 0) return;
-                
-                var parts = line.split('|');
-                if (parts.length !== 2) return;
-                
-                var tmpFile = parts[0];
-                var hash = parts[1];
-                
-                if (hash && hash !== root._lastTextHash) {
-                    root._lastTextHash = hash;
-                    root._pendingTmpFile = tmpFile;
-                    readTmpFileProcess.running = true;
-                } else if (tmpFile.length > 0) {
-                    // Same content, cleanup tmpfile
-                    cleanupTmpProcess.command = ["rm", "-f", tmpFile];
-                    cleanupTmpProcess.running = true;
+                if (text.length > 0 && !text.includes("No selection")) {
+                    console.warn("ClipboardService: checkAndInsertProcess stderr:", text);
                 }
             }
         }
         
         onExited: function(code) {
-            if (code !== 0) {
-                console.warn("ClipboardService: checkTextProcess exited with code:", code);
-            }
-        }
-    }
-    
-    property string _pendingTmpFile: ""
-    
-    property Process readTmpFileProcess: Process {
-        running: false
-        command: ["cat", root._pendingTmpFile]
-        
-        stdout: StdioCollector {
-            waitForEnd: true
-            
-            onStreamFinished: {
-                var content = text;
-                if (content.length > 0) {
-                    // Pass the tmpFile directly to insertTextItem instead of content
-                    root.insertTextItemFromFile(root._lastTextHash, root._pendingTmpFile);
-                }
-            }
-        }
-        
-        onExited: function(code) {
-            // Don't cleanup here, let insertProcess do it
-        }
-    }
-    
-    property Process cleanupTmpProcess: Process {
-        running: false
-    }
-
-    // Check image clipboard
-    property Process checkImageProcess: Process {
-        running: false
-        command: ["sh", "-c", "wl-paste --list-types 2>/dev/null | grep '^image/' | head -1"]
-        
-        stdout: StdioCollector {
-            waitForEnd: true
-            
-            onStreamFinished: {
-                var mimeType = text.trim();
-                if (mimeType.length > 0) {
-                    root.getImageHash(mimeType);
-                }
-            }
-        }
-    }
-
-    property Process getImageHashProcess: Process {
-        property string mimeType: ""
-        running: false
-        command: ["sh", "-c", "wl-paste --type " + mimeType + " 2>/dev/null | md5sum | cut -d' ' -f1"]
-        
-        stdout: StdioCollector {
-            waitForEnd: true
-            
-            onStreamFinished: {
-                var hash = text.trim();
-                if (hash && hash !== root._lastImageHash) {
-                    root._lastImageHash = hash;
-                    root.insertImageItem(hash, getImageHashProcess.mimeType);
-                }
+            _operationInProgress = false;
+            if (code === 0) {
+                Qt.callLater(root.list);
             }
         }
     }
@@ -173,13 +124,28 @@ QtObject {
                     
                     for (var i = 0; i < jsonArray.length; i++) {
                         var item = jsonArray[i];
+                        var isFile = item.mime_type === "text/uri-list";
+                        
+                        // For files, extract the filename from the URI for preview
+                        var preview = item.preview;
+                        if (isFile && item.full_content) {
+                            var uriContent = item.full_content.trim();
+                            if (uriContent.startsWith("file://")) {
+                                var filePath = uriContent.substring(7); // Remove "file://"
+                                var fileName = filePath.split('/').pop();
+                                preview = "[File] " + fileName;
+                            }
+                        } else if (item.is_image === 1) {
+                            preview = "[Image]";
+                        }
                         
                         clipboardItems.push({
                             id: item.id.toString(),
-                            preview: item.is_image ? "[Image]" : item.preview,
+                            preview: preview,
                             fullContent: item.preview,
                             mime: item.mime_type,
                             isImage: item.is_image === 1,
+                            isFile: isFile,
                             binaryPath: item.binary_path || "",
                             hash: item.content_hash || "",
                             createdAt: item.created_at || 0
@@ -212,7 +178,7 @@ QtObject {
         }
     }
 
-    // Insert item into database
+    // Insert item into database - kept for backwards compatibility but deprecated
     property Process insertProcess: Process {
         property string itemHash: ""
         property string itemContent: ""
@@ -235,55 +201,9 @@ QtObject {
                 root._operationInProgress = false;
             }
             
-            // Cleanup temp file
-            if (tmpFile.length > 0) {
-                cleanupTmpProcess.command = ["rm", "-f", tmpFile];
-                cleanupTmpProcess.running = true;
-                tmpFile = "";
-            }
-            
             itemHash = "";
             itemContent = "";
-        }
-    }
-
-    // Save image binary
-    property Process saveImageProcess: Process {
-        property string mimeType: ""
-        property string hash: ""
-        running: false
-        
-        onExited: function(code) {
-            if (code === 0) {
-                var binaryPath = root.binaryDataDir + "/" + saveImageProcess.hash;
-                
-                // Use script to insert, with empty content
-                insertImageDbProcess.itemHash = saveImageProcess.hash;
-                insertImageDbProcess.itemMimeType = saveImageProcess.mimeType;
-                insertImageDbProcess.itemBinaryPath = binaryPath;
-                insertImageDbProcess.command = ["sh", "-c", "echo -n '' | '" + root.insertScriptPath + "' '" + root.dbPath + "' '" + saveImageProcess.hash + "' '" + saveImageProcess.mimeType + "' 1 '" + binaryPath + "'"];
-                insertImageDbProcess.running = true;
-            } else {
-                console.warn("ClipboardService: Failed to save image");
-                root._operationInProgress = false;
-            }
-        }
-    }
-    
-    // Insert image into database (no stdin needed)
-    property Process insertImageDbProcess: Process {
-        property string itemHash: ""
-        property string itemMimeType: ""
-        property string itemBinaryPath: ""
-        running: false
-        
-        onExited: function(code) {
-            if (code === 0) {
-                Qt.callLater(root.list);
-            } else {
-                console.warn("ClipboardService: Failed to insert image into database");
-                root._operationInProgress = false;
-            }
+            tmpFile = "";
         }
     }
 
@@ -383,30 +303,22 @@ QtObject {
     }
 
     function checkClipboard() {
-        if (!checkTextProcess.running) {
-            checkTextProcess.running = true;
-        }
-        if (!checkImageProcess.running) {
-            checkImageProcess.running = true;
-        }
+        if (!_initialized || _operationInProgress) return;
+        _operationInProgress = true;
+        checkAndInsertProcess.command = [checkScriptPath, dbPath, insertScriptPath, binaryDataDir];
+        checkAndInsertProcess.running = true;
     }
 
     function getImageHash(mimeType) {
-        getImageHashProcess.mimeType = mimeType;
-        getImageHashProcess.command = ["sh", "-c", "wl-paste --type " + mimeType + " 2>/dev/null | md5sum | cut -d' ' -f1"];
-        getImageHashProcess.running = true;
+        // Deprecated - now handled by clipboard_check.sh
     }
 
     function insertTextItemFromFile(hash, tmpFile) {
-        _operationInProgress = true;
-        // Call insert script with temp file
-        insertProcess.itemHash = hash;
-        insertProcess.tmpFile = tmpFile;
-        insertProcess.command = ["sh", "-c", "cat '" + tmpFile + "' | '" + insertScriptPath + "' '" + dbPath + "' '" + hash + "' 'text/plain' 0 ''"];
-        insertProcess.running = true;
-        
-        // Clear the pending tmp file reference
-        _pendingTmpFile = "";
+        // Deprecated - now handled by clipboard_check.sh
+    }
+    
+    function insertFileItemFromFile(hash, tmpFile) {
+        // Deprecated - now handled by clipboard_check.sh
     }
     
     property Process writeTmpProcess: Process {
@@ -418,25 +330,13 @@ QtObject {
             waitForEnd: true
             
             onStreamFinished: {
-                var tmpFile = text.trim();
-                if (tmpFile.length > 0) {
-                    // Now call insert script with temp file
-                    insertProcess.itemHash = writeTmpProcess.itemHash;
-                    insertProcess.tmpFile = tmpFile;
-                    insertProcess.command = ["sh", "-c", "cat '" + tmpFile + "' | '" + root.insertScriptPath + "' '" + root.dbPath + "' '" + writeTmpProcess.itemHash + "' 'text/plain' 0 ''"];
-                    insertProcess.running = true;
-                }
+                // Deprecated
             }
         }
     }
 
     function insertImageItem(hash, mimeType) {
-        _operationInProgress = true;
-        var binaryPath = binaryDataDir + "/" + hash;
-        saveImageProcess.hash = hash;
-        saveImageProcess.mimeType = mimeType;
-        saveImageProcess.command = ["sh", "-c", "wl-paste --type " + mimeType + " > " + binaryPath];
-        saveImageProcess.running = true;
+        // Deprecated - now handled by clipboard_check.sh
     }
 
     function list() {

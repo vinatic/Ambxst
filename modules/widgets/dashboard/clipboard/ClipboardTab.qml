@@ -185,13 +185,19 @@ Item {
     }
 
     function copyToClipboard(itemId) {
-        // Find the item to determine if it's an image
+        // Find the item to determine its type
         for (var i = 0; i < root.allItems.length; i++) {
             if (root.allItems[i].id === itemId) {
                 var item = root.allItems[i];
                 if (item.isImage && item.binaryPath) {
-                    copyProcess.command = ["sh", "-c", "cat '" + item.binaryPath + "' | wl-copy"];
+                    // Copy image with correct MIME type
+                    copyProcess.command = ["sh", "-c", "cat '" + item.binaryPath + "' | wl-copy --type '" + item.mime + "'"];
+                } else if (item.isFile) {
+                    // Copy file URI with text/uri-list MIME type, removing carriage returns
+                    copyProcess.command = ["sh", "-c",
+                                          "sqlite3 '" + ClipboardService.dbPath + "' \"SELECT full_content FROM clipboard_items WHERE id = " + itemId + ";\" | tr -d '\\r' | wl-copy --type text/uri-list"];
                 } else {
+                    // Copy text as plain text
                     copyProcess.command = ["sh", "-c",
                                           "sqlite3 '" + ClipboardService.dbPath + "' \"SELECT full_content FROM clipboard_items WHERE id = " + itemId + ";\" | wl-copy"];
                 }
@@ -864,7 +870,17 @@ Item {
 
                                 Text {
                                     anchors.centerIn: parent
-                                    text: isInDeleteMode ? Icons.trash : (modelData.isImage ? Icons.image : Icons.clip)
+                                    text: {
+                                        if (isInDeleteMode) {
+                                            return Icons.trash;
+                                        } else if (modelData.isImage) {
+                                            return Icons.image;
+                                        } else if (modelData.isFile) {
+                                            return Icons.file;
+                                        } else {
+                                            return Icons.clip;
+                                        }
+                                    }
                                     color: {
                                         if (isInDeleteMode) {
                                             return Colors.error;
@@ -1101,7 +1117,7 @@ Item {
                     // Preview para texto con scroll
                     Flickable {
                         anchors.fill: parent
-                        visible: previewPanel.currentItem && !previewPanel.currentItem.isImage
+                        visible: previewPanel.currentItem && !previewPanel.currentItem.isImage && !previewPanel.currentItem.isFile
                         clip: true
                         contentWidth: width
                         contentHeight: previewText.height
@@ -1120,6 +1136,76 @@ Item {
 
                         ScrollBar.vertical: ScrollBar {
                             policy: ScrollBar.AsNeeded
+                        }
+                    }
+                    
+                    // Preview para archivos (text/uri-list)
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: 16
+                        visible: previewPanel.currentItem && previewPanel.currentItem.isFile
+                        
+                        Rectangle {
+                            width: 120
+                            height: 120
+                            color: Colors.surfaceBright
+                            radius: Config.roundness > 0 ? Config.roundness + 4 : 0
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            
+                            Text {
+                                anchors.centerIn: parent
+                                text: Icons.file
+                                textFormat: Text.RichText
+                                font.family: Icons.font
+                                font.pixelSize: 48
+                                color: Colors.primary
+                            }
+                        }
+                        
+                        Column {
+                            width: previewPanel.width - 16
+                            spacing: 8
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            
+                            Text {
+                                text: {
+                                    if (!previewPanel.currentItem) return "";
+                                    var content = root.currentFullContent || previewPanel.currentItem.preview;
+                                    if (content.startsWith("file://")) {
+                                        var filePath = content.substring(7).trim();
+                                        return filePath.split('/').pop();
+                                    }
+                                    return content;
+                                }
+                                font.family: Config.theme.font
+                                font.pixelSize: Config.theme.fontSize + 2
+                                font.weight: Font.Bold
+                                color: Colors.overBackground
+                                horizontalAlignment: Text.AlignHCenter
+                                width: parent.width
+                                wrapMode: Text.Wrap
+                            }
+                            
+                            Text {
+                                text: {
+                                    if (!previewPanel.currentItem) return "";
+                                    var content = root.currentFullContent || previewPanel.currentItem.preview;
+                                    if (content.startsWith("file://")) {
+                                        var filePath = content.substring(7).trim();
+                                        var parts = filePath.split('/');
+                                        parts.pop(); // Remove filename
+                                        return parts.join('/');
+                                    }
+                                    return "";
+                                }
+                                font.family: Config.theme.font
+                                font.pixelSize: Config.theme.fontSize - 1
+                                color: Colors.surfaceBright
+                                horizontalAlignment: Text.AlignHCenter
+                                width: parent.width
+                                wrapMode: Text.Wrap
+                                elide: Text.ElideMiddle
+                            }
                         }
                     }
                 }

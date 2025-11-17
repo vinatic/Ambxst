@@ -131,4 +131,5 @@ QtObject {
     readonly property string moon: ""
     readonly property string user: ""
     readonly property string spinnerGap: ""
+    readonly property string file: ""
 }
