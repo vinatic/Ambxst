@@ -1244,14 +1244,19 @@ Item {
                                 height: {
                                     // For videos (YouTube), use a larger layout
                                     if (root.linkPreviewData && root.linkPreviewData.type === 'video' && root.linkPreviewData.image) {
-                                        return videoEmbedContent.height + 16;
+                                        return videoEmbedContent.height + 24;
                                     }
-                                    return linkEmbedContent.height + 16;
+                                    return linkEmbedContent.height + 24;
                                 }
                                 visible: root.linkPreviewData && !root.linkPreviewData.error && 
                                         (root.linkPreviewData.title || root.linkPreviewData.description || root.linkPreviewData.image)
                                 color: Colors.surface
-                                radius: Config.roundness > 0 ? Config.roundness + 4 : 0
+                                
+                                // Rounded corners only on the right side
+                                topLeftRadius: 0
+                                topRightRadius: Config.roundness > 0 ? Config.roundness + 4 : 0
+                                bottomLeftRadius: 0
+                                bottomRightRadius: Config.roundness > 0 ? Config.roundness + 4 : 0
                                 
                                 // Left accent bar
                                 Rectangle {
@@ -1260,7 +1265,12 @@ Item {
                                     width: 4
                                     height: parent.height
                                     color: Colors.primary
-                                    radius: Config.roundness > 0 ? Config.roundness : 0
+                                    
+                                    // Rounded corners only on the left side
+                                    topLeftRadius: Config.roundness > 0 ? Config.roundness + 4 : 0
+                                    topRightRadius: 0
+                                    bottomLeftRadius: Config.roundness > 0 ? Config.roundness + 4 : 0
+                                    bottomRightRadius: 0
                                 }
                                 
                                 // Video embed layout (YouTube, etc.)
@@ -1485,6 +1495,7 @@ Item {
                                         color: Colors.surfaceBright
                                         radius: Config.roundness > 0 ? Math.max(Config.roundness - 4, 0) : 0
                                         visible: root.linkPreviewData && root.linkPreviewData.image
+                                        anchors.verticalCenter: parent.verticalCenter
                                         
                                         Image {
                                             anchors.fill: parent
