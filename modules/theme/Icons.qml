@@ -34,12 +34,9 @@ QtObject {
 
     // Dashboard
     readonly property string widgets: ""
-    readonly property string pins: ""
     readonly property string kanban: ""
     readonly property string wallpapers: ""
     readonly property string assistant: ""
-
-    // Launcher
     readonly property string apps: ""
     readonly property string terminal: ""
     readonly property string terminalWindow: ""
@@ -47,6 +44,8 @@ QtObject {
     readonly property string emoji: ""
     readonly property string shortcut: ""
     readonly property string launch: ""
+    readonly property string pin: ""
+    readonly property string unpin: ""
 
     // Toolbox
     readonly property string toolbox: ""
