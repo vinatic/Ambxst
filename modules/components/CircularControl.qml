@@ -113,11 +113,12 @@ PaneRect {
                 let handleSizeRad = root.handleSize * (360 / (2 * Math.PI * radius)) * Math.PI / 180;
 
                 // Dibujar progreso (desde inicio hasta valor actual - gap)
-                if (progressCanvas.angle > 0) {
+                let progressEndAngle = baseStartAngle + progressAngleRad - handleGapRad;
+                if (progressCanvas.angle > 1 && progressEndAngle > (baseStartAngle + 0.01)) {
                     ctx.strokeStyle = root.accentColor;
                     ctx.lineWidth = lineWidth;
                     ctx.beginPath();
-                    ctx.arc(centerX, centerY, radius, baseStartAngle, baseStartAngle + progressAngleRad - handleGapRad, false);
+                    ctx.arc(centerX, centerY, radius, baseStartAngle, progressEndAngle, false);
                     ctx.stroke();
                 }
 
