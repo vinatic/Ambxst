@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import qs.modules.theme
+import qs.modules.components
 import qs.modules.globals
 import qs.config
 
@@ -218,18 +219,27 @@ FocusScope {
             Repeater {
                 id: filterRepeater
                 model: filterModel
-                delegate: Rectangle {
+                delegate: StyledRect {
+                    id: filterTag
                     required property string label
                     required property string type
                     required property int index
                     
                     property bool isActive: root.activeFilters.includes(type)
                     property bool hasFocus: root.keyboardNavigationActive && root.focusedFilterIndex === index
+                    property bool isHovered: false
+
+                    // Variante dinámica según estado
+                    variant: {
+                        if (isActive && (hasFocus || isHovered)) return "activefocus";
+                        if (isActive) return "active";
+                        if (hasFocus || isHovered) return "focus";
+                        return "common";
+                    }
 
                     // Ancho dinámico: incluye icono solo cuando está activo
                     width: filterText.width + 24 + (isActive ? filterIcon.width + 4 : 0)
                     height: 32
-                    color: hasFocus ? Colors.surfaceBright : (isActive ? Colors.surfaceBright : Colors.surface)
                     radius: isActive ? (Config.roundness > 0 ? Config.roundness / 2 : 0) : Config.roundness
 
                     Behavior on radius {
@@ -259,7 +269,7 @@ FocusScope {
                                     text: Icons.accept
                                     font.family: Icons.font
                                     font.pixelSize: 16
-                                    color: Colors.primary
+                                    color: filterTag.itemColor
                                     visible: isActive
                                     opacity: isActive ? 1 : 0
 
@@ -286,7 +296,7 @@ FocusScope {
                                 text: label
                                 font.family: Config.theme.font
                                 font.pixelSize: Config.theme.fontSize
-                                color: isActive ? Colors.primary : Colors.overBackground
+                                color: filterTag.itemColor
 
                                 Behavior on color {
                                     enabled: Config.animDuration > 0
@@ -301,7 +311,12 @@ FocusScope {
 
                     MouseArea {
                         anchors.fill: parent
+                        hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
+                        
+                        onEntered: filterTag.isHovered = true
+                        onExited: filterTag.isHovered = false
+                        
                         onClicked: {
                             root.keyboardNavigationActive = false;
                             root.focusedFilterIndex = -1;
@@ -321,14 +336,6 @@ FocusScope {
                         enabled: Config.animDuration > 0
                         NumberAnimation {
                             duration: Config.animDuration / 3
-                            easing.type: Easing.OutCubic
-                        }
-                    }
-
-                    Behavior on color {
-                        enabled: Config.animDuration > 0
-                        ColorAnimation {
-                            duration: Config.animDuration / 2
                             easing.type: Easing.OutCubic
                         }
                     }
