@@ -81,8 +81,10 @@ void main() {
     // Interpolar tamaño del dot: start = max, end = min
     float dotRadius = mix(ubuf.dotMaxSize, ubuf.dotMinSize, adjustedPos);
     
-    // Bordes sólidos sin antialiasing
-    float alpha = step(distToCenter, dotRadius);
+    // Antialiasing muy fino solo en el borde para círculos suaves pero sólidos
+    // Usar fwidth para calcular el ancho de un pixel en el espacio de la textura
+    float edgeWidth = length(vec2(dFdx(distToCenter), dFdy(distToCenter))) * 0.5;
+    float alpha = 1.0 - smoothstep(dotRadius - edgeWidth, dotRadius + edgeWidth, distToCenter);
     
     // Mezclar colores
     vec4 finalColor = mix(ubuf.backgroundColor, ubuf.dotColor, alpha);
