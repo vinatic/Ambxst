@@ -32,15 +32,17 @@ Item {
     property real workspaceIconOpacityShrinked: 1
     property real workspaceIconMarginShrinked: -4
     property int workspaceIndexInGroup: Config.workspaces.dynamic ? dynamicWorkspaceIds.indexOf(monitor?.activeWorkspace?.id || 1) : (monitor?.activeWorkspace?.id - 1 || 0) % Config.workspaces.shown
+    property var occupiedRanges: []
 
     function updateWorkspaceOccupied() {
         if (Config.workspaces.dynamic) {
             // Get occupied workspace IDs, sorted and limited by 'shown'
             const occupiedIds = Hyprland.workspaces.values.filter(ws => HyprlandData.windowList.some(w => w.workspace.id === ws.id)).map(ws => ws.id).sort((a, b) => a - b).slice(0, Config.workspaces.shown);
 
-            // Include active workspace if not already in list
+            // Include active workspace if not already in list AND if it has windows
             const activeId = monitor?.activeWorkspace?.id || 1;
-            if (!occupiedIds.includes(activeId)) {
+            const activeHasWindows = HyprlandData.windowList.some(w => w.workspace.id === activeId);
+            if (!occupiedIds.includes(activeId) && activeHasWindows) {
                 occupiedIds.push(activeId);
                 occupiedIds.sort((a, b) => a - b);
                 if (occupiedIds.length > Config.workspaces.shown) {
@@ -56,9 +58,37 @@ Item {
             workspaceOccupied = Array.from({
                 length: Config.workspaces.shown
             }, (_, i) => {
-                return Hyprland.workspaces.values.some(ws => ws.id === workspaceGroup * Config.workspaces.shown + i + 1);
+                const wsId = workspaceGroup * Config.workspaces.shown + i + 1;
+                return HyprlandData.windowList.some(w => w.workspace.id === wsId);
             });
         }
+        updateOccupiedRanges();
+    }
+
+    function updateOccupiedRanges() {
+        const ranges = [];
+        let rangeStart = -1;
+        
+        for (let i = 0; i < effectiveWorkspaceCount; i++) {
+            const isOccupied = workspaceOccupied[i];
+            
+            if (isOccupied) {
+                if (rangeStart === -1) {
+                    rangeStart = i;
+                }
+            } else {
+                if (rangeStart !== -1) {
+                    ranges.push({ start: rangeStart, end: i - 1 });
+                    rangeStart = -1;
+                }
+            }
+        }
+        
+        if (rangeStart !== -1) {
+            ranges.push({ start: rangeStart, end: effectiveWorkspaceCount - 1 });
+        }
+        
+        occupiedRanges = ranges;
     }
 
     function workspaceLabelFontSize(value) {
@@ -91,11 +121,16 @@ Item {
     }
 
     Connections {
+        target: activeWindow
+        function onActivatedChanged() {
+            updateWorkspaceOccupied();
+        }
+    }
+
+    Connections {
         target: HyprlandData
         function onWindowListChanged() {
-            if (Config.workspaces.dynamic) {
-                updateWorkspaceOccupied();
-            }
+            updateWorkspaceOccupied();
         }
     }
 
@@ -132,36 +167,37 @@ Item {
         }
     }
 
-    RowLayout {
+    Item {
         id: rowLayout
         visible: orientation === "horizontal"
         z: 1
 
-        spacing: 0
         anchors.fill: parent
         anchors.margins: widgetPadding
-        implicitHeight: workspaceButtonWidth
 
         Repeater {
-            model: effectiveWorkspaceCount
+            model: occupiedRanges
 
             StyledRect {
                 variant: "focus"
                 required property int index
+                required property var modelData
                 z: 1
-                implicitWidth: workspaceButtonWidth
-                implicitHeight: workspaceButtonWidth
-                property var leftOccupied: (workspaceOccupied[index - 1] && !(!activeWindow?.activated && monitor?.activeWorkspace?.id === index))
-                property var rightOccupied: (workspaceOccupied[index + 1] && !(!activeWindow?.activated && monitor?.activeWorkspace?.id === index + 2))
-                property var radiusLeft: leftOccupied ? 0 : Config.roundness > 0 ? Math.max(Config.roundness - widgetPadding, 0) : 0
-                property var radiusRight: rightOccupied ? 0 : Config.roundness > 0 ? Math.max(Config.roundness - widgetPadding, 0) : 0
+                width: (modelData.end - modelData.start + 1) * workspaceButtonWidth
+                height: workspaceButtonWidth
+                
+                property var radiusLeft: Config.roundness > 0 ? Math.max(Config.roundness - widgetPadding, 0) : 0
+                property var radiusRight: Config.roundness > 0 ? Math.max(Config.roundness - widgetPadding, 0) : 0
 
                 topLeftRadius: radiusLeft
                 bottomLeftRadius: radiusLeft
                 topRightRadius: radiusRight
                 bottomRightRadius: radiusRight
 
-                opacity: (workspaceOccupied[index] && !(!activeWindow?.activated && monitor?.activeWorkspace?.id === index + 1)) ? Config.opacity : 0
+                opacity: Config.opacity
+
+                x: modelData.start * workspaceButtonWidth
+                y: 0
 
                 Behavior on opacity {
                     enabled: Config.animDuration > 0
@@ -170,15 +206,14 @@ Item {
                         easing.type: Easing.OutQuad
                     }
                 }
-                Behavior on radiusLeft {
+                Behavior on x {
                     enabled: Config.animDuration > 0
                     NumberAnimation {
                         duration: Math.max(0, Config.animDuration - 100)
                         easing.type: Easing.OutQuad
                     }
                 }
-
-                Behavior on radiusRight {
+                Behavior on width {
                     enabled: Config.animDuration > 0
                     NumberAnimation {
                         duration: Math.max(0, Config.animDuration - 100)
@@ -189,36 +224,37 @@ Item {
         }
     }
 
-    ColumnLayout {
+    Item {
         id: columnLayout
         visible: orientation === "vertical"
         z: 1
 
-        spacing: 0
         anchors.fill: parent
         anchors.margins: widgetPadding
-        implicitWidth: workspaceButtonWidth
 
         Repeater {
-            model: effectiveWorkspaceCount
+            model: occupiedRanges
 
             StyledRect {
-                variant: "common"
+                variant: "focus"
                 required property int index
+                required property var modelData
                 z: 1
-                implicitWidth: workspaceButtonWidth
-                implicitHeight: workspaceButtonWidth
-                property var topOccupied: (workspaceOccupied[index - 1] && !(!activeWindow?.activated && monitor?.activeWorkspace?.id === index))
-                property var bottomOccupied: (workspaceOccupied[index + 1] && !(!activeWindow?.activated && monitor?.activeWorkspace?.id === index + 2))
-                property var radiusTop: topOccupied ? 0 : Config.roundness > 0 ? Math.max(Config.roundness - widgetPadding, 0) : 0
-                property var radiusBottom: bottomOccupied ? 0 : Config.roundness > 0 ? Math.max(Config.roundness - widgetPadding, 0) : 0
+                width: workspaceButtonWidth
+                height: (modelData.end - modelData.start + 1) * workspaceButtonWidth
+                
+                property var radiusTop: Config.roundness > 0 ? Math.max(Config.roundness - widgetPadding, 0) : 0
+                property var radiusBottom: Config.roundness > 0 ? Math.max(Config.roundness - widgetPadding, 0) : 0
 
                 topLeftRadius: radiusTop
                 topRightRadius: radiusTop
                 bottomLeftRadius: radiusBottom
                 bottomRightRadius: radiusBottom
 
-                opacity: (workspaceOccupied[index] && !(!activeWindow?.activated && monitor?.activeWorkspace?.id === index + 1)) ? Config.opacity : 0
+                opacity: Config.opacity
+
+                x: 0
+                y: modelData.start * workspaceButtonWidth
 
                 Behavior on opacity {
                     enabled: Config.animDuration > 0
@@ -227,15 +263,14 @@ Item {
                         easing.type: Easing.OutQuad
                     }
                 }
-                Behavior on radiusTop {
+                Behavior on y {
                     enabled: Config.animDuration > 0
                     NumberAnimation {
                         duration: Math.max(0, Config.animDuration - 100)
                         easing.type: Easing.OutQuad
                     }
                 }
-
-                Behavior on radiusBottom {
+                Behavior on height {
                     enabled: Config.animDuration > 0
                     NumberAnimation {
                         duration: Math.max(0, Config.animDuration - 100)
