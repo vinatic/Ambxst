@@ -671,13 +671,13 @@ Item {
                 property bool isInRenameMode: root.renameMode && modelData.name === root.sessionToRename
                 property color textColor: {
                     if (isInDeleteMode) {
-                        return Config.resolveColor(Config.theme.itemError);
+                        return Config.resolveColor(Config.theme.srError.itemColor);
                     } else if (isInRenameMode) {
-                        return Config.resolveColor(Config.theme.itemSecondary);
+                        return Config.resolveColor(Config.theme.srSecondary.itemColor);
                     } else if (root.selectedIndex === index) {
-                        return Config.resolveColor(Config.theme.itemPrimary);
+                        return Config.resolveColor(Config.theme.srPrimary.itemColor);
                     } else {
-                        return Config.resolveColor(Config.theme.itemCommon);
+                        return Config.resolveColor(Config.theme.srCommon.itemColor);
                     }
                 }
 
@@ -936,7 +936,7 @@ Item {
                             Text {
                                 anchors.centerIn: parent
                                 text: Icons.cancel
-                                color: renameCancelButton.isHighlighted ? Colors[Config.theme.itemOverSecondary] : Colors[Config.theme.itemSecondary]
+                                color: renameCancelButton.isHighlighted ? Colors[Config.theme.srOverSecondary.itemColor] : Colors[Config.theme.srSecondary.itemColor]
                                 font.pixelSize: 14
                                 font.family: Icons.font
                                 textFormat: Text.RichText
@@ -974,7 +974,7 @@ Item {
                             Text {
                                 anchors.centerIn: parent
                                 text: Icons.accept
-                                color: renameConfirmButton.isHighlighted ? Colors[Config.theme.itemOverSecondary] : Colors[Config.theme.itemSecondary]
+                                color: renameConfirmButton.isHighlighted ? Colors[Config.theme.srOverSecondary.itemColor] : Colors[Config.theme.srSecondary.itemColor]
                                 font.pixelSize: 14
                                 font.family: Icons.font
                                 textFormat: Text.RichText
@@ -1222,7 +1222,7 @@ Item {
                             Text {
                                 anchors.centerIn: parent
                                 text: Icons.cancel
-                                color: cancelButton.isHighlighted ? Colors[Config.theme.itemOverError] : Colors[Config.theme.itemError]
+                                color: cancelButton.isHighlighted ? Colors[Config.theme.srOverError.itemColor] : Colors[Config.theme.srError.itemColor]
                                 font.pixelSize: 14
                                 font.family: Icons.font
                                 textFormat: Text.RichText
@@ -1260,7 +1260,7 @@ Item {
                             Text {
                                 anchors.centerIn: parent
                                 text: Icons.accept
-                                color: confirmButton.isHighlighted ? Colors[Config.theme.itemOverError] : Colors[Config.theme.itemError]
+                                color: confirmButton.isHighlighted ? Colors[Config.theme.srOverError.itemColor] : Colors[Config.theme.srError.itemColor]
                                 font.pixelSize: 14
                                 font.family: Icons.font
                                 textFormat: Text.RichText
@@ -1444,7 +1444,7 @@ Item {
                                         font.family: Config.theme.font
                                         font.pixelSize: Config.theme.fontSize
                                         font.weight: Font.Bold
-                                        color: Colors[Config.theme.itemPane]
+                                        color: Colors[Config.theme.srPane.itemColor]
                                         horizontalAlignment: Text.AlignHCenter
                                         elide: Text.ElideMiddle
                                         visible: parent.parent.height > 35
@@ -1627,7 +1627,7 @@ Item {
                                             font.family: Config.theme.font
                                             font.pixelSize: Config.theme.fontSize
                                             font.weight: modelData.active ? Font.Bold : Font.Normal
-                                            color: modelData.active ? Colors[Config.theme.itemPrimary] : Colors[Config.theme.itemCommon]
+                                            color: modelData.active ? Colors[Config.theme.srPrimary.itemColor] : Colors[Config.theme.srCommon.itemColor]
 
                                             Behavior on color {
                                                 enabled: Config.animDuration > 0

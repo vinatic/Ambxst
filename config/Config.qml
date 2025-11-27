@@ -83,219 +83,275 @@ Singleton {
                 property string paneOrientation: "vertical"
                 property list<var> separatorColor: [["surfaceBright", 0.0]]
 
-                // Gradient configurations
-                property list<var> gradBg: [["background", 0.0]]
-                property string gradBgType: "linear"
-                property int gradBgAngle: 0
-                property real gradBgCenterX: 0.5
-                property real gradBgCenterY: 0.5
-                property real gradBgHalftoneDotMin: 2.0
-                property real gradBgHalftoneDotMax: 8.0
-                property real gradBgHalftoneStart: 0.0
-                property real gradBgHalftoneEnd: 1.0
-                property string gradBgHalftoneDotColor: "primary"
-                property string gradBgHalftoneBackgroundColor: "surface"
-                property list<var> gradPane: [["surface", 0.0]]
-                property string gradPaneType: "linear"
-                property int gradPaneAngle: 0
-                property real gradPaneCenterX: 0.5
-                property real gradPaneCenterY: 0.5
-                property real gradPaneHalftoneDotMin: 2.0
-                property real gradPaneHalftoneDotMax: 8.0
-                property real gradPaneHalftoneStart: 0.0
-                property real gradPaneHalftoneEnd: 1.0
-                property string gradPaneHalftoneDotColor: "primary"
-                property string gradPaneHalftoneBackgroundColor: "surface"
-                property list<var> gradCommon: [["surface", 0.0]]
-                property string gradCommonType: "linear"
-                property int gradCommonAngle: 0
-                property real gradCommonCenterX: 0.5
-                property real gradCommonCenterY: 0.5
-                property real gradCommonHalftoneDotMin: 2.0
-                property real gradCommonHalftoneDotMax: 8.0
-                property real gradCommonHalftoneStart: 0.0
-                property real gradCommonHalftoneEnd: 1.0
-                property string gradCommonHalftoneDotColor: "primary"
-                property string gradCommonHalftoneBackgroundColor: "surface"
-                property list<var> gradFocus: [["surfaceBright", 0.0]]
-                property string gradFocusType: "linear"
-                property int gradFocusAngle: 0
-                property real gradFocusCenterX: 0.5
-                property real gradFocusCenterY: 0.5
-                property real gradFocusHalftoneDotMin: 2.0
-                property real gradFocusHalftoneDotMax: 8.0
-                property real gradFocusHalftoneStart: 0.0
-                property real gradFocusHalftoneEnd: 1.0
-                property string gradFocusHalftoneDotColor: "primary"
-                property string gradFocusHalftoneBackgroundColor: "surfaceBright"
-                property list<var> gradPrimary: [["primary", 0.0]]
-                property string gradPrimaryType: "linear"
-                property int gradPrimaryAngle: 0
-                property real gradPrimaryCenterX: 0.5
-                property real gradPrimaryCenterY: 0.5
-                property real gradPrimaryHalftoneDotMin: 2.0
-                property real gradPrimaryHalftoneDotMax: 8.0
-                property real gradPrimaryHalftoneStart: 0.0
-                property real gradPrimaryHalftoneEnd: 1.0
-                property string gradPrimaryHalftoneDotColor: "overPrimary"
-                property string gradPrimaryHalftoneBackgroundColor: "primary"
-                property list<var> gradPrimaryFocus: [["overBackground", 0.0]]
-                property string gradPrimaryFocusType: "linear"
-                property int gradPrimaryFocusAngle: 0
-                property real gradPrimaryFocusCenterX: 0.5
-                property real gradPrimaryFocusCenterY: 0.5
-                property real gradPrimaryFocusHalftoneDotMin: 2.0
-                property real gradPrimaryFocusHalftoneDotMax: 8.0
-                property real gradPrimaryFocusHalftoneStart: 0.0
-                property real gradPrimaryFocusHalftoneEnd: 1.0
-                property string gradPrimaryFocusHalftoneDotColor: "primary"
-                property string gradPrimaryFocusHalftoneBackgroundColor: "overBackground"
-                property list<var> gradOverPrimary: [["overPrimary", 0.0]]
-                property string gradOverPrimaryType: "linear"
-                property int gradOverPrimaryAngle: 0
-                property real gradOverPrimaryCenterX: 0.5
-                property real gradOverPrimaryCenterY: 0.5
-                property real gradOverPrimaryHalftoneDotMin: 2.0
-                property real gradOverPrimaryHalftoneDotMax: 8.0
-                property real gradOverPrimaryHalftoneStart: 0.0
-                property real gradOverPrimaryHalftoneEnd: 1.0
-                property string gradOverPrimaryHalftoneDotColor: "primary"
-                property string gradOverPrimaryHalftoneBackgroundColor: "overPrimary"
-                property list<var> gradSecondary: [["secondary", 0.0]]
-                property string gradSecondaryType: "linear"
-                property int gradSecondaryAngle: 0
-                property real gradSecondaryCenterX: 0.5
-                property real gradSecondaryCenterY: 0.5
-                property real gradSecondaryHalftoneDotMin: 2.0
-                property real gradSecondaryHalftoneDotMax: 8.0
-                property real gradSecondaryHalftoneStart: 0.0
-                property real gradSecondaryHalftoneEnd: 1.0
-                property string gradSecondaryHalftoneDotColor: "overSecondary"
-                property string gradSecondaryHalftoneBackgroundColor: "secondary"
-                property list<var> gradSecondaryFocus: [["overBackground", 0.0]]
-                property string gradSecondaryFocusType: "linear"
-                property int gradSecondaryFocusAngle: 0
-                property real gradSecondaryFocusCenterX: 0.5
-                property real gradSecondaryFocusCenterY: 0.5
-                property real gradSecondaryFocusHalftoneDotMin: 2.0
-                property real gradSecondaryFocusHalftoneDotMax: 8.0
-                property real gradSecondaryFocusHalftoneStart: 0.0
-                property real gradSecondaryFocusHalftoneEnd: 1.0
-                property string gradSecondaryFocusHalftoneDotColor: "secondary"
-                property string gradSecondaryFocusHalftoneBackgroundColor: "overBackground"
-                property list<var> gradOverSecondary: [["overSecondary", 0.0]]
-                property string gradOverSecondaryType: "linear"
-                property int gradOverSecondaryAngle: 0
-                property real gradOverSecondaryCenterX: 0.5
-                property real gradOverSecondaryCenterY: 0.5
-                property real gradOverSecondaryHalftoneDotMin: 2.0
-                property real gradOverSecondaryHalftoneDotMax: 8.0
-                property real gradOverSecondaryHalftoneStart: 0.0
-                property real gradOverSecondaryHalftoneEnd: 1.0
-                property string gradOverSecondaryHalftoneDotColor: "secondary"
-                property string gradOverSecondaryHalftoneBackgroundColor: "overSecondary"
-                property list<var> gradTertiary: [["tertiary", 0.0]]
-                property string gradTertiaryType: "linear"
-                property int gradTertiaryAngle: 0
-                property real gradTertiaryCenterX: 0.5
-                property real gradTertiaryCenterY: 0.5
-                property real gradTertiaryHalftoneDotMin: 2.0
-                property real gradTertiaryHalftoneDotMax: 8.0
-                property real gradTertiaryHalftoneStart: 0.0
-                property real gradTertiaryHalftoneEnd: 1.0
-                property string gradTertiaryHalftoneDotColor: "overTertiary"
-                property string gradTertiaryHalftoneBackgroundColor: "tertiary"
-                property list<var> gradTertiaryFocus: [["overBackground", 0.0]]
-                property string gradTertiaryFocusType: "linear"
-                property int gradTertiaryFocusAngle: 0
-                property real gradTertiaryFocusCenterX: 0.5
-                property real gradTertiaryFocusCenterY: 0.5
-                property real gradTertiaryFocusHalftoneDotMin: 2.0
-                property real gradTertiaryFocusHalftoneDotMax: 8.0
-                property real gradTertiaryFocusHalftoneStart: 0.0
-                property real gradTertiaryFocusHalftoneEnd: 1.0
-                property string gradTertiaryFocusHalftoneDotColor: "tertiary"
-                property string gradTertiaryFocusHalftoneBackgroundColor: "overBackground"
-                property list<var> gradOverTertiary: [["overTertiary", 0.0]]
-                property string gradOverTertiaryType: "linear"
-                property int gradOverTertiaryAngle: 0
-                property real gradOverTertiaryCenterX: 0.5
-                property real gradOverTertiaryCenterY: 0.5
-                property real gradOverTertiaryHalftoneDotMin: 2.0
-                property real gradOverTertiaryHalftoneDotMax: 8.0
-                property real gradOverTertiaryHalftoneStart: 0.0
-                property real gradOverTertiaryHalftoneEnd: 1.0
-                property string gradOverTertiaryHalftoneDotColor: "tertiary"
-                property string gradOverTertiaryHalftoneBackgroundColor: "overTertiary"
-                property list<var> gradError: [["error", 0.0]]
-                property string gradErrorType: "linear"
-                property int gradErrorAngle: 0
-                property real gradErrorCenterX: 0.5
-                property real gradErrorCenterY: 0.5
-                property real gradErrorHalftoneDotMin: 2.0
-                property real gradErrorHalftoneDotMax: 8.0
-                property real gradErrorHalftoneStart: 0.0
-                property real gradErrorHalftoneEnd: 1.0
-                property string gradErrorHalftoneDotColor: "overError"
-                property string gradErrorHalftoneBackgroundColor: "error"
-                property list<var> gradErrorFocus: [["overBackground", 0.0]]
-                property string gradErrorFocusType: "linear"
-                property int gradErrorFocusAngle: 0
-                property real gradErrorFocusCenterX: 0.5
-                property real gradErrorFocusCenterY: 0.5
-                property real gradErrorFocusHalftoneDotMin: 2.0
-                property real gradErrorFocusHalftoneDotMax: 8.0
-                property real gradErrorFocusHalftoneStart: 0.0
-                property real gradErrorFocusHalftoneEnd: 1.0
-                property string gradErrorFocusHalftoneDotColor: "error"
-                property string gradErrorFocusHalftoneBackgroundColor: "overBackground"
-                property list<var> gradOverError: [["overError", 0.0]]
-                property string gradOverErrorType: "linear"
-                property int gradOverErrorAngle: 0
-                property real gradOverErrorCenterX: 0.5
-                property real gradOverErrorCenterY: 0.5
-                property real gradOverErrorHalftoneDotMin: 2.0
-                property real gradOverErrorHalftoneDotMax: 8.0
-                property real gradOverErrorHalftoneStart: 0.0
-                property real gradOverErrorHalftoneEnd: 1.0
-                property string gradOverErrorHalftoneDotColor: "error"
-                property string gradOverErrorHalftoneBackgroundColor: "overError"
+                // StyledRect variant configurations
+                // Each variant (bg, pane, common, focus, primary, etc.) contains:
+                // - gradient properties (stops, type, angle, center, halftone)
+                // - border properties [color, width]
+                // - item color (text/icon color to use on top of the variant)
 
-                // Border configurations [color, width]
-                property list<var> borderBg: ["surfaceBright", 0]
-                property list<var> borderPane: ["surfaceBright", 0]
-                property list<var> borderCommon: ["surfaceBright", 0]
-                property list<var> borderFocus: ["surfaceBright", 0]
-                property list<var> borderPrimary: ["primary", 0]
-                property list<var> borderPrimaryFocus: ["overBackground", 0]
-                property list<var> borderOverPrimary: ["overPrimary", 0]
-                property list<var> borderSecondary: ["secondary", 0]
-                property list<var> borderSecondaryFocus: ["overBackground", 0]
-                property list<var> borderOverSecondary: ["overSecondary", 0]
-                property list<var> borderTertiary: ["tertiary", 0]
-                property list<var> borderTertiaryFocus: ["overBackground", 0]
-                property list<var> borderOverTertiary: ["overTertiary", 0]
-                property list<var> borderError: ["error", 0]
-                property list<var> borderErrorFocus: ["overBackground", 0]
-                property list<var> borderOverError: ["overError", 0]
+                // SR: Background variant
+                property JsonObject srBg: JsonObject {
+                    property list<var> gradient: [["background", 0.0]]
+                    property string gradientType: "linear"
+                    property int gradientAngle: 0
+                    property real gradientCenterX: 0.5
+                    property real gradientCenterY: 0.5
+                    property real halftoneDotMin: 2.0
+                    property real halftoneDotMax: 8.0
+                    property real halftoneStart: 0.0
+                    property real halftoneEnd: 1.0
+                    property string halftoneDotColor: "primary"
+                    property string halftoneBackgroundColor: "surface"
+                    property list<var> border: ["surfaceBright", 0]
+                    property string itemColor: "overBackground"
+                }
 
-                // Item color configurations
-                property string itemBg: "overBackground"
-                property string itemPane: "overBackground"
-                property string itemCommon: "overBackground"
-                property string itemFocus: "overBackground"
-                property string itemPrimary: "overPrimary"
-                property string itemPrimaryFocus: "overPrimary"
-                property string itemOverPrimary: "primary"
-                property string itemSecondary: "overSecondary"
-                property string itemSecondaryFocus: "overSecondary"
-                property string itemOverSecondary: "secondary"
-                property string itemTertiary: "overTertiary"
-                property string itemTertiaryFocus: "overTertiary"
-                property string itemOverTertiary: "tertiary"
-                property string itemError: "overError"
-                property string itemErrorFocus: "overError"
-                property string itemOverError: "error"
+                // SR: Pane variant
+                property JsonObject srPane: JsonObject {
+                    property list<var> gradient: [["surface", 0.0]]
+                    property string gradientType: "linear"
+                    property int gradientAngle: 0
+                    property real gradientCenterX: 0.5
+                    property real gradientCenterY: 0.5
+                    property real halftoneDotMin: 2.0
+                    property real halftoneDotMax: 8.0
+                    property real halftoneStart: 0.0
+                    property real halftoneEnd: 1.0
+                    property string halftoneDotColor: "primary"
+                    property string halftoneBackgroundColor: "surface"
+                    property list<var> border: ["surfaceBright", 0]
+                    property string itemColor: "overBackground"
+                }
+
+                // SR: Common variant (default/neutral)
+                property JsonObject srCommon: JsonObject {
+                    property list<var> gradient: [["surface", 0.0]]
+                    property string gradientType: "linear"
+                    property int gradientAngle: 0
+                    property real gradientCenterX: 0.5
+                    property real gradientCenterY: 0.5
+                    property real halftoneDotMin: 2.0
+                    property real halftoneDotMax: 8.0
+                    property real halftoneStart: 0.0
+                    property real halftoneEnd: 1.0
+                    property string halftoneDotColor: "primary"
+                    property string halftoneBackgroundColor: "surface"
+                    property list<var> border: ["surfaceBright", 0]
+                    property string itemColor: "overBackground"
+                }
+
+                // SR: Focus variant
+                property JsonObject srFocus: JsonObject {
+                    property list<var> gradient: [["surfaceBright", 0.0]]
+                    property string gradientType: "linear"
+                    property int gradientAngle: 0
+                    property real gradientCenterX: 0.5
+                    property real gradientCenterY: 0.5
+                    property real halftoneDotMin: 2.0
+                    property real halftoneDotMax: 8.0
+                    property real halftoneStart: 0.0
+                    property real halftoneEnd: 1.0
+                    property string halftoneDotColor: "primary"
+                    property string halftoneBackgroundColor: "surfaceBright"
+                    property list<var> border: ["surfaceBright", 0]
+                    property string itemColor: "overBackground"
+                }
+
+                // SR: Primary variants
+                property JsonObject srPrimary: JsonObject {
+                    property list<var> gradient: [["primary", 0.0]]
+                    property string gradientType: "linear"
+                    property int gradientAngle: 0
+                    property real gradientCenterX: 0.5
+                    property real gradientCenterY: 0.5
+                    property real halftoneDotMin: 2.0
+                    property real halftoneDotMax: 8.0
+                    property real halftoneStart: 0.0
+                    property real halftoneEnd: 1.0
+                    property string halftoneDotColor: "overPrimary"
+                    property string halftoneBackgroundColor: "primary"
+                    property list<var> border: ["primary", 0]
+                    property string itemColor: "overPrimary"
+                }
+
+                property JsonObject srPrimaryFocus: JsonObject {
+                    property list<var> gradient: [["overBackground", 0.0]]
+                    property string gradientType: "linear"
+                    property int gradientAngle: 0
+                    property real gradientCenterX: 0.5
+                    property real gradientCenterY: 0.5
+                    property real halftoneDotMin: 2.0
+                    property real halftoneDotMax: 8.0
+                    property real halftoneStart: 0.0
+                    property real halftoneEnd: 1.0
+                    property string halftoneDotColor: "primary"
+                    property string halftoneBackgroundColor: "overBackground"
+                    property list<var> border: ["overBackground", 0]
+                    property string itemColor: "overPrimary"
+                }
+
+                property JsonObject srOverPrimary: JsonObject {
+                    property list<var> gradient: [["overPrimary", 0.0]]
+                    property string gradientType: "linear"
+                    property int gradientAngle: 0
+                    property real gradientCenterX: 0.5
+                    property real gradientCenterY: 0.5
+                    property real halftoneDotMin: 2.0
+                    property real halftoneDotMax: 8.0
+                    property real halftoneStart: 0.0
+                    property real halftoneEnd: 1.0
+                    property string halftoneDotColor: "primary"
+                    property string halftoneBackgroundColor: "overPrimary"
+                    property list<var> border: ["overPrimary", 0]
+                    property string itemColor: "primary"
+                }
+
+                // SR: Secondary variants
+                property JsonObject srSecondary: JsonObject {
+                    property list<var> gradient: [["secondary", 0.0]]
+                    property string gradientType: "linear"
+                    property int gradientAngle: 0
+                    property real gradientCenterX: 0.5
+                    property real gradientCenterY: 0.5
+                    property real halftoneDotMin: 2.0
+                    property real halftoneDotMax: 8.0
+                    property real halftoneStart: 0.0
+                    property real halftoneEnd: 1.0
+                    property string halftoneDotColor: "overSecondary"
+                    property string halftoneBackgroundColor: "secondary"
+                    property list<var> border: ["secondary", 0]
+                    property string itemColor: "overSecondary"
+                }
+
+                property JsonObject srSecondaryFocus: JsonObject {
+                    property list<var> gradient: [["overBackground", 0.0]]
+                    property string gradientType: "linear"
+                    property int gradientAngle: 0
+                    property real gradientCenterX: 0.5
+                    property real gradientCenterY: 0.5
+                    property real halftoneDotMin: 2.0
+                    property real halftoneDotMax: 8.0
+                    property real halftoneStart: 0.0
+                    property real halftoneEnd: 1.0
+                    property string halftoneDotColor: "secondary"
+                    property string halftoneBackgroundColor: "overBackground"
+                    property list<var> border: ["overBackground", 0]
+                    property string itemColor: "overSecondary"
+                }
+
+                property JsonObject srOverSecondary: JsonObject {
+                    property list<var> gradient: [["overSecondary", 0.0]]
+                    property string gradientType: "linear"
+                    property int gradientAngle: 0
+                    property real gradientCenterX: 0.5
+                    property real gradientCenterY: 0.5
+                    property real halftoneDotMin: 2.0
+                    property real halftoneDotMax: 8.0
+                    property real halftoneStart: 0.0
+                    property real halftoneEnd: 1.0
+                    property string halftoneDotColor: "secondary"
+                    property string halftoneBackgroundColor: "overSecondary"
+                    property list<var> border: ["overSecondary", 0]
+                    property string itemColor: "secondary"
+                }
+
+                // SR: Tertiary variants
+                property JsonObject srTertiary: JsonObject {
+                    property list<var> gradient: [["tertiary", 0.0]]
+                    property string gradientType: "linear"
+                    property int gradientAngle: 0
+                    property real gradientCenterX: 0.5
+                    property real gradientCenterY: 0.5
+                    property real halftoneDotMin: 2.0
+                    property real halftoneDotMax: 8.0
+                    property real halftoneStart: 0.0
+                    property real halftoneEnd: 1.0
+                    property string halftoneDotColor: "overTertiary"
+                    property string halftoneBackgroundColor: "tertiary"
+                    property list<var> border: ["tertiary", 0]
+                    property string itemColor: "overTertiary"
+                }
+
+                property JsonObject srTertiaryFocus: JsonObject {
+                    property list<var> gradient: [["overBackground", 0.0]]
+                    property string gradientType: "linear"
+                    property int gradientAngle: 0
+                    property real gradientCenterX: 0.5
+                    property real gradientCenterY: 0.5
+                    property real halftoneDotMin: 2.0
+                    property real halftoneDotMax: 8.0
+                    property real halftoneStart: 0.0
+                    property real halftoneEnd: 1.0
+                    property string halftoneDotColor: "tertiary"
+                    property string halftoneBackgroundColor: "overBackground"
+                    property list<var> border: ["overBackground", 0]
+                    property string itemColor: "overTertiary"
+                }
+
+                property JsonObject srOverTertiary: JsonObject {
+                    property list<var> gradient: [["overTertiary", 0.0]]
+                    property string gradientType: "linear"
+                    property int gradientAngle: 0
+                    property real gradientCenterX: 0.5
+                    property real gradientCenterY: 0.5
+                    property real halftoneDotMin: 2.0
+                    property real halftoneDotMax: 8.0
+                    property real halftoneStart: 0.0
+                    property real halftoneEnd: 1.0
+                    property string halftoneDotColor: "tertiary"
+                    property string halftoneBackgroundColor: "overTertiary"
+                    property list<var> border: ["overTertiary", 0]
+                    property string itemColor: "tertiary"
+                }
+
+                // SR: Error variants
+                property JsonObject srError: JsonObject {
+                    property list<var> gradient: [["error", 0.0]]
+                    property string gradientType: "linear"
+                    property int gradientAngle: 0
+                    property real gradientCenterX: 0.5
+                    property real gradientCenterY: 0.5
+                    property real halftoneDotMin: 2.0
+                    property real halftoneDotMax: 8.0
+                    property real halftoneStart: 0.0
+                    property real halftoneEnd: 1.0
+                    property string halftoneDotColor: "overError"
+                    property string halftoneBackgroundColor: "error"
+                    property list<var> border: ["error", 0]
+                    property string itemColor: "overError"
+                }
+
+                property JsonObject srErrorFocus: JsonObject {
+                    property list<var> gradient: [["overBackground", 0.0]]
+                    property string gradientType: "linear"
+                    property int gradientAngle: 0
+                    property real gradientCenterX: 0.5
+                    property real gradientCenterY: 0.5
+                    property real halftoneDotMin: 2.0
+                    property real halftoneDotMax: 8.0
+                    property real halftoneStart: 0.0
+                    property real halftoneEnd: 1.0
+                    property string halftoneDotColor: "error"
+                    property string halftoneBackgroundColor: "overBackground"
+                    property list<var> border: ["overBackground", 0]
+                    property string itemColor: "overError"
+                }
+
+                property JsonObject srOverError: JsonObject {
+                    property list<var> gradient: [["overError", 0.0]]
+                    property string gradientType: "linear"
+                    property int gradientAngle: 0
+                    property real gradientCenterX: 0.5
+                    property real gradientCenterY: 0.5
+                    property real halftoneDotMin: 2.0
+                    property real halftoneDotMax: 8.0
+                    property real halftoneStart: 0.0
+                    property real halftoneEnd: 1.0
+                    property string halftoneDotColor: "error"
+                    property string halftoneBackgroundColor: "overError"
+                    property list<var> border: ["overError", 0]
+                    property string itemColor: "error"
+                }
             }
 
             property JsonObject bar: JsonObject {

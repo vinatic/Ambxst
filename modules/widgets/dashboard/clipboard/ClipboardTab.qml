@@ -828,15 +828,11 @@ Item {
                         property bool isDraggingForReorder: false
                         property color textColor: {
                             if (isInDeleteMode) {
-                                return Config.resolveColor(Config.theme.itemError);
-                            } else if (isInAliasMode) {
-                                return Config.resolveColor(Config.theme.itemSecondary);
-                            } else if (isExpanded) {
-                                return Config.resolveColor(Config.theme.itemCommon);
+                                return Config.resolveColor(Config.theme.srError.itemColor);
                             } else if (isSelected) {
-                                return Config.resolveColor(Config.theme.itemPrimary);
+                                return Config.resolveColor(Config.theme.srPrimary.itemColor);
                             } else {
-                                return Config.resolveColor(Config.theme.itemCommon);
+                                return Config.resolveColor(Config.theme.srCommon.itemColor);
                             }
                         }
                         property string displayText: {
@@ -1072,7 +1068,7 @@ Item {
                                         Text {
                                             anchors.centerIn: parent
                                             text: Icons.cancel
-                                            color: cancelButton.isHighlighted ? Colors[Config.theme.itemOverError] : Colors[Config.theme.itemError]
+                                            color: cancelButton.isHighlighted ? Colors[Config.theme.srOverError.itemColor] : Colors[Config.theme.srError.itemColor]
                                             font.pixelSize: 14
                                             font.family: Icons.font
                                             textFormat: Text.RichText
@@ -1110,7 +1106,7 @@ Item {
                                         Text {
                                             anchors.centerIn: parent
                                             text: Icons.accept
-                                            color: confirmButton.isHighlighted ? Colors[Config.theme.itemOverError] : Colors[Config.theme.itemError]
+                                            color: confirmButton.isHighlighted ? Colors[Config.theme.srOverError.itemColor] : Colors[Config.theme.srError.itemColor]
                                             font.pixelSize: 14
                                             font.family: Icons.font
                                             textFormat: Text.RichText
@@ -1228,7 +1224,7 @@ Item {
                                         Text {
                                             anchors.centerIn: parent
                                             text: Icons.cancel
-                                            color: aliasCancelButton.isHighlighted ? Colors[Config.theme.itemOverSecondary] : Colors[Config.theme.itemSecondary]
+                                            color: aliasCancelButton.isHighlighted ? Colors[Config.theme.srOverSecondary.itemColor] : Colors[Config.theme.srSecondary.itemColor]
                                             font.pixelSize: 14
                                             font.family: Icons.font
                                             textFormat: Text.RichText
@@ -1266,7 +1262,7 @@ Item {
                                         Text {
                                             anchors.centerIn: parent
                                             text: Icons.accept
-                                            color: aliasConfirmButton.isHighlighted ? Colors[Config.theme.itemOverSecondary] : Colors[Config.theme.itemSecondary]
+                                            color: aliasConfirmButton.isHighlighted ? Colors[Config.theme.srOverSecondary.itemColor] : Colors[Config.theme.srSecondary.itemColor]
                                             font.pixelSize: 14
                                             font.family: Icons.font
                                             textFormat: Text.RichText

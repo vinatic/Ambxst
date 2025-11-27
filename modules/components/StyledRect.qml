@@ -17,512 +17,70 @@ ClippingRectangle {
     property string gradientOrientation: "vertical"
     property bool enableShadow: false
 
-    readonly property var gradientStops: {
+    readonly property var variantConfig: {
         switch (variant) {
         case "bg":
-            return Config.theme.gradBg;
+            return Config.theme.srBg;
         case "pane":
-            return Config.theme.gradPane;
+            return Config.theme.srPane;
         case "common":
-            return Config.theme.gradCommon;
+            return Config.theme.srCommon;
         case "focus":
-            return Config.theme.gradFocus;
+            return Config.theme.srFocus;
         case "primary":
-            return Config.theme.gradPrimary;
+            return Config.theme.srPrimary;
         case "primaryfocus":
-            return Config.theme.gradPrimaryFocus;
+            return Config.theme.srPrimaryFocus;
         case "overprimary":
-            return Config.theme.gradOverPrimary;
+            return Config.theme.srOverPrimary;
         case "secondary":
-            return Config.theme.gradSecondary;
+            return Config.theme.srSecondary;
         case "secondaryfocus":
-            return Config.theme.gradSecondaryFocus;
+            return Config.theme.srSecondaryFocus;
         case "oversecondary":
-            return Config.theme.gradOverSecondary;
+            return Config.theme.srOverSecondary;
         case "tertiary":
-            return Config.theme.gradTertiary;
+            return Config.theme.srTertiary;
         case "tertiaryfocus":
-            return Config.theme.gradTertiaryFocus;
+            return Config.theme.srTertiaryFocus;
         case "overtertiary":
-            return Config.theme.gradOverTertiary;
+            return Config.theme.srOverTertiary;
         case "error":
-            return Config.theme.gradError;
+            return Config.theme.srError;
         case "errorfocus":
-            return Config.theme.gradErrorFocus;
+            return Config.theme.srErrorFocus;
         case "overerror":
-            return Config.theme.gradOverError;
+            return Config.theme.srOverError;
         default:
-            return Config.theme.gradCommon;
+            return Config.theme.srCommon;
         }
     }
 
-    readonly property string gradientType: {
-        switch (variant) {
-        case "bg":
-            return Config.theme.gradBgType;
-        case "pane":
-            return Config.theme.gradPaneType;
-        case "common":
-            return Config.theme.gradCommonType;
-        case "focus":
-            return Config.theme.gradFocusType;
-        case "primary":
-            return Config.theme.gradPrimaryType;
-        case "primaryfocus":
-            return Config.theme.gradPrimaryFocusType;
-        case "overprimary":
-            return Config.theme.gradOverPrimaryType;
-        case "secondary":
-            return Config.theme.gradSecondaryType;
-        case "secondaryfocus":
-            return Config.theme.gradSecondaryFocusType;
-        case "oversecondary":
-            return Config.theme.gradOverSecondaryType;
-        case "tertiary":
-            return Config.theme.gradTertiaryType;
-        case "tertiaryfocus":
-            return Config.theme.gradTertiaryFocusType;
-        case "overtertiary":
-            return Config.theme.gradOverTertiaryType;
-        case "error":
-            return Config.theme.gradErrorType;
-        case "errorfocus":
-            return Config.theme.gradErrorFocusType;
-        case "overerror":
-            return Config.theme.gradOverErrorType;
-        default:
-            return Config.theme.gradCommonType;
-        }
-    }
+    readonly property var gradientStops: variantConfig.gradient
 
-    readonly property real gradientAngle: {
-        switch (variant) {
-        case "bg":
-            return Config.theme.gradBgAngle;
-        case "pane":
-            return Config.theme.gradPaneAngle;
-        case "common":
-            return Config.theme.gradCommonAngle;
-        case "focus":
-            return Config.theme.gradFocusAngle;
-        case "primary":
-            return Config.theme.gradPrimaryAngle;
-        case "primaryfocus":
-            return Config.theme.gradPrimaryFocusAngle;
-        case "overprimary":
-            return Config.theme.gradOverPrimaryAngle;
-        case "secondary":
-            return Config.theme.gradSecondaryAngle;
-        case "secondaryfocus":
-            return Config.theme.gradSecondaryFocusAngle;
-        case "oversecondary":
-            return Config.theme.gradOverSecondaryAngle;
-        case "tertiary":
-            return Config.theme.gradTertiaryAngle;
-        case "tertiaryfocus":
-            return Config.theme.gradTertiaryFocusAngle;
-        case "overtertiary":
-            return Config.theme.gradOverTertiaryAngle;
-        case "error":
-            return Config.theme.gradErrorAngle;
-        case "errorfocus":
-            return Config.theme.gradErrorFocusAngle;
-        case "overerror":
-            return Config.theme.gradOverErrorAngle;
-        default:
-            return Config.theme.gradCommonAngle;
-        }
-    }
+    readonly property string gradientType: variantConfig.gradientType
 
-    readonly property real gradientCenterX: {
-        switch (variant) {
-        case "bg":
-            return Config.theme.gradBgCenterX;
-        case "pane":
-            return Config.theme.gradPaneCenterX;
-        case "common":
-            return Config.theme.gradCommonCenterX;
-        case "focus":
-            return Config.theme.gradFocusCenterX;
-        case "primary":
-            return Config.theme.gradPrimaryCenterX;
-        case "primaryfocus":
-            return Config.theme.gradPrimaryFocusCenterX;
-        case "overprimary":
-            return Config.theme.gradOverPrimaryCenterX;
-        case "secondary":
-            return Config.theme.gradSecondaryCenterX;
-        case "secondaryfocus":
-            return Config.theme.gradSecondaryFocusCenterX;
-        case "oversecondary":
-            return Config.theme.gradOverSecondaryCenterX;
-        case "tertiary":
-            return Config.theme.gradTertiaryCenterX;
-        case "tertiaryfocus":
-            return Config.theme.gradTertiaryFocusCenterX;
-        case "overtertiary":
-            return Config.theme.gradOverTertiaryCenterX;
-        case "error":
-            return Config.theme.gradErrorCenterX;
-        case "errorfocus":
-            return Config.theme.gradErrorFocusCenterX;
-        case "overerror":
-            return Config.theme.gradOverErrorCenterX;
-        default:
-            return Config.theme.gradCommonCenterX;
-        }
-    }
+    readonly property real gradientAngle: variantConfig.gradientAngle
 
-    readonly property real gradientCenterY: {
-        switch (variant) {
-        case "bg":
-            return Config.theme.gradBgCenterY;
-        case "pane":
-            return Config.theme.gradPaneCenterY;
-        case "common":
-            return Config.theme.gradCommonCenterY;
-        case "focus":
-            return Config.theme.gradFocusCenterY;
-        case "primary":
-            return Config.theme.gradPrimaryCenterY;
-        case "primaryfocus":
-            return Config.theme.gradPrimaryFocusCenterY;
-        case "overprimary":
-            return Config.theme.gradOverPrimaryCenterY;
-        case "secondary":
-            return Config.theme.gradSecondaryCenterY;
-        case "secondaryfocus":
-            return Config.theme.gradSecondaryFocusCenterY;
-        case "oversecondary":
-            return Config.theme.gradOverSecondaryCenterY;
-        case "tertiary":
-            return Config.theme.gradTertiaryCenterY;
-        case "tertiaryfocus":
-            return Config.theme.gradTertiaryFocusCenterY;
-        case "overtertiary":
-            return Config.theme.gradOverTertiaryCenterY;
-        case "error":
-            return Config.theme.gradErrorCenterY;
-        case "errorfocus":
-            return Config.theme.gradErrorFocusCenterY;
-        case "overerror":
-            return Config.theme.gradOverErrorCenterY;
-        default:
-            return Config.theme.gradCommonCenterY;
-        }
-    }
+    readonly property real gradientCenterX: variantConfig.gradientCenterX
 
-    readonly property real halftoneDotMin: {
-        switch (variant) {
-        case "bg":
-            return Config.theme.gradBgHalftoneDotMin;
-        case "pane":
-            return Config.theme.gradPaneHalftoneDotMin;
-        case "common":
-            return Config.theme.gradCommonHalftoneDotMin;
-        case "focus":
-            return Config.theme.gradFocusHalftoneDotMin;
-        case "primary":
-            return Config.theme.gradPrimaryHalftoneDotMin;
-        case "primaryfocus":
-            return Config.theme.gradPrimaryFocusHalftoneDotMin;
-        case "overprimary":
-            return Config.theme.gradOverPrimaryHalftoneDotMin;
-        case "secondary":
-            return Config.theme.gradSecondaryHalftoneDotMin;
-        case "secondaryfocus":
-            return Config.theme.gradSecondaryFocusHalftoneDotMin;
-        case "oversecondary":
-            return Config.theme.gradOverSecondaryHalftoneDotMin;
-        case "tertiary":
-            return Config.theme.gradTertiaryHalftoneDotMin;
-        case "tertiaryfocus":
-            return Config.theme.gradTertiaryFocusHalftoneDotMin;
-        case "overtertiary":
-            return Config.theme.gradOverTertiaryHalftoneDotMin;
-        case "error":
-            return Config.theme.gradErrorHalftoneDotMin;
-        case "errorfocus":
-            return Config.theme.gradErrorFocusHalftoneDotMin;
-        case "overerror":
-            return Config.theme.gradOverErrorHalftoneDotMin;
-        default:
-            return Config.theme.gradCommonHalftoneDotMin;
-        }
-    }
+    readonly property real gradientCenterY: variantConfig.gradientCenterY
 
-    readonly property real halftoneDotMax: {
-        switch (variant) {
-        case "bg":
-            return Config.theme.gradBgHalftoneDotMax;
-        case "pane":
-            return Config.theme.gradPaneHalftoneDotMax;
-        case "common":
-            return Config.theme.gradCommonHalftoneDotMax;
-        case "focus":
-            return Config.theme.gradFocusHalftoneDotMax;
-        case "primary":
-            return Config.theme.gradPrimaryHalftoneDotMax;
-        case "primaryfocus":
-            return Config.theme.gradPrimaryFocusHalftoneDotMax;
-        case "overprimary":
-            return Config.theme.gradOverPrimaryHalftoneDotMax;
-        case "secondary":
-            return Config.theme.gradSecondaryHalftoneDotMax;
-        case "secondaryfocus":
-            return Config.theme.gradSecondaryFocusHalftoneDotMax;
-        case "oversecondary":
-            return Config.theme.gradOverSecondaryHalftoneDotMax;
-        case "tertiary":
-            return Config.theme.gradTertiaryHalftoneDotMax;
-        case "tertiaryfocus":
-            return Config.theme.gradTertiaryFocusHalftoneDotMax;
-        case "overtertiary":
-            return Config.theme.gradOverTertiaryHalftoneDotMax;
-        case "error":
-            return Config.theme.gradErrorHalftoneDotMax;
-        case "errorfocus":
-            return Config.theme.gradErrorFocusHalftoneDotMax;
-        case "overerror":
-            return Config.theme.gradOverErrorHalftoneDotMax;
-        default:
-            return Config.theme.gradCommonHalftoneDotMax;
-        }
-    }
+    readonly property real halftoneDotMin: variantConfig.halftoneDotMin
 
-    readonly property real halftoneStart: {
-        switch (variant) {
-        case "bg":
-            return Config.theme.gradBgHalftoneStart;
-        case "pane":
-            return Config.theme.gradPaneHalftoneStart;
-        case "common":
-            return Config.theme.gradCommonHalftoneStart;
-        case "focus":
-            return Config.theme.gradFocusHalftoneStart;
-        case "primary":
-            return Config.theme.gradPrimaryHalftoneStart;
-        case "primaryfocus":
-            return Config.theme.gradPrimaryFocusHalftoneStart;
-        case "overprimary":
-            return Config.theme.gradOverPrimaryHalftoneStart;
-        case "secondary":
-            return Config.theme.gradSecondaryHalftoneStart;
-        case "secondaryfocus":
-            return Config.theme.gradSecondaryFocusHalftoneStart;
-        case "oversecondary":
-            return Config.theme.gradOverSecondaryHalftoneStart;
-        case "tertiary":
-            return Config.theme.gradTertiaryHalftoneStart;
-        case "tertiaryfocus":
-            return Config.theme.gradTertiaryFocusHalftoneStart;
-        case "overtertiary":
-            return Config.theme.gradOverTertiaryHalftoneStart;
-        case "error":
-            return Config.theme.gradErrorHalftoneStart;
-        case "errorfocus":
-            return Config.theme.gradErrorFocusHalftoneStart;
-        case "overerror":
-            return Config.theme.gradOverErrorHalftoneStart;
-        default:
-            return Config.theme.gradCommonHalftoneStart;
-        }
-    }
+    readonly property real halftoneDotMax: variantConfig.halftoneDotMax
 
-    readonly property real halftoneEnd: {
-        switch (variant) {
-        case "bg":
-            return Config.theme.gradBgHalftoneEnd;
-        case "pane":
-            return Config.theme.gradPaneHalftoneEnd;
-        case "common":
-            return Config.theme.gradCommonHalftoneEnd;
-        case "focus":
-            return Config.theme.gradFocusHalftoneEnd;
-        case "primary":
-            return Config.theme.gradPrimaryHalftoneEnd;
-        case "primaryfocus":
-            return Config.theme.gradPrimaryFocusHalftoneEnd;
-        case "overprimary":
-            return Config.theme.gradOverPrimaryHalftoneEnd;
-        case "secondary":
-            return Config.theme.gradSecondaryHalftoneEnd;
-        case "secondaryfocus":
-            return Config.theme.gradSecondaryFocusHalftoneEnd;
-        case "oversecondary":
-            return Config.theme.gradOverSecondaryHalftoneEnd;
-        case "tertiary":
-            return Config.theme.gradTertiaryHalftoneEnd;
-        case "tertiaryfocus":
-            return Config.theme.gradTertiaryFocusHalftoneEnd;
-        case "overtertiary":
-            return Config.theme.gradOverTertiaryHalftoneEnd;
-        case "error":
-            return Config.theme.gradErrorHalftoneEnd;
-        case "errorfocus":
-            return Config.theme.gradErrorFocusHalftoneEnd;
-        case "overerror":
-            return Config.theme.gradOverErrorHalftoneEnd;
-        default:
-            return Config.theme.gradCommonHalftoneEnd;
-        }
-    }
+    readonly property real halftoneStart: variantConfig.halftoneStart
 
-    readonly property color halftoneDotColor: {
-        switch (variant) {
-        case "bg":
-            return Config.resolveColor(Config.theme.gradBgHalftoneDotColor);
-        case "pane":
-            return Config.resolveColor(Config.theme.gradPaneHalftoneDotColor);
-        case "common":
-            return Config.resolveColor(Config.theme.gradCommonHalftoneDotColor);
-        case "focus":
-            return Config.resolveColor(Config.theme.gradFocusHalftoneDotColor);
-        case "primary":
-            return Config.resolveColor(Config.theme.gradPrimaryHalftoneDotColor);
-        case "primaryfocus":
-            return Config.resolveColor(Config.theme.gradPrimaryFocusHalftoneDotColor);
-        case "overprimary":
-            return Config.resolveColor(Config.theme.gradOverPrimaryHalftoneDotColor);
-        case "secondary":
-            return Config.resolveColor(Config.theme.gradSecondaryHalftoneDotColor);
-        case "secondaryfocus":
-            return Config.resolveColor(Config.theme.gradSecondaryFocusHalftoneDotColor);
-        case "oversecondary":
-            return Config.resolveColor(Config.theme.gradOverSecondaryHalftoneDotColor);
-        case "tertiary":
-            return Config.resolveColor(Config.theme.gradTertiaryHalftoneDotColor);
-        case "tertiaryfocus":
-            return Config.resolveColor(Config.theme.gradTertiaryFocusHalftoneDotColor);
-        case "overtertiary":
-            return Config.resolveColor(Config.theme.gradOverTertiaryHalftoneDotColor);
-        case "error":
-            return Config.resolveColor(Config.theme.gradErrorHalftoneDotColor);
-        case "errorfocus":
-            return Config.resolveColor(Config.theme.gradErrorFocusHalftoneDotColor);
-        case "overerror":
-            return Config.resolveColor(Config.theme.gradOverErrorHalftoneDotColor);
-        default:
-            return Config.resolveColor(Config.theme.gradCommonHalftoneDotColor);
-        }
-    }
+    readonly property real halftoneEnd: variantConfig.halftoneEnd
 
-    readonly property color halftoneBackgroundColor: {
-        switch (variant) {
-        case "bg":
-            return Config.resolveColor(Config.theme.gradBgHalftoneBackgroundColor);
-        case "pane":
-            return Config.resolveColor(Config.theme.gradPaneHalftoneBackgroundColor);
-        case "common":
-            return Config.resolveColor(Config.theme.gradCommonHalftoneBackgroundColor);
-        case "focus":
-            return Config.resolveColor(Config.theme.gradFocusHalftoneBackgroundColor);
-        case "primary":
-            return Config.resolveColor(Config.theme.gradPrimaryHalftoneBackgroundColor);
-        case "primaryfocus":
-            return Config.resolveColor(Config.theme.gradPrimaryFocusHalftoneBackgroundColor);
-        case "overprimary":
-            return Config.resolveColor(Config.theme.gradOverPrimaryHalftoneBackgroundColor);
-        case "secondary":
-            return Config.resolveColor(Config.theme.gradSecondaryHalftoneBackgroundColor);
-        case "secondaryfocus":
-            return Config.resolveColor(Config.theme.gradSecondaryFocusHalftoneBackgroundColor);
-        case "oversecondary":
-            return Config.resolveColor(Config.theme.gradOverSecondaryHalftoneBackgroundColor);
-        case "tertiary":
-            return Config.resolveColor(Config.theme.gradTertiaryHalftoneBackgroundColor);
-        case "tertiaryfocus":
-            return Config.resolveColor(Config.theme.gradTertiaryFocusHalftoneBackgroundColor);
-        case "overtertiary":
-            return Config.resolveColor(Config.theme.gradOverTertiaryHalftoneBackgroundColor);
-        case "error":
-            return Config.resolveColor(Config.theme.gradErrorHalftoneBackgroundColor);
-        case "errorfocus":
-            return Config.resolveColor(Config.theme.gradErrorFocusHalftoneBackgroundColor);
-        case "overerror":
-            return Config.resolveColor(Config.theme.gradOverErrorHalftoneBackgroundColor);
-        default:
-            return Config.resolveColor(Config.theme.gradCommonHalftoneBackgroundColor);
-        }
-    }
+    readonly property color halftoneDotColor: Config.resolveColor(variantConfig.halftoneDotColor)
 
-    readonly property var borderData: {
-        switch (variant) {
-        case "bg":
-            return Config.theme.borderBg;
-        case "pane":
-            return Config.theme.borderPane;
-        case "common":
-            return Config.theme.borderCommon;
-        case "focus":
-            return Config.theme.borderFocus;
-        case "primary":
-            return Config.theme.borderPrimary;
-        case "primaryfocus":
-            return Config.theme.borderPrimaryFocus;
-        case "overprimary":
-            return Config.theme.borderOverPrimary;
-        case "secondary":
-            return Config.theme.borderSecondary;
-        case "secondaryfocus":
-            return Config.theme.borderSecondaryFocus;
-        case "oversecondary":
-            return Config.theme.borderOverSecondary;
-        case "tertiary":
-            return Config.theme.borderTertiary;
-        case "tertiaryfocus":
-            return Config.theme.borderTertiaryFocus;
-        case "overtertiary":
-            return Config.theme.borderOverTertiary;
-        case "error":
-            return Config.theme.borderError;
-        case "errorfocus":
-            return Config.theme.borderErrorFocus;
-        case "overerror":
-            return Config.theme.borderOverError;
-        default:
-            return Config.theme.borderCommon;
-        }
-    }
+    readonly property color halftoneBackgroundColor: Config.resolveColor(variantConfig.halftoneBackgroundColor)
 
-    readonly property color itemColor: {
-        switch (variant) {
-        case "bg":
-            return Config.resolveColor(Config.theme.itemBg);
-        case "pane":
-            return Config.resolveColor(Config.theme.itemPane);
-        case "common":
-            return Config.resolveColor(Config.theme.itemCommon);
-        case "focus":
-            return Config.resolveColor(Config.theme.itemFocus);
-        case "primary":
-            return Config.resolveColor(Config.theme.itemPrimary);
-        case "primaryfocus":
-            return Config.resolveColor(Config.theme.itemPrimaryFocus);
-        case "overprimary":
-            return Config.resolveColor(Config.theme.itemOverPrimary);
-        case "secondary":
-            return Config.resolveColor(Config.theme.itemSecondary);
-        case "secondaryfocus":
-            return Config.resolveColor(Config.theme.itemSecondaryFocus);
-        case "oversecondary":
-            return Config.resolveColor(Config.theme.itemOverSecondary);
-        case "tertiary":
-            return Config.resolveColor(Config.theme.itemTertiary);
-        case "tertiaryfocus":
-            return Config.resolveColor(Config.theme.itemTertiaryFocus);
-        case "overtertiary":
-            return Config.resolveColor(Config.theme.itemOverTertiary);
-        case "error":
-            return Config.resolveColor(Config.theme.itemError);
-        case "errorfocus":
-            return Config.resolveColor(Config.theme.itemErrorFocus);
-        case "overerror":
-            return Config.resolveColor(Config.theme.itemOverError);
-        default:
-            return Config.resolveColor(Config.theme.itemCommon);
-        }
-    }
+    readonly property var borderData: variantConfig.border
+
+    readonly property color itemColor: Config.resolveColor(variantConfig.itemColor)
 
     radius: Config.roundness
     color: "transparent"
