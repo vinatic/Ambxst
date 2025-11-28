@@ -8,8 +8,8 @@ import qs.modules.components
 import qs.config
 
 StyledRect {
-    variant: "bg"
     id: root
+    variant: "bg"
 
     required property string orientation
 
@@ -66,8 +66,8 @@ StyledRect {
 
         // Sliding highlight indicator (behind buttons)
         StyledRect {
-            variant: "primary"
             id: highlight
+            variant: "primary"
             z: 0
             radius: Math.max(0, Config.roundness - 2)
 
