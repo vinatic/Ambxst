@@ -913,7 +913,7 @@ Rectangle {
 
             // Recent emojis vertical list
             Item {
-                width: LayoutMetrics.calculateRightPanelWidth(parent.height)
+                width: LayoutMetrics.calculateRightPanelWidth(parent.width)
                 height: parent.height
                 visible: recentEmojis.length > 0 && searchText.length === 0
 
@@ -1124,7 +1124,7 @@ Rectangle {
 
             // Placeholder cuando no hay recientes
             Item {
-                width: LayoutMetrics.calculateRightPanelWidth(parent.height)
+                width: LayoutMetrics.calculateRightPanelWidth(parent.width)
                 height: parent.height
                 visible: recentEmojis.length === 0 && searchText.length === 0
 

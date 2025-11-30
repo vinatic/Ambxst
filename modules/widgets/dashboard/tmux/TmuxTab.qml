@@ -1852,7 +1852,7 @@ Item {
         // Preview panel
         Item {
             id: previewPanel
-            width: LayoutMetrics.calculateRightPanelWidth(parent.height)
+            width: LayoutMetrics.calculateRightPanelWidth(parent.width)
             height: parent.height
 
             property var currentSession: root.selectedIndex >= 0 && root.selectedIndex < root.filteredSessions.length ? root.filteredSessions[root.selectedIndex] : null

@@ -2292,7 +2292,7 @@ Item {
         // Preview panel (toda la altura, resto del ancho)
         Item {
             id: previewPanel
-            width: LayoutMetrics.calculateRightPanelWidth(parent.height)
+            width: LayoutMetrics.calculateRightPanelWidth(parent.width)
             height: parent.height
 
             property var currentItem: root.selectedIndex >= 0 && root.selectedIndex < root.allItems.length ? root.allItems[root.selectedIndex] : null

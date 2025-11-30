@@ -187,7 +187,8 @@ FocusScope {
 
             // Columna para el buscador y las opciones.
             ColumnLayout {
-                Layout.fillWidth: true
+                Layout.preferredWidth: 300
+                Layout.fillWidth: false
                 Layout.fillHeight: true
                 spacing: 8
 
@@ -530,7 +531,6 @@ FocusScope {
             // Contenedor para la cuadrícula de fondos de pantalla.
             ClippingRectangle {
                 id: wallpaperGridContainer
-                width: LayoutMetrics.calculateRightPanelWidth(parent.height)
                 height: parent.height
                 color: "transparent"
                 radius: Config.roundness > 0 ? Config.roundness + 4 : 0
@@ -538,8 +538,7 @@ FocusScope {
                 border.width: 0
                 clip: true
 
-                Layout.preferredWidth: width
-                Layout.fillWidth: false
+                Layout.fillWidth: true
                 Layout.fillHeight: true
 
                 readonly property int wallpaperHeight: (height + LayoutMetrics.wallpaperMargin * 2) / LayoutMetrics.gridRows

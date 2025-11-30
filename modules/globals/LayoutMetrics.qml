@@ -11,15 +11,10 @@ QtObject {
     readonly property int wallpaperMargin: 4
 
     function calculateLeftPanelWidth(containerWidth, containerHeight, containerSpacing) {
-        var actualSpacing = containerSpacing !== undefined ? containerSpacing : spacing;
-        var remainingWidth = containerWidth - actualSpacing * 2 - separatorWidth;
-        var wallpaperHeight = (containerHeight + 4 * 2) / gridRows;
-        var rightPanelWidth = (wallpaperHeight * gridColumns) - adjustmentPadding;
-        return remainingWidth - rightPanelWidth;
+        return 300;
     }
 
-    function calculateRightPanelWidth(containerHeight) {
-        var wallpaperHeight = (containerHeight + 4 * 2) / gridRows;
-        return (wallpaperHeight * gridColumns) - adjustmentPadding;
+    function calculateRightPanelWidth(containerWidth) {
+        return containerWidth - 300 - spacing - separatorWidth;
     }
 }
