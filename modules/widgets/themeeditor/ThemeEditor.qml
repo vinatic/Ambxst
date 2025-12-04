@@ -17,6 +17,7 @@ FloatingWindow {
     color: "transparent"
 
     minimumSize: Qt.size(750, 750)
+    maximumSize: Qt.size(750, 750)
 
     property string selectedVariant: ""
     property bool hasChanges: false

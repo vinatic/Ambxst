@@ -177,7 +177,9 @@ NotchAnimationBehavior {
 
             Column {
                 id: tabs
-                anchors.fill: parent
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
                 spacing: root.tabSpacing
 
                 Repeater {
@@ -221,6 +223,43 @@ NotchAnimationBehavior {
 
                         onClicked: stack.navigateToTab(index)
                     }
+                }
+            }
+
+            // Theme Editor button
+            Button {
+                id: themeEditorButton
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                height: width
+                flat: true
+                hoverEnabled: true
+
+                background: StyledRect {
+                    radius: Styling.radius(4)
+                    variant: themeEditorButton.hovered ? "focus" : "common"
+                }
+
+                contentItem: Text {
+                    text: Icons.gear
+                    font.family: Icons.font
+                    font.pixelSize: 20
+                    font.weight: Font.Medium
+                    color: Colors.overBackground
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                onClicked: {
+                    Visibilities.setActiveModule("");
+                    GlobalStates.themeEditorVisible = false;
+                    GlobalStates.themeEditorVisible = true;
+                }
+
+                StyledToolTip {
+                    visible: parent.hovered
+                    tooltipText: "Theme Editor"
                 }
             }
         }

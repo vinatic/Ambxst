@@ -297,13 +297,6 @@ PanelWindow {
                 }
             }
 
-            ToggleButton {
-                id: themeEditorButton
-                buttonIcon: Icons.gear
-                tooltipText: "Theme Editor"
-                onToggle: function() { GlobalStates.themeEditorVisible = !GlobalStates.themeEditorVisible }
-            }
-
             PowerButton {
                 id: powerButton
             }
@@ -469,14 +462,6 @@ PanelWindow {
                     bar: panel
                     layer.enabled: Config.bar.showBackground
                 }
-            }
-
-            ToggleButton {
-                id: themeEditorButtonVert
-                buttonIcon: Icons.gear
-                tooltipText: "Theme Editor"
-                Layout.preferredHeight: 36
-                onToggle: function() { GlobalStates.themeEditorVisible = !GlobalStates.themeEditorVisible }
             }
 
             PowerButton {
