@@ -253,13 +253,7 @@ NotchAnimationBehavior {
 
                 onClicked: {
                     Visibilities.setActiveModule("");
-                    GlobalStates.themeEditorVisible = false;
-                    GlobalStates.themeEditorVisible = true;
-                }
-
-                StyledToolTip {
-                    visible: parent.hovered
-                    tooltipText: "Theme Editor"
+                    GlobalStates.openThemeEditor();
                 }
             }
         }

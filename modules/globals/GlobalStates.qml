@@ -76,4 +76,9 @@ Singleton {
 
     // Theme Editor state
     property bool themeEditorVisible: false
+
+    function openThemeEditor() {
+        themeEditorVisible = false;
+        themeEditorVisible = true;
+    }
 }
