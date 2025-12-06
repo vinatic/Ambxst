@@ -482,9 +482,9 @@ GroupBox {
             // Color selector - using ColorButton
             ColorButton {
                 Layout.fillWidth: true
-                compact: true
                 colorNames: root.colorNames
                 currentColor: (stopEditor.currentStop && stopEditor.currentStop[0]) ? stopEditor.currentStop[0].toString() : "surface"
+                label: "Color"
                 dialogTitle: "Select Stop Color"
                 onColorSelected: color => {
                     if (root.selectedStopIndex >= 0 && root.selectedStopIndex < root.stops.length) {
