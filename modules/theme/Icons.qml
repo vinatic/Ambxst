@@ -186,4 +186,5 @@ QtObject {
     readonly property string alignRight: ""
     readonly property string alignJustify: ""
     readonly property string markdown: ""
+    readonly property string faders: ""
 }
