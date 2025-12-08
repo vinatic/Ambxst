@@ -3044,19 +3044,27 @@ Item {
                         id: mdEditorFlickable
                         anchors.fill: parent
                         contentWidth: width
-                        contentHeight: mdEditor.contentHeight + 32
+                        contentHeight: mdEditor.contentHeight + height * 0.5  // Extra bottom margin for scroll
                         clip: true
                         boundsBehavior: Flickable.StopAtBounds
 
-                        // Sync scroll to preview
-                        onContentYChanged: {
-                            if (mdEditorFlickable.moving || mdEditorFlickable.dragging) {
-                                let ratio = contentHeight > height ? contentY / (contentHeight - height) : 0;
-                                let targetY = ratio * (mdPreviewFlickable.contentHeight - mdPreviewFlickable.height);
-                                if (mdPreviewFlickable.contentHeight > mdPreviewFlickable.height) {
-                                    mdPreviewFlickable.contentY = Math.max(0, Math.min(targetY, mdPreviewFlickable.contentHeight - mdPreviewFlickable.height));
-                                }
+                        // Flag to prevent sync loops
+                        property bool syncing: false
+
+                        // Sync editor scroll to preview
+                        function syncToPreview() {
+                            if (syncing || !mdPreviewFlickable) return;
+                            syncing = true;
+                            let ratio = contentHeight > height ? contentY / Math.max(1, contentHeight - height) : 0;
+                            let targetY = ratio * (mdPreviewFlickable.contentHeight - mdPreviewFlickable.height);
+                            if (mdPreviewFlickable.contentHeight > mdPreviewFlickable.height) {
+                                mdPreviewFlickable.contentY = Math.max(0, Math.min(targetY, mdPreviewFlickable.contentHeight - mdPreviewFlickable.height));
                             }
+                            syncing = false;
+                        }
+
+                        onContentYChanged: {
+                            syncToPreview();
                         }
 
                         TextArea.flickable: TextArea {
@@ -3083,10 +3091,34 @@ Item {
                                     saveDebounceTimer.restart();
                                 }
                                 root.mdUpdateHeadingDisplay();
+                                // Sync after text changes with small delay to let layout update
+                                mdSyncTimer.restart();
                             }
 
                             onCursorPositionChanged: {
                                 root.mdUpdateHeadingDisplay();
+                                // Ensure cursor is visible and sync preview
+                                mdSyncTimer.restart();
+                            }
+
+                            // Timer to debounce sync calls
+                            Timer {
+                                id: mdSyncTimer
+                                interval: 50
+                                repeat: false
+                                onTriggered: {
+                                    // Make sure cursor is visible in editor
+                                    let cursorRect = mdEditor.cursorRectangle;
+                                    if (cursorRect.y < mdEditorFlickable.contentY) {
+                                        mdEditorFlickable.contentY = Math.max(0, cursorRect.y - 20);
+                                    } else if (cursorRect.y + cursorRect.height > mdEditorFlickable.contentY + mdEditorFlickable.height) {
+                                        mdEditorFlickable.contentY = Math.min(
+                                            mdEditorFlickable.contentHeight - mdEditorFlickable.height,
+                                            cursorRect.y + cursorRect.height - mdEditorFlickable.height + 20
+                                        );
+                                    }
+                                    // Sync will happen via onContentYChanged
+                                }
                             }
 
                             Keys.onEscapePressed: {
@@ -3158,18 +3190,20 @@ Item {
                         id: mdPreviewFlickable
                         anchors.fill: parent
                         contentWidth: width
-                        contentHeight: mdPreviewText.contentHeight + 32
+                        contentHeight: mdPreviewText.contentHeight + height * 0.5  // Extra bottom margin for scroll
                         clip: true
                         boundsBehavior: Flickable.StopAtBounds
 
-                        // Sync scroll to editor
+                        // Sync preview scroll to editor (only on manual interaction)
                         onContentYChanged: {
-                            if (mdPreviewFlickable.moving || mdPreviewFlickable.dragging) {
-                                let ratio = contentHeight > height ? contentY / (contentHeight - height) : 0;
+                            if ((mdPreviewFlickable.moving || mdPreviewFlickable.dragging) && !mdEditorFlickable.syncing) {
+                                mdEditorFlickable.syncing = true;
+                                let ratio = contentHeight > height ? contentY / Math.max(1, contentHeight - height) : 0;
                                 let targetY = ratio * (mdEditorFlickable.contentHeight - mdEditorFlickable.height);
                                 if (mdEditorFlickable.contentHeight > mdEditorFlickable.height) {
                                     mdEditorFlickable.contentY = Math.max(0, Math.min(targetY, mdEditorFlickable.contentHeight - mdEditorFlickable.height));
                                 }
+                                mdEditorFlickable.syncing = false;
                             }
                         }
 
