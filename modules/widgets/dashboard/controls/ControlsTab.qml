@@ -16,16 +16,14 @@ Rectangle {
 
     property int currentSection: 0  // 0: Network, 1: Bluetooth, 2: Mixer, 3: Effects
 
-    RowLayout {
+    ColumnLayout {
         anchors.fill: parent
         spacing: 8
 
-        // Sidebar navigation with labels
-        ColumnLayout {
-            id: sidebar
-            Layout.preferredWidth: 100
-            Layout.maximumWidth: 100
-            Layout.fillHeight: true
+        // Tab bar at the top, centered
+        RowLayout {
+            id: tabBar
+            Layout.alignment: Qt.AlignHCenter
             Layout.fillWidth: false
             spacing: 4
 
@@ -38,28 +36,30 @@ Rectangle {
                 ]
 
                 delegate: Button {
-                    id: sidebarButton
+                    id: tabButton
                     required property var modelData
                     required property int index
 
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 36
+                    implicitWidth: 90
+                    implicitHeight: 32
                     flat: true
                     hoverEnabled: true
 
                     background: StyledRect {
-                        variant: root.currentSection === sidebarButton.modelData.section ? "primary" : (sidebarButton.hovered ? "focus" : "common")
+                        variant: root.currentSection === tabButton.modelData.section ? "primary" : (tabButton.hovered ? "focus" : "common")
                         radius: Styling.radius(4)
                     }
 
                     contentItem: RowLayout {
-                        spacing: 8
+                        id: tabContent
+                        spacing: 6
+                        anchors.centerIn: parent
 
                         Text {
-                            text: sidebarButton.modelData.icon
+                            text: tabButton.modelData.icon
                             font.family: Icons.font
-                            font.pixelSize: 16
-                            color: root.currentSection === sidebarButton.modelData.section 
+                            font.pixelSize: 14
+                            color: root.currentSection === tabButton.modelData.section 
                                 ? Config.resolveColor(Config.theme.srPrimary.itemColor) 
                                 : Colors.overBackground
                             Layout.leftMargin: 8
@@ -74,15 +74,14 @@ Rectangle {
                         }
 
                         Text {
-                            text: sidebarButton.modelData.label
+                            text: tabButton.modelData.label
                             font.family: Config.theme.font
                             font.pixelSize: Config.theme.fontSize - 2
                             font.weight: Font.Medium
-                            color: root.currentSection === sidebarButton.modelData.section 
+                            color: root.currentSection === tabButton.modelData.section 
                                 ? Config.resolveColor(Config.theme.srPrimary.itemColor) 
                                 : Colors.overBackground
-                            Layout.fillWidth: true
-                            elide: Text.ElideRight
+                            Layout.rightMargin: 8
 
                             Behavior on color {
                                 enabled: Config.animDuration > 0
@@ -94,18 +93,11 @@ Rectangle {
                         }
                     }
 
-                    onClicked: root.currentSection = sidebarButton.modelData.section
-
-                    StyledToolTip {
-                        visible: sidebarButton.hovered
-                        tooltipText: sidebarButton.modelData.label
-                    }
+                    onClicked: root.currentSection = tabButton.modelData.section
                 }
             }
 
-            Item { Layout.fillHeight: true }
-
-            // Scroll hint for sidebar
+            // Scroll/wheel support on tab bar
             WheelHandler {
                 acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
                 onWheel: event => {
@@ -118,20 +110,11 @@ Rectangle {
             }
         }
 
-        // Separator
-        Separator {
-            Layout.preferredWidth: 2
-            Layout.fillHeight: true
-            vert: true
-        }
-
         // Content area with animated transitions
         Item {
             id: contentArea
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.minimumWidth: 300
-            Layout.preferredWidth: 300
             clip: true
 
             property int previousSection: 0
