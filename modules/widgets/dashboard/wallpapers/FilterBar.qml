@@ -242,14 +242,6 @@ FocusScope {
                     height: 32
                     radius: isActive ? Styling.radius(0) / 2 : Styling.radius(0)
 
-                    Behavior on radius {
-                        enabled: Config.animDuration > 0
-                        NumberAnimation {
-                            duration: Config.animDuration / 2
-                            easing.type: Easing.OutQuart
-                        }
-                    }
-
                     Item {
                         anchors.fill: parent
                         anchors.margins: 8

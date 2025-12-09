@@ -21,6 +21,7 @@ ClippingRectangle {
     property string gradientOrientation: "vertical"
     property bool enableShadow: false
     property bool enableBorder: true
+    property bool animateRadius: true
 
     readonly property var variantConfig: {
         switch (variant) {
@@ -97,7 +98,7 @@ ClippingRectangle {
     color: "transparent"
 
     Behavior on radius {
-        enabled: Config.animDuration > 0
+        enabled: root.animateRadius && Config.animDuration > 0
         NumberAnimation {
             duration: Config.animDuration / 2
         }

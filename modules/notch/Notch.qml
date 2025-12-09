@@ -67,6 +67,7 @@ Item {
         height: parent.implicitHeight
         enabled: false // No interactuable
         enableBorder: false // No usar border de StyledRect, el Canvas se encarga
+        animateRadius: false // Custom animation below
 
         property int defaultRadius: Config.roundness > 0 ? (screenNotchOpen || hasActiveNotifications ? Config.roundness + 20 : Config.roundness + 4) : 0
 
@@ -175,6 +176,7 @@ Item {
             layer.enabled: false
             clip: false // Desactivar clip para que no corte el border
             enableBorder: true // En island sí usar border de StyledRect
+            animateRadius: false // Custom animation below
             
             // Usar el islandRadius como radius base también
             radius: parent.islandRadius

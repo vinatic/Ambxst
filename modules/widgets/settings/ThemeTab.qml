@@ -107,14 +107,6 @@ Item {
                             height: 32
                             radius: isSelected ? Styling.radius(0) / 2 : Styling.radius(0)
 
-                            Behavior on radius {
-                                enabled: (Config.animDuration ?? 0) > 0
-                                NumberAnimation {
-                                    duration: (Config.animDuration ?? 0) / 2
-                                    easing.type: Easing.OutQuart
-                                }
-                            }
-
                             Behavior on width {
                                 enabled: (Config.animDuration ?? 0) > 0
                                 NumberAnimation {

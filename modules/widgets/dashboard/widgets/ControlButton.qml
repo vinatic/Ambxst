@@ -26,14 +26,6 @@ StyledRect {
 
     radius: root.isActive ? Styling.radius(0) : Styling.radius(4)
 
-    Behavior on radius {
-        enabled: Config.animDuration > 0
-        NumberAnimation {
-            duration: Config.animDuration / 2
-            easing.type: Easing.OutQuart
-        }
-    }
-
     Text {
         anchors.centerIn: parent
         text: root.iconName
