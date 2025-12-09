@@ -96,6 +96,13 @@ ClippingRectangle {
     radius: Styling.radius(0)
     color: "transparent"
 
+    Behavior on radius {
+        enabled: Config.animDuration > 0
+        NumberAnimation {
+            duration: Config.animDuration / 2
+        }
+    }
+
     // Linear gradient
     Rectangle {
         id: linearGrad

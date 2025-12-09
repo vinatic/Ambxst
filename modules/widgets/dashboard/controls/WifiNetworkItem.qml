@@ -43,8 +43,8 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.leftMargin: 8
-        anchors.rightMargin: 8
+        anchors.leftMargin: 12
+        anchors.rightMargin: 12
         anchors.topMargin: 8
         spacing: 8
 

@@ -73,15 +73,20 @@ Item {
                 }
 
                 // Device list
-                Repeater {
-                    model: root.showOutput ? Audio.outputDevices : Audio.inputDevices
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 4
 
-                    delegate: AudioDeviceItem {
-                        required property var modelData
-                        Layout.fillWidth: true
-                        node: modelData
-                        isOutput: root.showOutput
-                        isSelected: (root.showOutput ? Audio.sink : Audio.source) === modelData
+                    Repeater {
+                        model: root.showOutput ? Audio.outputDevices : Audio.inputDevices
+
+                        delegate: AudioDeviceItem {
+                            required property var modelData
+                            Layout.fillWidth: true
+                            node: modelData
+                            isOutput: root.showOutput
+                            isSelected: (root.showOutput ? Audio.sink : Audio.source) === modelData
+                        }
                     }
                 }
 

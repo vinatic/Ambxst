@@ -26,7 +26,7 @@ Item {
     StyledRect {
         anchors.fill: parent
         variant: isSelected ? "primary" : (mouseArea.containsMouse ? "focus" : "common")
-        radius: Styling.radius(4)
+        radius: isSelected ? Styling.radius(-4) : Styling.radius(4)
     }
 
     MouseArea {
@@ -44,7 +44,10 @@ Item {
 
     RowLayout {
         anchors.fill: parent
-        anchors.margins: 8
+        anchors.leftMargin: 12
+        anchors.rightMargin: 12
+        anchors.topMargin: 8
+        anchors.bottomMargin: 8
         spacing: 12
 
         // Device icon
@@ -63,6 +66,7 @@ Item {
             text: Audio.friendlyDeviceName(root.node)
             font.family: Config.theme.font
             font.pixelSize: Config.theme.fontSize
+            font.weight: root.isSelected ? Font.Bold : Font.Normal
             color: root.isSelected 
                 ? Config.resolveColor(Config.theme.srPrimary.itemColor)
                 : Colors.overBackground
