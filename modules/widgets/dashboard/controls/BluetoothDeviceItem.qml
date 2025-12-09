@@ -54,10 +54,15 @@ Item {
             Text {
                 text: {
                     const icon = root.device?.icon ?? "bluetooth";
-                    if (icon.includes("audio-headset") || icon.includes("headphone")) return Icons.speakerHigh;
+                    if (icon.includes("audio-headset") || icon.includes("headphone")) return Icons.headphones;
                     if (icon.includes("input-keyboard")) return Icons.keyboard;
-                    if (icon.includes("input-mouse")) return "";  // Mouse icon
-                    if (icon.includes("phone")) return "";  // Phone icon
+                    if (icon.includes("input-mouse")) return Icons.mouse;
+                    if (icon.includes("phone")) return Icons.phone;
+                    if (icon.includes("watch")) return Icons.watch;
+                    if (icon.includes("input-gaming") || icon.includes("gamepad")) return Icons.gamepad;
+                    if (icon.includes("printer")) return Icons.printer;
+                    if (icon.includes("camera")) return Icons.camera;
+                    if (icon.includes("audio-speakers") || icon.includes("speaker")) return Icons.speaker;
                     return Icons.bluetooth;
                 }
                 font.family: Icons.font
@@ -119,18 +124,20 @@ Item {
                 Text {
                     text: {
                         const battery = root.device?.battery ?? 0;
-                        if (battery > 80) return "";  // Full battery
-                        if (battery > 60) return "";
-                        if (battery > 40) return "";
-                        if (battery > 20) return "";
-                        return "";  // Low battery
+                        if (battery > 80) return Icons.batteryFull;
+                        if (battery > 60) return Icons.batteryHigh;
+                        if (battery > 40) return Icons.batteryMedium;
+                        if (battery > 20) return Icons.batteryLow;
+                        return Icons.batteryEmpty;
                     }
                     font.family: Icons.font
-                    font.pixelSize: 14
+                    font.pixelSize: 18
                     color: {
                         const battery = root.device?.battery ?? 0;
-                        if (battery <= 20) return Colors.error;
-                        return Colors.overSurfaceVariant;
+                        if (battery > 60) return Colors.green;
+                        if (battery > 40) return Colors.yellow;
+                        if (battery > 20) return Colors.red;
+                        return Colors.error;
                     }
                 }
             }

@@ -237,7 +237,6 @@ NotchAnimationBehavior {
             }
         }
 
-        // Separator
         Separator {
             width: 2
             height: parent.height

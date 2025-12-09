@@ -16,10 +16,9 @@ RowLayout {
     property color statusColor: Colors.primary
     property bool showToggle: false
     property bool toggleChecked: false
-    property bool showSpinner: false
 
     // Action buttons configuration
-    // Each action: { icon: "...", tooltip: "...", onClicked: function, enabled: true }
+    // Each action: { icon: "...", tooltip: "...", onClicked: function, enabled: true, loading: false }
     property var actions: []
 
     signal toggleChanged(bool checked)
@@ -48,23 +47,6 @@ RowLayout {
 
     Item { Layout.fillWidth: true }
 
-    // Spinning indicator
-    Text {
-        visible: root.showSpinner
-        text: Icons.sync
-        font.family: Icons.font
-        font.pixelSize: 16
-        color: Colors.primary
-        
-        RotationAnimation on rotation {
-            running: root.showSpinner
-            from: 0
-            to: 360
-            duration: 1000
-            loops: Animation.Infinite
-        }
-    }
-
     // Action buttons
     Repeater {
         model: root.actions
@@ -76,7 +58,9 @@ RowLayout {
             flat: true
             implicitWidth: 28
             implicitHeight: 28
-            enabled: modelData.enabled !== undefined ? modelData.enabled : true
+            enabled: (modelData.enabled !== undefined ? modelData.enabled : true) && !(modelData.loading ?? false)
+
+            property bool isLoading: modelData.loading ?? false
 
             background: StyledRect {
                 variant: actionButton.hovered ? "focus" : "common"
@@ -84,12 +68,21 @@ RowLayout {
             }
 
             contentItem: Text {
+                id: iconText
                 text: actionButton.modelData.icon || ""
                 font.family: Icons.font
                 font.pixelSize: 14
-                color: actionButton.enabled ? Colors.overBackground : Colors.outline
+                color: actionButton.isLoading ? Colors.primary : (actionButton.enabled ? Colors.overBackground : Colors.outline)
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
+
+                RotationAnimation on rotation {
+                    running: actionButton.isLoading
+                    from: 0
+                    to: 360
+                    duration: 1000
+                    loops: Animation.Infinite
+                }
             }
 
             onClicked: {

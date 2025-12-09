@@ -36,7 +36,6 @@ Item {
         // Titlebar
         PanelTitlebar {
             title: "Bluetooth"
-            showSpinner: BluetoothService.discovering
             showToggle: true
             toggleChecked: BluetoothService.enabled
             
@@ -49,7 +48,8 @@ Item {
                 {
                     icon: Icons.sync,
                     tooltip: "Scan for devices",
-                    enabled: !BluetoothService.discovering && BluetoothService.enabled,
+                    enabled: BluetoothService.enabled,
+                    loading: BluetoothService.discovering,
                     onClicked: function() { BluetoothService.startDiscovery(); }
                 }
             ]

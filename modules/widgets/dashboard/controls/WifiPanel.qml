@@ -27,7 +27,6 @@ Item {
             statusText: NetworkService.wifiConnecting ? "Connecting..." : 
                        (NetworkService.wifiStatus === "limited" ? "Limited" : "")
             statusColor: NetworkService.wifiStatus === "limited" ? Colors.warning : Colors.primary
-            showSpinner: NetworkService.wifiScanning
             showToggle: true
             toggleChecked: NetworkService.wifiStatus !== "disabled"
             
@@ -46,7 +45,8 @@ Item {
                 {
                     icon: Icons.sync,
                     tooltip: "Rescan networks",
-                    enabled: !NetworkService.wifiScanning && NetworkService.wifiEnabled,
+                    enabled: NetworkService.wifiEnabled,
+                    loading: NetworkService.wifiScanning,
                     onClicked: function() { NetworkService.rescanWifi(); }
                 }
             ]
