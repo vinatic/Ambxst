@@ -14,7 +14,6 @@ Item {
 
     required property string variantId
 
-    signal updateVariant(string property, var value)
     signal close
 
     implicitHeight: mainColumn.implicitHeight
@@ -74,7 +73,6 @@ Item {
         if (variantConfig) {
             GlobalStates.markThemeChanged();
             variantConfig[prop] = value;
-            root.updateVariant(prop, value);
         }
     }
 

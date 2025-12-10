@@ -82,109 +82,88 @@ Singleton {
     property bool themeHasChanges: false
     property var themeSnapshot: null
 
+    // Constants for theme snapshot operations (avoid duplication)
+    readonly property var _srVariantNames: [
+        "srBg", "srInternalBg", "srBarBg", "srPane", "srCommon", "srFocus",
+        "srPrimary", "srPrimaryFocus", "srOverPrimary",
+        "srSecondary", "srSecondaryFocus", "srOverSecondary",
+        "srTertiary", "srTertiaryFocus", "srOverTertiary",
+        "srError", "srErrorFocus", "srOverError"
+    ]
+    readonly property var _simpleThemeProps: [
+        "roundness", "oledMode", "lightMode", "font", "fontSize",
+        "tintIcons", "enableCorners", "animDuration",
+        "shadowOpacity", "shadowColor", "shadowXOffset", "shadowYOffset", "shadowBlur"
+    ]
+    readonly property var _srVariantProps: [
+        "gradientType", "gradientAngle", "gradientCenterX", "gradientCenterY",
+        "halftoneDotMin", "halftoneDotMax", "halftoneStart", "halftoneEnd",
+        "halftoneDotColor", "halftoneBackgroundColor", "itemColor", "opacity"
+    ]
+
     function openSettings() {
         settingsVisible = false;
         settingsVisible = true;
+    }
+
+    // Deep copy a single SR variant
+    function _copySrVariant(src) {
+        var copy = {};
+        for (var i = 0; i < _srVariantProps.length; i++) {
+            copy[_srVariantProps[i]] = src[_srVariantProps[i]];
+        }
+        // Deep copy arrays
+        copy.gradient = JSON.parse(JSON.stringify(src.gradient));
+        copy.border = JSON.parse(JSON.stringify(src.border));
+        return copy;
+    }
+
+    // Restore a single SR variant from source to destination
+    function _restoreSrVariant(src, dest) {
+        for (var i = 0; i < _srVariantProps.length; i++) {
+            dest[_srVariantProps[i]] = src[_srVariantProps[i]];
+        }
+        // Deep copy arrays
+        dest.gradient = JSON.parse(JSON.stringify(src.gradient));
+        dest.border = JSON.parse(JSON.stringify(src.border));
     }
 
     // Create a deep copy of the current theme config
     function createThemeSnapshot() {
         var snapshot = {};
         var theme = Config.theme;
-        
+
         // Copy simple properties
-        snapshot.roundness = theme.roundness;
-        snapshot.oledMode = theme.oledMode;
-        snapshot.lightMode = theme.lightMode;
-        snapshot.font = theme.font;
-        snapshot.fontSize = theme.fontSize;
-        snapshot.tintIcons = theme.tintIcons;
-        snapshot.enableCorners = theme.enableCorners;
-        snapshot.animDuration = theme.animDuration;
-        snapshot.shadowOpacity = theme.shadowOpacity;
-        snapshot.shadowColor = theme.shadowColor;
-        snapshot.shadowXOffset = theme.shadowXOffset;
-        snapshot.shadowYOffset = theme.shadowYOffset;
-        snapshot.shadowBlur = theme.shadowBlur;
-        
-        // Copy SR variants
-        var variants = ["srBg", "srInternalBg", "srBarBg", "srPane", "srCommon", "srFocus",
-                       "srPrimary", "srPrimaryFocus", "srOverPrimary",
-                       "srSecondary", "srSecondaryFocus", "srOverSecondary",
-                       "srTertiary", "srTertiaryFocus", "srOverTertiary",
-                       "srError", "srErrorFocus", "srOverError"];
-        
-        for (var i = 0; i < variants.length; i++) {
-            var name = variants[i];
-            var src = theme[name];
-            snapshot[name] = {
-                gradient: JSON.parse(JSON.stringify(src.gradient)),
-                gradientType: src.gradientType,
-                gradientAngle: src.gradientAngle,
-                gradientCenterX: src.gradientCenterX,
-                gradientCenterY: src.gradientCenterY,
-                halftoneDotMin: src.halftoneDotMin,
-                halftoneDotMax: src.halftoneDotMax,
-                halftoneStart: src.halftoneStart,
-                halftoneEnd: src.halftoneEnd,
-                halftoneDotColor: src.halftoneDotColor,
-                halftoneBackgroundColor: src.halftoneBackgroundColor,
-                border: JSON.parse(JSON.stringify(src.border)),
-                itemColor: src.itemColor,
-                opacity: src.opacity
-            };
+        for (var i = 0; i < _simpleThemeProps.length; i++) {
+            var prop = _simpleThemeProps[i];
+            snapshot[prop] = theme[prop];
         }
-        
+
+        // Copy SR variants
+        for (var j = 0; j < _srVariantNames.length; j++) {
+            var name = _srVariantNames[j];
+            snapshot[name] = _copySrVariant(theme[name]);
+        }
+
         return snapshot;
     }
 
     // Restore theme from snapshot
     function restoreThemeSnapshot(snapshot) {
         if (!snapshot) return;
-        
+
         var theme = Config.theme;
-        
+
         // Restore simple properties
-        theme.roundness = snapshot.roundness;
-        theme.oledMode = snapshot.oledMode;
-        theme.lightMode = snapshot.lightMode;
-        theme.font = snapshot.font;
-        theme.fontSize = snapshot.fontSize;
-        theme.tintIcons = snapshot.tintIcons;
-        theme.enableCorners = snapshot.enableCorners;
-        theme.animDuration = snapshot.animDuration;
-        theme.shadowOpacity = snapshot.shadowOpacity;
-        theme.shadowColor = snapshot.shadowColor;
-        theme.shadowXOffset = snapshot.shadowXOffset;
-        theme.shadowYOffset = snapshot.shadowYOffset;
-        theme.shadowBlur = snapshot.shadowBlur;
-        
+        for (var i = 0; i < _simpleThemeProps.length; i++) {
+            var prop = _simpleThemeProps[i];
+            theme[prop] = snapshot[prop];
+        }
+
         // Restore SR variants
-        var variants = ["srBg", "srInternalBg", "srBarBg", "srPane", "srCommon", "srFocus",
-                       "srPrimary", "srPrimaryFocus", "srOverPrimary",
-                       "srSecondary", "srSecondaryFocus", "srOverSecondary",
-                       "srTertiary", "srTertiaryFocus", "srOverTertiary",
-                       "srError", "srErrorFocus", "srOverError"];
-        
-        for (var i = 0; i < variants.length; i++) {
-            var name = variants[i];
-            var src = snapshot[name];
-            var dest = theme[name];
-            
-            dest.gradient = JSON.parse(JSON.stringify(src.gradient));
-            dest.gradientType = src.gradientType;
-            dest.gradientAngle = src.gradientAngle;
-            dest.gradientCenterX = src.gradientCenterX;
-            dest.gradientCenterY = src.gradientCenterY;
-            dest.halftoneDotMin = src.halftoneDotMin;
-            dest.halftoneDotMax = src.halftoneDotMax;
-            dest.halftoneStart = src.halftoneStart;
-            dest.halftoneEnd = src.halftoneEnd;
-            dest.halftoneDotColor = src.halftoneDotColor;
-            dest.halftoneBackgroundColor = src.halftoneBackgroundColor;
-            dest.border = JSON.parse(JSON.stringify(src.border));
-            dest.itemColor = src.itemColor;
-            dest.opacity = src.opacity;
+        for (var j = 0; j < _srVariantNames.length; j++) {
+            var name = _srVariantNames[j];
+            _restoreSrVariant(snapshot[name], theme[name]);
         }
     }
 

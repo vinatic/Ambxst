@@ -309,9 +309,6 @@ Item {
                         VariantEditor {
                             Layout.fillWidth: true
                             variantId: root.selectedVariant
-                            onUpdateVariant: (property, value) => {
-                                GlobalStates.markThemeChanged();
-                            }
                             onClose: {}
                         }
                     }
