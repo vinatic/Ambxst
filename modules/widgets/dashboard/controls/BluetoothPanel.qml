@@ -13,6 +13,10 @@ import qs.config
 Item {
     id: root
 
+    property int maxContentWidth: 480
+    readonly property int contentWidth: Math.min(width, maxContentWidth)
+    readonly property real sideMargin: (width - contentWidth) / 2
+
     Component.onCompleted: {
         // Only refresh device list, don't start scanning automatically
         if (BluetoothService.enabled) {
@@ -24,64 +28,72 @@ Item {
         BluetoothService.stopDiscovery();
     }
 
-    ColumnLayout {
+    // Device list - fills entire width for scroll/drag
+    ListView {
+        id: deviceList
         anchors.fill: parent
-        spacing: 8
+        clip: true
+        spacing: 4
 
-        // Titlebar
-        PanelTitlebar {
-            title: "Bluetooth"
-            showToggle: true
-            toggleChecked: BluetoothService.enabled
-            
-            actions: [
-                {
-                    icon: Icons.externalLink,
-                    tooltip: "Open Blueman",
-                    onClicked: function() { Quickshell.execDetached(["blueman-manager"]); }
-                },
-                {
-                    icon: Icons.sync,
-                    tooltip: "Scan for devices",
-                    enabled: BluetoothService.enabled,
-                    loading: BluetoothService.discovering,
-                    onClicked: function() { BluetoothService.startDiscovery(); }
-                }
-            ]
-            
-            onToggleChanged: checked => {
-                BluetoothService.setEnabled(checked);
-                if (checked) {
-                    BluetoothService.startDiscovery();
+        model: BluetoothService.friendlyDeviceList
+
+        header: Item {
+            width: deviceList.width
+            height: titlebar.height + 8
+
+            PanelTitlebar {
+                id: titlebar
+                width: root.contentWidth
+                anchors.horizontalCenter: parent.horizontalCenter
+                title: "Bluetooth"
+                showToggle: true
+                toggleChecked: BluetoothService.enabled
+                
+                actions: [
+                    {
+                        icon: Icons.externalLink,
+                        tooltip: "Open Blueman",
+                        onClicked: function() { Quickshell.execDetached(["blueman-manager"]); }
+                    },
+                    {
+                        icon: Icons.sync,
+                        tooltip: "Scan for devices",
+                        enabled: BluetoothService.enabled,
+                        loading: BluetoothService.discovering,
+                        onClicked: function() { BluetoothService.startDiscovery(); }
+                    }
+                ]
+                
+                onToggleChanged: checked => {
+                    BluetoothService.setEnabled(checked);
+                    if (checked) {
+                        BluetoothService.startDiscovery();
+                    }
                 }
             }
         }
 
-        // Device list
-        ListView {
-            id: deviceList
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            clip: true
-            spacing: 4
+        delegate: Item {
+            required property var modelData
+            width: deviceList.width
+            height: deviceItem.height
 
-            model: BluetoothService.friendlyDeviceList
-
-            delegate: BluetoothDeviceItem {
-                required property var modelData
-                width: deviceList.width
-                device: modelData
+            BluetoothDeviceItem {
+                id: deviceItem
+                width: root.contentWidth
+                anchors.horizontalCenter: parent.horizontalCenter
+                device: parent.modelData
             }
+        }
 
-            // Empty state
-            Text {
-                anchors.centerIn: parent
-                visible: deviceList.count === 0 && !BluetoothService.discovering
-                text: BluetoothService.enabled ? "No devices found" : "Bluetooth is disabled"
-                font.family: Config.theme.font
-                font.pixelSize: Config.theme.fontSize
-                color: Colors.overSurfaceVariant
-            }
+        // Empty state
+        Text {
+            anchors.centerIn: parent
+            visible: deviceList.count === 0 && !BluetoothService.discovering
+            text: BluetoothService.enabled ? "No devices found" : "Bluetooth is disabled"
+            font.family: Config.theme.font
+            font.pixelSize: Config.theme.fontSize
+            color: Colors.overSurfaceVariant
         }
     }
 }

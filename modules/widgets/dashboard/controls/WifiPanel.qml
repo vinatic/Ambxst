@@ -12,78 +12,89 @@ import qs.config
 Item {
     id: root
 
+    property int maxContentWidth: 480
+    readonly property int contentWidth: Math.min(width, maxContentWidth)
+    readonly property real sideMargin: (width - contentWidth) / 2
+
     Component.onCompleted: {
         NetworkService.rescanWifi();
     }
 
-    ColumnLayout {
+    // Network list - fills entire width for scroll/drag
+    ListView {
+        id: networkList
         anchors.fill: parent
-        anchors.rightMargin: 4
-        spacing: 8
+        clip: true
+        spacing: 4
 
-        // Titlebar
-        PanelTitlebar {
-            title: "Wi-Fi"
-            statusText: NetworkService.wifiConnecting ? "Connecting..." : 
-                       (NetworkService.wifiStatus === "limited" ? "Limited" : "")
-            statusColor: NetworkService.wifiStatus === "limited" ? Colors.warning : Colors.primary
-            showToggle: true
-            toggleChecked: NetworkService.wifiStatus !== "disabled"
-            
-            actions: [
-                {
-                    icon: Icons.globe,
-                    tooltip: "Open captive portal",
-                    enabled: NetworkService.wifiStatus === "limited",
-                    onClicked: function() { NetworkService.openPublicWifiPortal(); }
-                },
-                {
-                    icon: Icons.externalLink,
-                    tooltip: "Network settings",
-                    onClicked: function() { Quickshell.execDetached(["nm-connection-editor"]); }
-                },
-                {
-                    icon: Icons.sync,
-                    tooltip: "Rescan networks",
-                    enabled: NetworkService.wifiEnabled,
-                    loading: NetworkService.wifiScanning,
-                    onClicked: function() { NetworkService.rescanWifi(); }
-                }
-            ]
-            
-            onToggleChanged: checked => {
-                NetworkService.enableWifi(checked);
-                if (checked) {
-                    NetworkService.rescanWifi();
+        model: NetworkService.friendlyWifiNetworks
+
+        header: Item {
+            width: networkList.width
+            height: titlebar.height + 8
+
+            PanelTitlebar {
+                id: titlebar
+                width: root.contentWidth
+                anchors.horizontalCenter: parent.horizontalCenter
+                title: "Wi-Fi"
+                statusText: NetworkService.wifiConnecting ? "Connecting..." : 
+                           (NetworkService.wifiStatus === "limited" ? "Limited" : "")
+                statusColor: NetworkService.wifiStatus === "limited" ? Colors.warning : Colors.primary
+                showToggle: true
+                toggleChecked: NetworkService.wifiStatus !== "disabled"
+                
+                actions: [
+                    {
+                        icon: Icons.globe,
+                        tooltip: "Open captive portal",
+                        enabled: NetworkService.wifiStatus === "limited",
+                        onClicked: function() { NetworkService.openPublicWifiPortal(); }
+                    },
+                    {
+                        icon: Icons.externalLink,
+                        tooltip: "Network settings",
+                        onClicked: function() { Quickshell.execDetached(["nm-connection-editor"]); }
+                    },
+                    {
+                        icon: Icons.sync,
+                        tooltip: "Rescan networks",
+                        enabled: NetworkService.wifiEnabled,
+                        loading: NetworkService.wifiScanning,
+                        onClicked: function() { NetworkService.rescanWifi(); }
+                    }
+                ]
+                
+                onToggleChanged: checked => {
+                    NetworkService.enableWifi(checked);
+                    if (checked) {
+                        NetworkService.rescanWifi();
+                    }
                 }
             }
         }
 
-        // Network list
-        ListView {
-            id: networkList
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            clip: true
-            spacing: 4
+        delegate: Item {
+            required property var modelData
+            width: networkList.width
+            height: networkItem.height
 
-            model: NetworkService.friendlyWifiNetworks
-
-            delegate: WifiNetworkItem {
-                required property var modelData
-                width: networkList.width - 4
-                network: modelData
+            WifiNetworkItem {
+                id: networkItem
+                width: root.contentWidth
+                anchors.horizontalCenter: parent.horizontalCenter
+                network: parent.modelData
             }
+        }
 
-            // Empty state
-            Text {
-                anchors.centerIn: parent
-                visible: networkList.count === 0 && !NetworkService.wifiScanning
-                text: NetworkService.wifiEnabled ? "No networks found" : "Wi-Fi is disabled"
-                font.family: Config.theme.font
-                font.pixelSize: Config.theme.fontSize
-                color: Colors.overSurfaceVariant
-            }
+        // Empty state
+        Text {
+            anchors.centerIn: parent
+            visible: networkList.count === 0 && !NetworkService.wifiScanning
+            text: NetworkService.wifiEnabled ? "No networks found" : "Wi-Fi is disabled"
+            font.family: Config.theme.font
+            font.pixelSize: Config.theme.fontSize
+            color: Colors.overSurfaceVariant
         }
     }
 }

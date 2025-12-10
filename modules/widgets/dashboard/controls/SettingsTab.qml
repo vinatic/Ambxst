@@ -170,6 +170,7 @@ Rectangle {
             clip: true
 
             property int previousSection: 0
+            readonly property int maxContentWidth: 480
 
             // Track section changes for animation direction
             onVisibleChanged: {
@@ -188,10 +189,8 @@ Rectangle {
             // WiFi Panel
             WifiPanel {
                 id: wifiPanel
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                width: Math.min(parent.width, 480)
+                anchors.fill: parent
+                maxContentWidth: contentArea.maxContentWidth
                 visible: opacity > 0
                 opacity: root.currentSection === 0 ? 1 : 0
 
@@ -219,10 +218,8 @@ Rectangle {
             // Bluetooth Panel
             BluetoothPanel {
                 id: bluetoothPanel
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                width: Math.min(parent.width, 480)
+                anchors.fill: parent
+                maxContentWidth: contentArea.maxContentWidth
                 visible: opacity > 0
                 opacity: root.currentSection === 1 ? 1 : 0
 
@@ -250,10 +247,8 @@ Rectangle {
             // Audio Mixer Panel
             AudioMixerPanel {
                 id: audioPanel
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                width: Math.min(parent.width, 480)
+                anchors.fill: parent
+                maxContentWidth: contentArea.maxContentWidth
                 visible: opacity > 0
                 opacity: root.currentSection === 2 ? 1 : 0
 
@@ -281,10 +276,8 @@ Rectangle {
             // EasyEffects Panel
             EasyEffectsPanel {
                 id: effectsPanel
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                width: Math.min(parent.width, 480)
+                anchors.fill: parent
+                maxContentWidth: contentArea.maxContentWidth
                 visible: opacity > 0
                 opacity: root.currentSection === 3 ? 1 : 0
 
@@ -312,10 +305,8 @@ Rectangle {
             // Theme Panel
             ThemePanel {
                 id: themePanel
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                width: Math.min(parent.width, 480)
+                anchors.fill: parent
+                maxContentWidth: contentArea.maxContentWidth
                 visible: opacity > 0
                 opacity: root.currentSection === 4 ? 1 : 0
 
