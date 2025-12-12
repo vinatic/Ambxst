@@ -26,6 +26,7 @@ Item {
     // Edit form state
     property var editModifiers: []
     property string editKey: ""
+    property string editName: ""
     property string editDispatcher: ""
     property string editArgument: ""
     property string editFlags: ""
@@ -41,6 +42,7 @@ Item {
         const bindData = isAmbxst ? bind.bind : bind;
         root.editModifiers = bindData.modifiers ? bindData.modifiers.slice() : [];
         root.editKey = bindData.key || "";
+        root.editName = bindData.name || "";
         root.editDispatcher = bindData.dispatcher || "";
         root.editArgument = bindData.argument || "";
         root.editFlags = bindData.flags || "";
@@ -93,14 +95,15 @@ Item {
                 let newBinds = [];
                 for (let i = 0; i < customBinds.length; i++) {
                     if (i === root.editingIndex) {
-                        let updatedBind = Object.assign({}, customBinds[i]);
-                        updatedBind.modifiers = root.editModifiers;
-                        updatedBind.key = root.editKey;
-                        updatedBind.dispatcher = root.editDispatcher;
-                        updatedBind.argument = root.editArgument;
-                        if (root.editFlags) {
-                            updatedBind.flags = root.editFlags;
-                        }
+                        let updatedBind = {
+                            "name": root.editName,
+                            "modifiers": root.editModifiers,
+                            "key": root.editKey,
+                            "dispatcher": root.editDispatcher,
+                            "argument": root.editArgument,
+                            "flags": root.editFlags,
+                            "enabled": customBinds[i].enabled !== false
+                        };
                         newBinds.push(updatedBind);
                     } else {
                         newBinds.push(customBinds[i]);
@@ -343,6 +346,7 @@ Item {
                             required property int index
 
                             Layout.fillWidth: true
+                            customName: modelData.name || ""
                             bindName: modelData.dispatcher
                             keybindText: root.formatKeybind(modelData)
                             dispatcher: modelData.dispatcher
@@ -542,10 +546,53 @@ Item {
                         anchors.horizontalCenter: parent.horizontalCenter
                         spacing: 16
 
-                        // Bind name/info
+                        // Custom name input (only for custom binds)
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 8
+                            visible: !root.isEditingAmbxst
+
+                            Text {
+                                text: "Name (optional)"
+                                font.family: Config.theme.font
+                                font.pixelSize: Styling.fontSize(-1)
+                                font.weight: Font.Medium
+                                color: Colors.overSurfaceVariant
+                            }
+
+                            StyledRect {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 44
+                                variant: nameInput.activeFocus ? "focus" : "common"
+                                radius: Styling.radius(-2)
+
+                                TextInput {
+                                    id: nameInput
+                                    anchors.fill: parent
+                                    anchors.margins: 12
+                                    text: root.editName
+                                    font.family: Config.theme.font
+                                    font.pixelSize: Styling.fontSize(0)
+                                    color: Colors.overBackground
+                                    verticalAlignment: Text.AlignVCenter
+                                    selectByMouse: true
+                                    onTextChanged: root.editName = text
+
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        visible: !nameInput.text && !nameInput.activeFocus
+                                        text: "e.g. Open Terminal, Switch to Workspace 1..."
+                                        font: nameInput.font
+                                        color: Colors.overSurfaceVariant
+                                    }
+                                }
+                            }
+                        }
+
+                        // Bind name/info (for ambxst binds only)
                         Text {
-                            visible: root.editingBind !== null
-                            text: root.editingBind ? (root.editingBind.name || root.editingBind.dispatcher || "") : ""
+                            visible: root.isEditingAmbxst && root.editingBind !== null
+                            text: root.editingBind ? (root.editingBind.name || "") : ""
                             font.family: Config.theme.font
                             font.pixelSize: Styling.fontSize(1)
                             font.weight: Font.Medium
@@ -816,6 +863,7 @@ Item {
     component BindItem: StyledRect {
         id: bindItem
 
+        property string customName: ""  // User-friendly name, if set shows only this
         property string bindName: ""
         property string keybindText: ""
         property string dispatcher: ""
@@ -824,19 +872,27 @@ Item {
         property bool isAmbxst: true
         property bool isHovered: false
 
+        // Computed display values
+        readonly property bool hasCustomName: customName !== ""
+        readonly property string displayName: hasCustomName ? customName : bindName
+        readonly property string displaySubtitle: hasCustomName ? "" : (argument || dispatcher)
+
         signal editRequested()
         signal toggleEnabled()
 
         variant: isHovered ? "focus" : "common"
-        height: 48
+        height: 56
         radius: Styling.radius(-2)
         enableShadow: true
         opacity: isEnabled ? 1 : 0.5
 
         RowLayout {
             anchors.fill: parent
-            anchors.margins: 8
-            spacing: 8
+            anchors.leftMargin: 12
+            anchors.rightMargin: 12
+            anchors.topMargin: 8
+            anchors.bottomMargin: 8
+            spacing: 12
 
             // Checkbox for custom binds (styled like OLED Mode)
             Item {
@@ -906,7 +962,7 @@ Item {
                 spacing: 2
 
                 Text {
-                    text: bindItem.bindName
+                    text: bindItem.displayName
                     font.family: Config.theme.font
                     font.pixelSize: Styling.fontSize(0)
                     font.weight: Font.Medium
@@ -916,7 +972,7 @@ Item {
                 }
 
                 Text {
-                    text: bindItem.argument || bindItem.dispatcher
+                    text: bindItem.displaySubtitle
                     font.family: Config.theme.font
                     font.pixelSize: Styling.fontSize(-2)
                     color: Colors.overSurfaceVariant
@@ -928,7 +984,7 @@ Item {
 
             // Keybind display at the end
             StyledRect {
-                variant: "pane"
+                variant: "internalbg"
                 Layout.preferredWidth: keybindLabel.width + 24
                 Layout.preferredHeight: 28
                 radius: Styling.radius(-4)

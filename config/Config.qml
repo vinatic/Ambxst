@@ -1042,12 +1042,47 @@ Singleton {
         onFileChanged: {
             root.pauseAutoSave = true;
             reload();
+            normalizeCustomBinds();
             root.pauseAutoSave = false;
         }
-        onPathChanged: reload()
+        onPathChanged: {
+            reload();
+            normalizeCustomBinds();
+        }
         onAdapterUpdated: {
             if (root.keybindsInitialLoadComplete) {
                 keybindsLoader.writeAdapter();
+            }
+        }
+
+        // Normalize custom binds to ensure all have a 'name' property
+        function normalizeCustomBinds() {
+            if (!adapter || !adapter.custom) return;
+
+            let needsUpdate = false;
+            let normalizedBinds = [];
+
+            for (let i = 0; i < adapter.custom.length; i++) {
+                let bind = adapter.custom[i];
+                if (bind.name === undefined) {
+                    needsUpdate = true;
+                    normalizedBinds.push({
+                        "name": "",
+                        "modifiers": bind.modifiers || [],
+                        "key": bind.key || "",
+                        "dispatcher": bind.dispatcher || "",
+                        "argument": bind.argument || "",
+                        "flags": bind.flags || "",
+                        "enabled": bind.enabled !== false
+                    });
+                } else {
+                    normalizedBinds.push(bind);
+                }
+            }
+
+            if (needsUpdate) {
+                console.log("Normalizing custom binds: adding missing 'name' property");
+                adapter.custom = normalizedBinds;
             }
         }
 
