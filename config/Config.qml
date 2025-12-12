@@ -1514,7 +1514,7 @@ Singleton {
                     "modifiers": [],
                     "key": "XF86MonBrightnessUp",
                     "dispatcher": "exec",
-                    "argument": "swayosd-client --brightness=raise 5",
+                    "argument": "ambxst brightness +5",
                     "flags": "le",
                     "enabled": true
                 },
@@ -1523,7 +1523,7 @@ Singleton {
                     "modifiers": [],
                     "key": "XF86MonBrightnessDown",
                     "dispatcher": "exec",
-                    "argument": "swayosd-client --brightness=lower 5",
+                    "argument": "ambxst brightness -5",
                     "flags": "le",
                     "enabled": true
                 },
