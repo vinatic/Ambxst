@@ -12,4 +12,8 @@ QtObject {
     function fontSize(offset) {
         return Math.max(Config.theme.fontSize + offset, 8);
     }
+
+    function monoFontSize(offset) {
+        return Math.max(Config.theme.monoFontSize + offset, 8);
+    }
 }

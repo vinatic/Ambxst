@@ -91,7 +91,7 @@ Singleton {
         "srError", "srErrorFocus", "srOverError"
     ]
     readonly property var _simpleThemeProps: [
-        "roundness", "oledMode", "lightMode", "font", "fontSize",
+        "roundness", "oledMode", "lightMode", "font", "fontSize", "monoFont", "monoFontSize",
         "tintIcons", "enableCorners", "animDuration",
         "shadowOpacity", "shadowColor", "shadowXOffset", "shadowYOffset", "shadowBlur"
     ]

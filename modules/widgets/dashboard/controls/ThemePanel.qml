@@ -351,7 +351,7 @@ Item {
                                         anchors.fill: parent
                                         anchors.margins: 8
                                         font.family: Config.theme.monoFont
-                                        font.pixelSize: Styling.fontSize(0)
+                                        font.pixelSize: Styling.monoFontSize(0)
                                         color: Colors.overBackground
                                         selectByMouse: true
                                         clip: true
@@ -387,7 +387,7 @@ Item {
                                         anchors.fill: parent
                                         anchors.margins: 8
                                         font.family: Config.theme.monoFont
-                                        font.pixelSize: Styling.fontSize(0)
+                                        font.pixelSize: Styling.monoFontSize(0)
                                         color: Colors.overBackground
                                         selectByMouse: true
                                         clip: true
