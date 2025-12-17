@@ -212,10 +212,10 @@ Item {
     }
 
     // Inline component for segmented selector rows
-    component SelectorRow: RowLayout {
+    component SelectorRow: ColumnLayout {
         id: selectorRowRoot
         property string label: ""
-        property var options: []  // Array of { label: "...", value: "..." }
+        property var options: []  // Array of { label: "...", value: "...", icon: "..." (optional) }
         property string value: ""
         signal valueSelected(string newValue)
 
@@ -226,33 +226,70 @@ Item {
             return 0;
         }
 
-        function getValueFromIndex(idx: int): string {
-            if (idx >= 0 && idx < options.length) {
-                return options[idx].value;
-            }
-            return "";
-        }
-
         Layout.fillWidth: true
-        spacing: 8
+        spacing: 4
 
         Text {
             text: selectorRowRoot.label
             font.family: Config.theme.font
-            font.pixelSize: Styling.fontSize(0)
-            color: Colors.overBackground
-            Layout.preferredWidth: 100
+            font.pixelSize: Styling.fontSize(-1)
+            font.weight: Font.Medium
+            color: Colors.overSurfaceVariant
+            visible: selectorRowRoot.label !== ""
         }
 
-        SegmentedSwitch {
+        RowLayout {
             Layout.fillWidth: true
-            Layout.preferredHeight: 32
-            options: selectorRowRoot.options.map(opt => opt.label)
-            currentIndex: selectorRowRoot.getIndexFromValue(selectorRowRoot.value)
-            onIndexChanged: index => {
-                let newValue = selectorRowRoot.getValueFromIndex(index);
-                if (newValue !== "") {
-                    selectorRowRoot.valueSelected(newValue);
+            spacing: 4
+
+            Repeater {
+                model: selectorRowRoot.options
+
+                delegate: StyledRect {
+                    id: optionButton
+                    required property var modelData
+                    required property int index
+
+                    readonly property bool isSelected: selectorRowRoot.getIndexFromValue(selectorRowRoot.value) === index
+                    property bool isHovered: false
+
+                    variant: isSelected ? "primary" : (isHovered ? "focus" : "common")
+                    enableShadow: true
+                    Layout.fillWidth: true
+                    height: 36
+                    radius: isSelected ? Styling.radius(0) / 2 : Styling.radius(0)
+
+                    Text {
+                        id: optionIcon
+                        anchors.left: parent.left
+                        anchors.leftMargin: 12
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: optionButton.modelData.icon ?? ""
+                        font.family: Icons.font
+                        font.pixelSize: 14
+                        color: optionButton.itemColor
+                        visible: (optionButton.modelData.icon ?? "") !== ""
+                    }
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: optionButton.modelData.label
+                        font.family: Config.theme.font
+                        font.pixelSize: Styling.fontSize(0)
+                        font.bold: true
+                        color: optionButton.itemColor
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+
+                        onEntered: optionButton.isHovered = true
+                        onExited: optionButton.isHovered = false
+
+                        onClicked: selectorRowRoot.valueSelected(optionButton.modelData.value)
+                    }
                 }
             }
         }
@@ -335,12 +372,12 @@ Item {
                         }
 
                         SelectorRow {
-                            label: "Position"
+                            label: ""
                             options: [
-                                { label: "Top", value: "top" },
-                                { label: "Bottom", value: "bottom" },
-                                { label: "Left", value: "left" },
-                                { label: "Right", value: "right" }
+                                { label: "Top", value: "top", icon: Icons.arrowUp },
+                                { label: "Bottom", value: "bottom", icon: Icons.arrowDown },
+                                { label: "Left", value: "left", icon: Icons.arrowLeft },
+                                { label: "Right", value: "right", icon: Icons.arrowRight }
                             ]
                             value: Config.bar.position ?? "top"
                             onValueSelected: newValue => {
@@ -418,7 +455,7 @@ Item {
                         }
 
                         SelectorRow {
-                            label: "Theme"
+                            label: ""
                             options: [
                                 { label: "Default", value: "default" },
                                 { label: "Island", value: "island" }
@@ -555,7 +592,7 @@ Item {
                                 Layout.preferredHeight: 20
                                 progressColor: Colors.primary
                                 tooltipText: `${(value * 0.2).toFixed(2)}`
-                                scroll: true
+                                scroll: false
                                 value: ((Config.overview.scale ?? 0.1) / 0.2)
 
                                 onValueChanged: {
@@ -609,10 +646,10 @@ Item {
                         }
 
                         SelectorRow {
-                            label: "Position"
+                            label: ""
                             options: [
-                                { label: "Top", value: "top" },
-                                { label: "Bottom", value: "bottom" }
+                                { label: "Top", value: "top", icon: Icons.arrowUp },
+                                { label: "Bottom", value: "bottom", icon: Icons.arrowDown }
                             ]
                             value: Config.lockscreen.position ?? "bottom"
                             onValueSelected: newValue => {

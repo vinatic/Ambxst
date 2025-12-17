@@ -15,7 +15,7 @@ Rectangle {
     implicitWidth: 400
     implicitHeight: 300
 
-    property int currentSection: 0  // 0: Network, 1: Bluetooth, 2: Mixer, 3: Effects, 4: Theme, 5: Shell, 6: Binds, 7: System
+    property int currentSection: 0  // 0: Network, 1: Bluetooth, 2: Mixer, 3: Effects, 4: Theme, 5: Binds, 6: System, 7: Shell
 
     RowLayout {
         anchors.fill: parent
@@ -76,9 +76,9 @@ Rectangle {
                                 { icon: Icons.faders, label: "Mixer", section: 2, isIcon: true },
                                 { icon: Icons.waveform, label: "Effects", section: 3, isIcon: true },
                                 { icon: Icons.paintBrush, label: "Theme", section: 4, isIcon: true },
-                                { icon: Qt.resolvedUrl("../../../../assets/ambxst-icon.svg"), label: "Shell", section: 5, isIcon: false },
-                                { icon: Icons.keyboard, label: "Binds", section: 6, isIcon: true },
-                                { icon: Icons.circuitry, label: "System", section: 7, isIcon: true }
+                                { icon: Icons.keyboard, label: "Binds", section: 5, isIcon: true },
+                                { icon: Icons.circuitry, label: "System", section: 6, isIcon: true },
+                                { icon: Qt.resolvedUrl("../../../../assets/ambxst-icon.svg"), label: "Ambxst", section: 7, isIcon: false }
                             ]
 
                         delegate: Button {
@@ -365,9 +365,9 @@ Rectangle {
                 }
             }
 
-            // Shell Panel
-            ShellPanel {
-                id: shellPanel
+            // Binds Panel
+            BindsPanel {
+                id: bindsPanel
                 anchors.fill: parent
                 maxContentWidth: contentArea.maxContentWidth
                 visible: opacity > 0
@@ -394,9 +394,9 @@ Rectangle {
                 }
             }
 
-            // Binds Panel
-            BindsPanel {
-                id: bindsPanel
+            // System Panel
+            SystemPanel {
+                id: systemPanel
                 anchors.fill: parent
                 maxContentWidth: contentArea.maxContentWidth
                 visible: opacity > 0
@@ -423,9 +423,9 @@ Rectangle {
                 }
             }
 
-            // System Panel
-            SystemPanel {
-                id: systemPanel
+            // Shell Panel
+            ShellPanel {
+                id: shellPanel
                 anchors.fill: parent
                 maxContentWidth: contentArea.maxContentWidth
                 visible: opacity > 0
