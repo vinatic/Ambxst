@@ -19,6 +19,13 @@ Button {
     property real iconSize: Config.dock?.iconSize ?? 40
     property real countDotWidth: 10
     property real countDotHeight: 4
+    property string dockPosition: "bottom"
+
+    // Position helpers
+    readonly property bool isBottom: dockPosition === "bottom"
+    readonly property bool isLeft: dockPosition === "left"
+    readonly property bool isRight: dockPosition === "right"
+    readonly property bool isVertical: isLeft || isRight
 
     readonly property bool isSeparator: appToplevel.appId === "SEPARATOR"
     readonly property var desktopEntry: isSeparator ? null : DesktopEntries.heuristicLookup(appToplevel.appId)
@@ -28,8 +35,16 @@ Button {
     readonly property bool showIndicators: !isSeparator && (Config.dock?.showRunningIndicators ?? true) && appIsRunning
 
     enabled: !isSeparator
-    implicitWidth: isSeparator ? 2 : iconSize + 8
-    implicitHeight: iconSize + 16
+    implicitWidth: isSeparator 
+        ? (isVertical ? iconSize * 0.6 : 2) 
+        : (isVertical 
+            ? (showIndicators ? iconSize + 16 : iconSize + 8)
+            : iconSize + 8)
+    implicitHeight: isSeparator 
+        ? (isVertical ? 2 : iconSize * 0.6) 
+        : (isVertical 
+            ? iconSize + 8
+            : (showIndicators ? iconSize + 16 : iconSize + 8))
     
     padding: 0
     topPadding: 0
@@ -40,18 +55,12 @@ Button {
     background: Item {
         StyledRect {
             anchors.centerIn: parent
-            anchors.verticalCenterOffset: root.showIndicators ? 0 : 0
-            width: root.iconSize + 8
-            height: root.showIndicators ? root.iconSize + 16 : root.iconSize + 8
+            width: parent.width
+            height: parent.height
             radius: Styling.radius(-2)
             variant: "focus"
             visible: !root.isSeparator && (root.hovered || root.pressed)
             opacity: root.pressed ? 1 : 0.7
-            
-            Behavior on height {
-                enabled: Config.animDuration > 0
-                NumberAnimation { duration: Config.animDuration; easing.type: Easing.OutQuart }
-            }
             
             Behavior on opacity {
                 enabled: Config.animDuration > 0
@@ -66,8 +75,9 @@ Button {
             active: root.isSeparator
             anchors.centerIn: parent
             sourceComponent: Separator {
-                vert: true
-                implicitHeight: root.iconSize * 0.6
+                vert: !root.isVertical
+                implicitWidth: root.isVertical ? root.iconSize * 0.6 : 2
+                implicitHeight: root.isVertical ? 2 : root.iconSize * 0.6
             }
         }
 
@@ -82,7 +92,12 @@ Button {
                 IconImage {
                     id: appIcon
                     anchors.centerIn: parent
-                    anchors.verticalCenterOffset: root.showIndicators ? -4 : 0
+                    // Offset for indicators: icon shifts away from indicator edge
+                    // bottom: shift up (-), left: shift right (+), right: shift left (-)
+                    anchors.verticalCenterOffset: root.isBottom ? (root.showIndicators ? -4 : 0) : 0
+                    anchors.horizontalCenterOffset: root.isVertical 
+                        ? (root.showIndicators ? (root.isLeft ? 4 : -4) : 0) 
+                        : 0
                     
                     source: {
                         if (root.desktopEntry && root.desktopEntry.icon) {
@@ -105,15 +120,20 @@ Button {
                         enabled: Config.animDuration > 0
                         NumberAnimation { duration: Config.animDuration; easing.type: Easing.OutQuart }
                     }
+                    
+                    Behavior on anchors.horizontalCenterOffset {
+                        enabled: Config.animDuration > 0
+                        NumberAnimation { duration: Config.animDuration; easing.type: Easing.OutQuart }
+                    }
                 }
 
-                // Running indicators
+                // Running indicators - horizontal layout (for bottom dock)
                 Row {
                     anchors.bottom: parent.bottom
                     anchors.bottomMargin: 2
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 3
-                    visible: root.showIndicators
+                    visible: root.showIndicators && !root.isVertical
 
                     Repeater {
                         model: Math.min(root.appToplevel.toplevels.length, 3)
@@ -131,8 +151,46 @@ Button {
                         }
                     }
                 }
+
+                // Running indicators - vertical layout (for left/right dock)
+                // Left dock: indicators on left edge, Right dock: indicators on right edge
+                Column {
+                    anchors.left: root.isLeft ? parent.left : undefined
+                    anchors.leftMargin: root.isLeft ? 2 : 0
+                    anchors.right: root.isRight ? parent.right : undefined
+                    anchors.rightMargin: root.isRight ? 2 : 0
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 3
+                    visible: root.showIndicators && root.isVertical
+
+                    Repeater {
+                        model: Math.min(root.appToplevel.toplevels.length, 3)
+                        delegate: Rectangle {
+                            required property int index
+                            width: root.countDotHeight
+                            height: root.appToplevel.toplevels.length <= 3 ? root.countDotWidth : root.countDotHeight
+                            radius: width / 2
+                            color: root.appIsActive ? Colors.primary : Qt.rgba(Colors.overBackground.r, Colors.overBackground.g, Colors.overBackground.b, 0.4)
+                            
+                            Behavior on color {
+                                enabled: Config.animDuration > 0
+                                ColorAnimation { duration: Config.animDuration / 2 }
+                            }
+                        }
+                    }
+                }
             }
         }
+    }
+
+    Behavior on implicitWidth {
+        enabled: Config.animDuration > 0 && root.isVertical
+        NumberAnimation { duration: Config.animDuration; easing.type: Easing.OutQuart }
+    }
+    
+    Behavior on implicitHeight {
+        enabled: Config.animDuration > 0 && !root.isVertical
+        NumberAnimation { duration: Config.animDuration; easing.type: Easing.OutQuart }
     }
 
     // Left click: launch or cycle through windows
