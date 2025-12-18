@@ -651,6 +651,19 @@ Item {
                         SelectorRow {
                             label: ""
                             options: [
+                                { label: "Default", value: "default" },
+                                { label: "Floating", value: "floating" },
+                                { label: "Integrated", value: "integrated" }
+                            ]
+                            value: Config.dock.theme ?? "default"
+                            onValueSelected: newValue => {
+                                Config.dock.theme = newValue;
+                            }
+                        }
+
+                        SelectorRow {
+                            label: ""
+                            options: [
                                 { label: "Bottom", value: "bottom", icon: Icons.arrowDown },
                                 { label: "Left", value: "left", icon: Icons.arrowLeft },
                                 { label: "Right", value: "right", icon: Icons.arrowRight }

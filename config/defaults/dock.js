@@ -2,6 +2,7 @@
 
 var data = {
     "enabled": false,
+    "theme": "default",
     "position": "bottom",
     "height": 56,
     "iconSize": 40,
