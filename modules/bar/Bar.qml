@@ -306,13 +306,6 @@ PanelWindow {
                                     bar: panel
                                     layerEnabled: false
                                 }
-
-                                Weather {
-                                    id: weatherComponent
-                                    bar: panel
-                                    orientation: "horizontal"
-                                    layer.enabled: false
-                                }
                             }
                         }
                     }
@@ -445,13 +438,6 @@ PanelWindow {
                                     id: controlsButtonVert
                                     bar: panel
                                     layerEnabled: false
-                                }
-
-                                Weather {
-                                    id: weatherComponentVert
-                                    bar: panel
-                                    orientation: "vertical"
-                                    layer.enabled: false
                                 }
                             }
                         }
