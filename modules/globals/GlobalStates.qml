@@ -129,7 +129,7 @@ Singleton {
 
     // Constants for theme snapshot operations (avoid duplication)
     readonly property var _srVariantNames: [
-        "srBg", "srInternalBg", "srBarBg", "srPane", "srCommon", "srFocus",
+        "srBg", "srPopup", "srInternalBg", "srBarBg", "srPane", "srCommon", "srFocus",
         "srPrimary", "srPrimaryFocus", "srOverPrimary",
         "srSecondary", "srSecondaryFocus", "srOverSecondary",
         "srTertiary", "srTertiaryFocus", "srOverTertiary",
