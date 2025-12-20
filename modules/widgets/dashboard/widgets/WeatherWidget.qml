@@ -61,6 +61,50 @@ Rectangle {
     readonly property string weatherEffect: WeatherService.effectiveWeatherEffect
     readonly property real weatherIntensity: WeatherService.effectiveWeatherIntensity
 
+    // Check if weather is overcast (clouds, rain, drizzle, snow, thunderstorm, fog)
+    readonly property bool isOvercast: weatherEffect === "clouds" || 
+                                        weatherEffect === "rain" || 
+                                        weatherEffect === "drizzle" || 
+                                        weatherEffect === "snow" || 
+                                        weatherEffect === "thunderstorm" ||
+                                        weatherEffect === "fog"
+
+    // Overcast overlay - darkens/grays the sky based on weather
+    Rectangle {
+        id: overcastOverlay
+        anchors.fill: parent
+        visible: root.isOvercast
+        opacity: root.weatherIntensity * 0.7
+
+        // Gray gradient that adapts to time of day
+        gradient: Gradient {
+            GradientStop { 
+                position: 0.0
+                color: root.blend.night > 0.5 
+                    ? Qt.rgba(0.15, 0.15, 0.2, 0.9)   // Dark gray-blue at night
+                    : root.blend.evening > 0.3
+                        ? Qt.rgba(0.3, 0.25, 0.3, 0.85)  // Purple-gray at evening
+                        : Qt.rgba(0.5, 0.52, 0.55, 0.8)  // Light gray during day
+            }
+            GradientStop { 
+                position: 0.6
+                color: root.blend.night > 0.5 
+                    ? Qt.rgba(0.2, 0.2, 0.25, 0.7)
+                    : root.blend.evening > 0.3
+                        ? Qt.rgba(0.35, 0.3, 0.35, 0.6)
+                        : Qt.rgba(0.6, 0.62, 0.65, 0.5)
+            }
+            GradientStop { 
+                position: 1.0
+                color: Qt.rgba(0.5, 0.5, 0.5, 0.2)  // Fade out at bottom
+            }
+        }
+
+        Behavior on opacity {
+            NumberAnimation { duration: 500; easing.type: Easing.InOutQuad }
+        }
+    }
+
     // Text colors (interpolated)
     readonly property color textPrimary: blendColors(
         Qt.color("#1a5276"),  // Day
@@ -197,8 +241,35 @@ Rectangle {
     Item {
         id: cloudEffect
         anchors.fill: parent
-        visible: root.weatherEffect === "clouds"
-        opacity: root.weatherIntensity
+        visible: root.weatherEffect === "clouds" || 
+                 root.weatherEffect === "rain" || 
+                 root.weatherEffect === "drizzle" || 
+                 root.weatherEffect === "snow" || 
+                 root.weatherEffect === "thunderstorm"
+        opacity: root.weatherEffect === "clouds" ? root.weatherIntensity : 0.8
+
+        // Cloud color based on time of day and weather
+        // Darker gray for stormy weather, lighter for just cloudy
+        property bool isStormy: root.weatherEffect === "rain" || 
+                                root.weatherEffect === "thunderstorm" ||
+                                root.weatherEffect === "drizzle"
+        
+        // Cloud base color adapts to time of day
+        property color cloudColorDark: root.blend.night > 0.5 
+            ? Qt.rgba(0.2, 0.2, 0.25, 1)      // Dark blue-gray at night
+            : root.blend.evening > 0.3
+                ? Qt.rgba(0.35, 0.3, 0.35, 1)  // Purple-gray at evening
+                : isStormy 
+                    ? Qt.rgba(0.4, 0.42, 0.45, 1)  // Dark gray for storms during day
+                    : Qt.rgba(0.85, 0.87, 0.9, 1)  // Light gray-white for fair clouds
+        
+        property color cloudColorLight: root.blend.night > 0.5 
+            ? Qt.rgba(0.3, 0.3, 0.35, 1)
+            : root.blend.evening > 0.3
+                ? Qt.rgba(0.45, 0.4, 0.45, 1)
+                : isStormy 
+                    ? Qt.rgba(0.5, 0.52, 0.55, 1)
+                    : Qt.rgba(0.92, 0.94, 0.96, 1)
 
         // Background layer - larger, slower, more transparent clouds
         Repeater {
@@ -220,7 +291,7 @@ Rectangle {
                     width: parent.width * 0.8
                     height: parent.height * 0.6
                     radius: height / 2
-                    color: Qt.rgba(1, 1, 1, 0.15)
+                    color: Qt.rgba(cloudEffect.cloudColorDark.r, cloudEffect.cloudColorDark.g, cloudEffect.cloudColorDark.b, 0.5)
                 }
                 Rectangle {
                     x: parent.width * 0.1
@@ -228,7 +299,7 @@ Rectangle {
                     width: parent.width * 0.4
                     height: parent.height * 0.5
                     radius: height / 2
-                    color: Qt.rgba(1, 1, 1, 0.12)
+                    color: Qt.rgba(cloudEffect.cloudColorLight.r, cloudEffect.cloudColorLight.g, cloudEffect.cloudColorLight.b, 0.4)
                 }
                 Rectangle {
                     x: parent.width * 0.5
@@ -236,7 +307,7 @@ Rectangle {
                     width: parent.width * 0.45
                     height: parent.height * 0.55
                     radius: height / 2
-                    color: Qt.rgba(1, 1, 1, 0.12)
+                    color: Qt.rgba(cloudEffect.cloudColorLight.r, cloudEffect.cloudColorLight.g, cloudEffect.cloudColorLight.b, 0.4)
                 }
 
                 NumberAnimation on x {
@@ -269,7 +340,7 @@ Rectangle {
                     width: parent.width * 0.7
                     height: parent.height * 0.7
                     radius: height / 2
-                    color: Qt.rgba(1, 1, 1, 0.28 - (index * 0.04))
+                    color: Qt.rgba(cloudEffect.cloudColorDark.r, cloudEffect.cloudColorDark.g, cloudEffect.cloudColorDark.b, 0.65 - (index * 0.08))
                 }
                 Rectangle {
                     x: parent.width * 0.05
@@ -277,7 +348,7 @@ Rectangle {
                     width: parent.width * 0.35
                     height: parent.height * 0.5
                     radius: height / 2
-                    color: Qt.rgba(1, 1, 1, 0.22 - (index * 0.03))
+                    color: Qt.rgba(cloudEffect.cloudColorLight.r, cloudEffect.cloudColorLight.g, cloudEffect.cloudColorLight.b, 0.55 - (index * 0.06))
                 }
                 Rectangle {
                     x: parent.width * 0.55
@@ -285,7 +356,7 @@ Rectangle {
                     width: parent.width * 0.4
                     height: parent.height * 0.55
                     radius: height / 2
-                    color: Qt.rgba(1, 1, 1, 0.22 - (index * 0.03))
+                    color: Qt.rgba(cloudEffect.cloudColorLight.r, cloudEffect.cloudColorLight.g, cloudEffect.cloudColorLight.b, 0.55 - (index * 0.06))
                 }
 
                 NumberAnimation on x {
@@ -365,7 +436,7 @@ Rectangle {
                 property real initialX: Math.random() * (rainEffect.width + 50) - 25
                 property real fallDistance: rainEffect.height + 40
                 property real horizontalDrift: fallDistance * Math.tan(rainEffect.angleRad)
-                property real fallSpeed: 800 + Math.random() * 400
+                property real fallSpeed: 400 + Math.random() * 200
                 property real delay: Math.random() * fallSpeed
 
                 x: initialX
