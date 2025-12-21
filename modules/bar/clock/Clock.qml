@@ -230,7 +230,7 @@ Item {
                             anchors.left: parent.left
                             anchors.leftMargin: 4
                             text: calendarContent.capitalizeMonth(calendarWrapper.currentDate)
-                            color: Colors.overBackground
+                            color: Colors.outline
                             font.family: Config.theme.font
                             font.pixelSize: Styling.fontSize(0)
                             font.weight: Font.Medium
@@ -278,7 +278,7 @@ Item {
                                         // Capitalize first letter and limit to 2 chars
                                         return (dayName.charAt(0).toUpperCase() + dayName.slice(1, 2)).replace(".", "");
                                     }
-                                    color: Colors.outline
+                                    color: Colors.overBackground
                                     font.family: Config.theme.font
                                     font.pixelSize: Styling.fontSize(0)
                                     font.weight: Font.Medium
@@ -295,7 +295,7 @@ Item {
                                         width: 28
                                         height: 28
                                         radius: 14
-                                        color: dayColumn.isToday ? Colors.overBackground : "transparent"
+                                        color: Colors.primary
                                         visible: dayColumn.isToday
                                     }
 

@@ -101,8 +101,6 @@ Item {
         id: layoutPopup
         anchorItem: buttonBg
         bar: root.bar
-        visualMargin: 8
-        popupPadding: 8
 
         contentWidth: layoutRow.implicitWidth + popupPadding * 2
         contentHeight: 36 + popupPadding * 2

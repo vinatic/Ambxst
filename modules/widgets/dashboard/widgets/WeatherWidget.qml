@@ -814,48 +814,61 @@ ClippingRectangle {
     // TEXT CONTENT
     // ═══════════════════════════════════════════════════════════
 
-    // Weather description and temperature (top left)
+    // Temperature (top left)
     Item {
-        id: textContainer
+        id: tempContainer
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.margins: 12
-        width: textColumn.width
-        height: textColumn.height
+        width: tempText.width
+        height: tempText.height
 
-        Column {
-            id: textColumn
-            spacing: 2
+        // Temperature or error icon
+        Text {
+            id: tempText
+            visible: WeatherService.dataAvailable
+            text: Math.round(WeatherService.currentTemp) + "°" + Config.weather.unit
+            color: "#FFFFFF"
+            font.family: "Noto Sans"
+            font.pixelSize: Config.theme.fontSize + 10
+            font.weight: Font.Bold
+        }
 
-            // Weather description (top)
-            Text {
-                id: descText
-                text: WeatherService.dataAvailable ? WeatherService.effectiveWeatherDescription : "Error"
-                color: Qt.rgba(1, 1, 1, 0.85)
-                font.family: "Noto Sans"
-                font.pixelSize: Config.theme.fontSize - 2
-                font.weight: Font.Bold
-            }
+        // Error icon when no data
+        Text {
+            visible: !WeatherService.dataAvailable
+            text: Icons.alert
+            font.family: Icons.font
+            font.pixelSize: Config.theme.fontSize + 10
+            color: "#FFFFFF"
+        }
 
-            // Temperature or error icon (bottom)
-            Text {
-                id: tempText
-                visible: WeatherService.dataAvailable
-                text: Math.round(WeatherService.currentTemp) + "°" + Config.weather.unit
-                color: "#FFFFFF"
-                font.family: "Noto Sans"
-                font.pixelSize: Config.theme.fontSize + 10
-                font.weight: Font.Bold
-            }
+        layer.enabled: true
+        layer.effect: MultiEffect {
+            shadowEnabled: true
+            shadowColor: Qt.rgba(0, 0, 0, 0.5)
+            shadowBlur: 0.4
+            shadowHorizontalOffset: 1
+            shadowVerticalOffset: 1
+        }
+    }
 
-            // Error icon when no data
-            Text {
-                visible: !WeatherService.dataAvailable
-                text: Icons.alert
-                font.family: Icons.font
-                font.pixelSize: Config.theme.fontSize + 10
-                color: "#FFFFFF"
-            }
+    // Weather description (top right)
+    Item {
+        id: descContainer
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.margins: 12
+        width: descText.width
+        height: descText.height
+
+        Text {
+            id: descText
+            text: WeatherService.dataAvailable ? WeatherService.effectiveWeatherDescription : "Error"
+            color: Qt.rgba(1, 1, 1, 0.85)
+            font.family: "Noto Sans"
+            font.pixelSize: Config.theme.fontSize - 2
+            font.weight: Font.Bold
         }
 
         layer.enabled: true

@@ -24,7 +24,7 @@ PopupWindow {
 
     // Visual configuration
     property int popupPadding: 8
-    property int visualMargin: 4  // Distance from bar
+    property int visualMargin: 8  // Distance from bar
     property int shadowMargin: 16  // Extra margin for shadow
     property string variant: "popup"  // StyledRect variant for background
 
