@@ -58,9 +58,10 @@ Item {
             height: 32
             visible: Battery.available
 
-            property real angle: Battery.percentage * 360
+            property real angle: Battery.percentage * (360 - 2 * gapAngle)
             property real radius: 12
             property real lineWidth: 3
+            property real gapAngle: 45
 
             Canvas {
                 id: canvas
@@ -78,15 +79,17 @@ Item {
 
                     ctx.lineCap = "round";
 
-                    // Base start angle (top)
-                    let baseStartAngle = -Math.PI / 2;
+                    // Base start angle (matching CircularControl: bottom + gap)
+                    let baseStartAngle = (Math.PI / 2) + (progressCanvas.gapAngle * Math.PI / 180);
                     let progressAngleRad = progressCanvas.angle * Math.PI / 180;
 
-                    // Draw background track
+                    // Draw background track (remaining part)
+                    let totalAngleRad = (360 - 2 * progressCanvas.gapAngle) * Math.PI / 180;
+                    
                     ctx.strokeStyle = Colors.outlineVariant;
                     ctx.lineWidth = lineWidth;
                     ctx.beginPath();
-                    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+                    ctx.arc(centerX, centerY, radius, baseStartAngle + progressAngleRad, baseStartAngle + totalAngleRad, false);
                     ctx.stroke();
 
                     // Draw progress
