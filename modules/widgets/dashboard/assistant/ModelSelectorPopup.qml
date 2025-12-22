@@ -11,9 +11,9 @@ Popup {
     id: root
     
     width: 400
-    // Height: Header (48) + Spacing (12) + List (5 * 48 = 240) + Bottom Padding/Margins approx
-    // We constrain the List height specifically.
-    height: contentItem.implicitHeight + 20
+    // Height: Header (48) + Spacing (12) + List (5 * 48 = 240) + Padding (8*2)
+    height: contentItem.implicitHeight + padding * 2
+    padding: 8
     
     // Center in parent
     x: (parent.width - width) / 2
@@ -66,6 +66,7 @@ Popup {
 
     background: StyledRect {
         variant: "popup"
+        radius: Styling.radius(8)
     }
     
     contentItem: ColumnLayout {
