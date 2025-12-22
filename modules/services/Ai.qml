@@ -87,6 +87,18 @@ Singleton {
         makeRequest();
     }
 
+    function updateMessage(index, newContent) {
+        if (index < 0 || index >= currentChat.length) return;
+        
+        let newChat = Array.from(currentChat);
+        let msg = newChat[index];
+        msg.content = newContent;
+        newChat[index] = msg;
+        
+        currentChat = newChat;
+        saveCurrentChat();
+    }
+
     property var systemTools: [
         {
             name: "run_shell_command",

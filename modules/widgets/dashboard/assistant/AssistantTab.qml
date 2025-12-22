@@ -397,11 +397,15 @@ Item {
                     }
                     
                     delegate: Item {
-                        width: chatView.width
-                        height: bubble.height + 20
+                        required property var modelData
+                        required property int index
                         
                         property bool isUser: modelData.role === "user"
-                        property bool isSystem: modelData.role === "system"
+                        property bool isSystem: modelData.role === "system" || modelData.role === "function"
+                        property bool isEditing: false
+
+                        width: ListView.view.width
+                        height: bubbleArea.height + 8
                         
                         Row {
                             anchors.left: parent.left
@@ -480,13 +484,47 @@ Item {
                                     anchors.leftMargin: 8
                                     anchors.rightMargin: 8
                                     spacing: 4
-                                    visible: bubbleArea.containsMouse
+                                    visible: bubbleArea.containsMouse || isEditing
                                     
+                                    // Edit (User & Assistant)
+                                    Button {
+                                        width: 24; height: 24
+                                        flat: true
+                                        padding: 0
+                                        visible: !isSystem
+                                        
+                                        property bool isHovered: hovered
+                                        
+                                        contentItem: Text { 
+                                            text: isEditing ? Icons.accept : Icons.edit
+                                            font.family: Icons.font
+                                            color: parent.down ? Colors.overPrimary : (parent.isHovered ? Colors.overSurface : Colors.overSurface)
+                                            horizontalAlignment: Text.AlignHCenter
+                                            verticalAlignment: Text.AlignVCenter 
+                                        }
+                                        
+                                        background: StyledRect { 
+                                            variant: parent.down ? "primary" : (parent.isHovered ? "focus" : "common")
+                                            radius: Styling.radius(4)
+                                        }
+                                        
+                                        onClicked: {
+                                            if (isEditing) {
+                                                Ai.updateMessage(index, bubbleContentText.text);
+                                                isEditing = false;
+                                            } else {
+                                                isEditing = true;
+                                                bubbleContentText.forceActiveFocus();
+                                                bubbleContentText.cursorPosition = bubbleContentText.text.length;
+                                            }
+                                        }
+                                    }
                                     // Copy
                                     Button {
                                         width: 24; height: 24
                                         flat: true
                                         padding: 0
+                                        visible: !isEditing
                                         
                                         property bool isHovered: hovered
                                         
@@ -511,7 +549,7 @@ Item {
                                     
                                     // Regenerate (Assistant only)
                                     Button {
-                                        visible: !isUser && !isSystem
+                                        visible: !isUser && !isSystem && !isEditing
                                         width: 24; height: 24
                                         flat: true
                                         padding: 0
@@ -548,8 +586,8 @@ Item {
                                     
                                     variant: isSystem ? "surface" : (isUser ? "primaryContainer" : "surfaceVariant")
                                     radius: Styling.radius(4)
-                                    border.width: isSystem ? 1 : 0
-                                    border.color: Colors.surfaceDim
+                                    border.width: isSystem || isEditing ? 1 : 0
+                                    border.color: isEditing ? Colors.primary : Colors.surfaceDim
                                     
                                     ColumnLayout {
                                         id: bubbleContent
@@ -559,6 +597,7 @@ Item {
                                         
                                         // Text Content
                                         TextEdit {
+                                            id: bubbleContentText
                                             Layout.fillWidth: true
                                             text: modelData.content || ""
                                             textFormat: Text.MarkdownText
@@ -566,7 +605,7 @@ Item {
                                             font.family: Config.theme.font
                                             font.pixelSize: 14
                                             wrapMode: Text.Wrap
-                                            readOnly: true
+                                            readOnly: !isEditing
                                             selectByMouse: true
                                             visible: text !== ""
                                         }
