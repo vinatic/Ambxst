@@ -151,38 +151,23 @@ Popup {
                 // Allow focus via Tab
                 activeFocusOnTab: true
                 
-                contentItem: Item {
+                contentItem: RowLayout {
                     anchors.fill: parent
+                    anchors.margins: 8
+                    spacing: 8
                     
-                    // Normal state content (Refresh Icon)
+                    // Icon (Left Aligned)
                     Item {
-                        anchors.centerIn: parent
-                        width: 48; height: 48
-                        opacity: parent.parent.confirming ? 0 : 1
-                        visible: opacity > 0
-                        
-                        Behavior on opacity {
-                            enabled: Config.animDuration > 0
-                            NumberAnimation { duration: Config.animDuration / 2 }
-                        }
+                        Layout.preferredWidth: 32
+                        Layout.preferredHeight: 32
+                        Layout.alignment: Qt.AlignVCenter
                         
                         Text {
                             anchors.centerIn: parent
-                            text: Icons.arrowCounterClockwise
+                            text: Ai.fetchingModels ? Icons.circleNotch : (refreshBtn.confirming ? Icons.sync : Icons.arrowCounterClockwise)
                             font.family: Icons.font
                             font.pixelSize: 20
-                            color: Colors.primary
-                            visible: !Ai.fetchingModels
-                        }
-                        
-                        // Spinner
-                        Text {
-                            anchors.centerIn: parent
-                            text: Icons.circleNotch
-                            font.family: Icons.font
-                            font.pixelSize: 20
-                            color: Colors.primary
-                            visible: Ai.fetchingModels
+                            color: refreshBtn.confirming ? Config.resolveColor(Config.theme.srPrimary.itemColor) : Colors.primary
                             
                             RotationAnimation on rotation {
                                 loops: Animation.Infinite
@@ -190,34 +175,31 @@ Popup {
                                 duration: 1000
                                 running: Ai.fetchingModels
                             }
+                            
+                            Behavior on color {
+                                enabled: Config.animDuration > 0
+                                ColorAnimation { duration: Config.animDuration / 2 }
+                            }
                         }
                     }
                     
-                    // Confirm state content (Text + Check)
-                    RowLayout {
-                        anchors.centerIn: parent
-                        spacing: 4
-                        opacity: parent.parent.confirming ? 1 : 0
+                    // Text Reveal (Right)
+                    Text {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        verticalAlignment: Text.AlignVCenter
+                        text: "Refresh?"
+                        font.family: Config.theme.font
+                        font.pixelSize: 13
+                        font.weight: Font.Bold
+                        color: Config.resolveColor(Config.theme.srPrimary.itemColor)
+                        
+                        opacity: refreshBtn.confirming ? 1 : 0
                         visible: opacity > 0
                         
                         Behavior on opacity {
                             enabled: Config.animDuration > 0
                             NumberAnimation { duration: Config.animDuration / 2 }
-                        }
-                        
-                        Text {
-                            text: "Refresh"
-                            font.family: Config.theme.font
-                            font.pixelSize: 13
-                            font.weight: Font.Medium
-                            color: Config.resolveColor(Config.theme.srPrimary.itemColor)
-                        }
-                        
-                        Text {
-                            text: Icons.accept
-                            font.family: Icons.font
-                            font.pixelSize: 14
-                            color: Config.resolveColor(Config.theme.srPrimary.itemColor)
                         }
                     }
                 }
