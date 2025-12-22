@@ -317,10 +317,11 @@ Item {
                 spacing: 8
                 
                 Text {
-                    text: "Hello, " + mainChatArea.username
+                    text: "Hello, <font color='" + Colors.primary + "'>" + mainChatArea.username + "</font>."
                     font.family: Config.theme.font
                     font.pixelSize: 32
                     font.weight: Font.Bold
+                    textFormat: Text.StyledText
                     Layout.alignment: Qt.AlignHCenter
                     color: Colors.overBackground
                 }
@@ -476,12 +477,16 @@ Item {
                 height: Math.min(150, Math.max(48, inputField.contentHeight + 24))
                 
                 // State-based anchors
-                anchors.bottom: mainChatArea.isWelcome ? undefined : parent.bottom
-                anchors.bottomMargin: mainChatArea.isWelcome ? 0 : 20
+                anchors.bottom: parent.bottom
+                // Calculate center position for bottom margin: (parent height / 2) - (input height / 2)
+                property real centerMargin: (parent.height / 2) - (height / 2)
+                anchors.bottomMargin: mainChatArea.isWelcome ? centerMargin : 20
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: mainChatArea.isWelcome ? parent.verticalCenter : undefined
                 
-                width: mainChatArea.isWelcome ? Math.min(600, parent.width - 40) : Math.min(800, parent.width - 20)
+                // Keep width compact as requested (600px max)
+                width: Math.min(600, parent.width - 40)
+                
+                Behavior on anchors.bottomMargin { NumberAnimation { duration: Config.animDuration; easing.type: Easing.OutCubic } }
                 
                 StyledRect {
                     anchors.fill: parent
