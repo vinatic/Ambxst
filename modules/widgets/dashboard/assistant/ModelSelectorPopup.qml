@@ -13,7 +13,7 @@ Popup {
     width: 400
     // Height: Header (48) + Spacing (12) + List (5 * 48 = 240) + Padding (8*2)
     height: contentItem.implicitHeight + padding * 2
-    padding: 8
+    padding: 16
     
     // Center in parent
     x: (parent.width - width) / 2
@@ -124,56 +124,133 @@ Popup {
             }
             
             // Refresh Button (Icon only)
+            // Refresh Button (Interactive)
             Button {
-                Layout.preferredWidth: 32
+                id: refreshBtn
+                
+                property bool confirming: false
+                
+                // Reset state when focus is lost
+                onActiveFocusChanged: {
+                    if (!activeFocus && confirming) {
+                        confirming = false;
+                    }
+                }
+                
+                Layout.preferredWidth: confirming ? 96 : 32
                 Layout.preferredHeight: 32
+                
+                Behavior on Layout.preferredWidth {
+                    enabled: Config.animDuration > 0
+                    NumberAnimation { duration: Config.animDuration; easing.type: Easing.OutCubic }
+                }
+                
                 flat: true
                 padding: 0
+                
+                // Allow focus via Tab
+                activeFocusOnTab: true
                 
                 contentItem: Item {
                     anchors.fill: parent
                     
-                    Text {
+                    // Normal state content (Refresh Icon)
+                    Item {
                         anchors.centerIn: parent
-                        text: Icons.arrowCounterClockwise
-                        font.family: Icons.font
-                        font.pixelSize: 16
-                        color: Colors.primary
-                        visible: !Ai.fetchingModels
-                    }
-                    
-                    // Spinner
-                    Rectangle {
-                        anchors.centerIn: parent
-                        width: 14; height: 14
-                        radius: 7
-                        color: "transparent"
-                        border.width: 2
-                        border.color: Colors.primary
-                        visible: Ai.fetchingModels
+                        width: 32; height: 32
+                        opacity: parent.parent.confirming ? 0 : 1
+                        visible: opacity > 0
                         
-                        Rectangle {
-                            width: 6; height: 6
-                            radius: 3
-                            color: Colors.surface
-                            x: -1; y: -1
+                        Behavior on opacity {
+                            enabled: Config.animDuration > 0
+                            NumberAnimation { duration: Config.animDuration / 2 }
                         }
                         
-                        RotationAnimation on rotation {
-                            loops: Animation.Infinite
-                            from: 0; to: 360
-                            duration: 1000
-                            running: Ai.fetchingModels
+                        Text {
+                            anchors.centerIn: parent
+                            text: Icons.arrowCounterClockwise
+                            font.family: Icons.font
+                            font.pixelSize: 16
+                            color: Colors.primary
+                            visible: !Ai.fetchingModels
+                        }
+                        
+                        // Spinner
+                        Rectangle {
+                            anchors.centerIn: parent
+                            width: 14; height: 14
+                            radius: 7
+                            color: "transparent"
+                            border.width: 2
+                            border.color: Colors.primary
+                            visible: Ai.fetchingModels
+                            
+                            Rectangle {
+                                width: 6; height: 6
+                                radius: 3
+                                color: Colors.surface
+                                x: -1; y: -1
+                            }
+                            
+                            RotationAnimation on rotation {
+                                loops: Animation.Infinite
+                                from: 0; to: 360
+                                duration: 1000
+                                running: Ai.fetchingModels
+                            }
+                        }
+                    }
+                    
+                    // Confirm state content (Text + Check)
+                    RowLayout {
+                        anchors.centerIn: parent
+                        spacing: 4
+                        opacity: parent.parent.confirming ? 1 : 0
+                        visible: opacity > 0
+                        
+                        Behavior on opacity {
+                            enabled: Config.animDuration > 0
+                            NumberAnimation { duration: Config.animDuration / 2 }
+                        }
+                        
+                        Text {
+                            text: "Refresh"
+                            font.family: Config.theme.font
+                            font.pixelSize: 13
+                            font.weight: Font.Medium
+                            color: Config.resolveColor(Config.theme.srPrimary.itemColor)
+                        }
+                        
+                        Text {
+                            text: Icons.accept
+                            font.family: Icons.font
+                            font.pixelSize: 14
+                            color: Config.resolveColor(Config.theme.srPrimary.itemColor)
                         }
                     }
                 }
                 
                 background: StyledRect {
-                    variant: parent.hovered ? "focus" : "transparent"
+                    variant: parent.confirming ? "primary" : (parent.hovered || parent.activeFocus ? "focus" : "transparent")
                     radius: Styling.radius(4)
+                    
+                    Behavior on color {
+                        enabled: Config.animDuration > 0
+                        ColorAnimation { duration: Config.animDuration / 2 }
+                    }
                 }
                 
-                onClicked: Ai.fetchAvailableModels()
+                onClicked: {
+                    if (!confirming) {
+                        confirming = true;
+                    } else {
+                        Ai.fetchAvailableModels();
+                        confirming = false;
+                    }
+                }
+                
+                Keys.onReturnPressed: clicked()
+                Keys.onEnterPressed: clicked()
             }
         }
         
