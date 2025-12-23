@@ -341,6 +341,8 @@ Popup {
 
                 contentItem: RowLayout {
                     anchors.fill: parent
+                    anchors.leftMargin: delegateBtn.leftPadding
+                    anchors.rightMargin: delegateBtn.rightPadding
                     spacing: 12
                     
                     // Icon
@@ -456,18 +458,24 @@ Popup {
                     }
                     
                     // Active Check
-                    Text {
-                        text: Icons.accept
-                        font.family: Icons.font
-                        font.pixelSize: 16
+                    Item {
+                        Layout.preferredWidth: 32
+                        Layout.preferredHeight: 32
                         Layout.alignment: Qt.AlignVCenter
-                        // On primary highlight, color should be readable. srPrimary itemColor usually contrasts well.
-                        color: delegateBtn.isSelected ? Config.resolveColor(Config.theme.srPrimary.itemColor) : Colors.primary
-                        visible: delegateBtn.isActiveModel
-                        
-                        Behavior on color {
-                            enabled: Config.animDuration > 0
-                            ColorAnimation { duration: Config.animDuration / 2; easing.type: Easing.OutCubic }
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: Icons.accept
+                            font.family: Icons.font
+                            font.pixelSize: 16
+                            // On primary highlight, color should be readable. srPrimary itemColor usually contrasts well.
+                            color: delegateBtn.isSelected ? Config.resolveColor(Config.theme.srPrimary.itemColor) : Colors.primary
+                            visible: delegateBtn.isActiveModel
+                            
+                            Behavior on color {
+                                enabled: Config.animDuration > 0
+                                ColorAnimation { duration: Config.animDuration / 2; easing.type: Easing.OutCubic }
+                            }
                         }
                     }
                 }
