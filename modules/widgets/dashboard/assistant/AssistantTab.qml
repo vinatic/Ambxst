@@ -598,19 +598,81 @@ Item {
                                         width: parent.width - 32
                                         spacing: 8
                                         
-                                        // Text Content
+                                        // Formatted View (Text + Code Blocks)
+                                        ColumnLayout {
+                                            Layout.fillWidth: true
+                                            visible: !messageDelegate.isEditing && !bubbleContentText.visible
+                                            spacing: 8
+                                            
+                                            Repeater {
+                                                model: {
+                                                    let txt = modelData.content || "";
+                                                    let parts = [];
+                                                    let regex = /```(\w*)\n([\s\S]*?)```/g;
+                                                    let lastIndex = 0;
+                                                    let match;
+                                                    while ((match = regex.exec(txt)) !== null) {
+                                                        if (match.index > lastIndex) {
+                                                            parts.push({type: "text", content: txt.substring(lastIndex, match.index), language: ""});
+                                                        }
+                                                        parts.push({type: "code", content: match[2].trim(), language: match[1] || "text"});
+                                                        lastIndex = regex.lastIndex;
+                                                    }
+                                                    if (lastIndex < txt.length) {
+                                                        parts.push({type: "text", content: txt.substring(lastIndex), language: ""});
+                                                    }
+                                                    return parts;
+                                                }
+                                                
+                                                delegate: Loader {
+                                                    Layout.fillWidth: true
+                                                    sourceComponent: modelData.type === 'code' ? codeComponent : textComponent
+                                                    
+                                                    property var segment: modelData
+                                                    
+                                                    Component {
+                                                        id: textComponent
+                                                        TextEdit {
+                                                            width: bubbleContent.width
+                                                            text: segment.content
+                                                            textFormat: Text.MarkdownText
+                                                            color: isSystem ? Colors.outline : (isUser ? Colors.overPrimaryContainer : Colors.overSurfaceVariant)
+                                                            font.family: Config.theme.font
+                                                            font.pixelSize: 14
+                                                            wrapMode: Text.Wrap
+                                                            readOnly: true
+                                                            selectByMouse: true
+                                                            
+                                                            // Handle links if needed
+                                                            onLinkActivated: (link) => Qt.openUrlExternally(link)
+                                                        }
+                                                    }
+                                                    
+                                                    Component {
+                                                        id: codeComponent
+                                                        CodeBlock {
+                                                            width: bubbleContent.width
+                                                            code: segment.content
+                                                            language: segment.language
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        // Edit Mode / Raw Text
                                         TextEdit {
                                             id: bubbleContentText
                                             Layout.fillWidth: true
                                             text: modelData.content || ""
-                                            textFormat: Text.MarkdownText
+                                            textFormat: Text.PlainText // Raw text for editing
                                             color: isSystem ? Colors.outline : (isUser ? Colors.overPrimaryContainer : Colors.overSurfaceVariant)
                                             font.family: Config.theme.font
                                             font.pixelSize: 14
                                             wrapMode: Text.Wrap
                                             readOnly: !messageDelegate.isEditing
                                             selectByMouse: true
-                                            visible: text !== ""
+                                            visible: messageDelegate.isEditing
                                         }
                                         
                                         // Function Call Block
