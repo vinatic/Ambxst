@@ -12,28 +12,28 @@ ColumnLayout {
     id: root
     property string code: ""
     property string language: "txt"
-    
+
     spacing: 0
 
     // Repository { id: highlightRepo }
-    
+
     // Header
     StyledRect {
         Layout.fillWidth: true
         Layout.preferredHeight: 32
         variant: "surface"
         radius: Styling.radius(4)
-        
+
         // Flatten bottom corners to join with code area
-        // Note: StyledRect doesn't support individual corner radius easily via variant. 
-        // We rely on visual stacking. 
-        
+        // Note: StyledRect doesn't support individual corner radius easily via variant.
+        // We rely on visual stacking.
+
         RowLayout {
             anchors.fill: parent
             anchors.leftMargin: 12
             anchors.rightMargin: 8
             spacing: 8
-            
+
             Text {
                 text: root.language || "text"
                 color: Colors.outline
@@ -41,15 +41,17 @@ ColumnLayout {
                 font.pixelSize: 12
                 font.weight: Font.Bold
             }
-            
-            Item { Layout.fillWidth: true }
-            
+
+            Item {
+                Layout.fillWidth: true
+            }
+
             Button {
                 Layout.preferredWidth: 24
                 Layout.preferredHeight: 24
                 flat: true
                 padding: 0
-                
+
                 contentItem: Text {
                     text: Icons.copy
                     font.family: Icons.font
@@ -58,9 +60,9 @@ ColumnLayout {
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                 }
-                
+
                 background: null
-                
+
                 onClicked: {
                     let p = Qt.createQmlObject('import Quickshell; import Quickshell.Io; Process { command: ["wl-copy", "' + root.code.replace(/"/g, '\\"') + '"] }', parent);
                     p.running = true;
@@ -68,7 +70,7 @@ ColumnLayout {
                     copyFeedback.visible = true;
                     copyFeedbackTimer.restart();
                 }
-                
+
                 Text {
                     id: copyFeedback
                     text: "Copied!"
@@ -79,7 +81,7 @@ ColumnLayout {
                     anchors.right: parent.left
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.rightMargin: 4
-                    
+
                     Timer {
                         id: copyFeedbackTimer
                         interval: 2000
@@ -89,16 +91,16 @@ ColumnLayout {
             }
         }
     }
-    
+
     // Code Area
     StyledRect {
         Layout.fillWidth: true
         implicitHeight: codeText.contentHeight + 16
         variant: "internalbg"
-        radius: Styling.radius(4)
-        
+        radius: Styling.radius(0)
+
         // Overlap slightly to hide top radius if needed, or just keep as separate blocks
-        
+
         TextEdit {
             id: codeText
             anchors.fill: parent

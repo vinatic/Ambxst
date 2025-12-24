@@ -9,6 +9,23 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 QS_BIN="${AMBXST_QS:-qs}"
 NIXGL_BIN="${AMBXST_NIXGL:-}"
 
+# Ensure QML modules are found when running in dev mode or manually
+# This handles the case where QML2_IMPORT_PATH isn't set by the wrapper
+if [ -z "${QML2_IMPORT_PATH:-}" ]; then
+  # Try to find nix store path if we are in a dev shell that has the env loaded but not exported
+  # (This is a fallback heuristic)
+  if command -v qs >/dev/null 2>&1; then
+     # In a dev shell, qs might be in the path. We rely on the user having set up the shell correctly.
+     # But if they run ./cli.sh directly without the wrapper, we warn them if syntax highlighting might fail.
+     true 
+  fi
+fi
+
+# If QML2_IMPORT_PATH is set (by wrapper or dev shell), ensure QML_IMPORT_PATH matches
+if [ -n "${QML2_IMPORT_PATH:-}" ] && [ -z "${QML_IMPORT_PATH:-}" ]; then
+  export QML_IMPORT_PATH="$QML2_IMPORT_PATH"
+fi
+
 show_help() {
   cat <<EOF
 Ambxst CLI - Desktop Environment Control
