@@ -506,12 +506,24 @@ Item {
                 delegate: StyledRect {
                     id: playerItem
                     required property var modelData
+                    required property int index
+
+                    readonly property bool isSelected: compactPlayer.player === modelData
+                    readonly property bool isFirst: index === 0
+                    readonly property bool isLast: index === MprisController.filteredPlayers.length - 1
+                    
+                    readonly property real defaultRadius: Styling.radius(4)
+                    readonly property real selectedRadius: defaultRadius / 2
 
                     Layout.fillWidth: true
                     Layout.preferredHeight: 36
-                    variant: (compactPlayer.player === modelData) ? "primary" : (hoverHandler.hovered ? "focus" : "common")
+                    variant: isSelected ? "primary" : (hoverHandler.hovered ? "focus" : "common")
                     enableShadow: false
-                    radius: Styling.radius(4)
+                    
+                    topLeftRadius: isSelected ? (isFirst ? defaultRadius : selectedRadius) : defaultRadius
+                    topRightRadius: isSelected ? (isFirst ? defaultRadius : selectedRadius) : defaultRadius
+                    bottomLeftRadius: isSelected ? (isLast ? defaultRadius : selectedRadius) : defaultRadius
+                    bottomRightRadius: isSelected ? (isLast ? defaultRadius : selectedRadius) : defaultRadius
 
                     RowLayout {
                         anchors.fill: parent
