@@ -20,8 +20,18 @@ FocusScope {
 
     property int currentIndex: 0
 
-    implicitWidth: layout === "row" ? (buttonSize * actions.length + spacing * (actions.length - 1)) : (buttonSize * Math.min(columns, actions.length) + spacing * (Math.min(columns, actions.length) - 1))
-    implicitHeight: layout === "row" ? buttonSize : (Math.ceil(actions.length / columns) * buttonSize + spacing * (Math.ceil(actions.length / columns) - 1))
+    function getNextValidIndex(current, step) {
+        let next = current;
+        let limit = actions.length;
+        for (let i = 0; i < limit; i++) {
+            next = (next + step + limit) % limit;
+            if (!actions[next].type || actions[next].type !== "separator") return next;
+        }
+        return current;
+    }
+
+    implicitWidth: container.implicitWidth
+    implicitHeight: container.implicitHeight
 
     Component.onCompleted: {
         root.forceActiveFocus();
@@ -33,7 +43,8 @@ FocusScope {
     onActiveFocusChanged: {
         if (activeFocus && repeater.count > 0) {
             Qt.callLater(() => {
-                repeater.itemAt(currentIndex).forceActiveFocus();
+                let item = repeater.itemAt(currentIndex);
+                if (item) item.forceActiveFocus();
             });
         }
     }
@@ -43,9 +54,9 @@ FocusScope {
 
         if (layout === "row") {
             if (event.key === Qt.Key_Right || event.key === Qt.Key_Down) {
-                nextIndex = (currentIndex + 1) % actions.length;
+                nextIndex = getNextValidIndex(currentIndex, 1);
             } else if (event.key === Qt.Key_Left || event.key === Qt.Key_Up) {
-                nextIndex = (currentIndex - 1 + actions.length) % actions.length;
+                nextIndex = getNextValidIndex(currentIndex, -1);
             }
         } else {
             // grid layout
@@ -67,7 +78,8 @@ FocusScope {
             event.accepted = true;
         } else if (nextIndex !== currentIndex) {
             currentIndex = nextIndex;
-            repeater.itemAt(currentIndex).forceActiveFocus();
+            let item = repeater.itemAt(currentIndex);
+            if (item) item.forceActiveFocus();
             event.accepted = true;
         }
     }
@@ -76,7 +88,7 @@ FocusScope {
         anchors.fill: parent
         color: "transparent"
 
-        // Highlight que se desplaza entre botones con efecto elástico
+        // Highlight que se desplaza entre botones
         StyledRect {
             variant: "primary"
             id: highlight
@@ -84,61 +96,41 @@ FocusScope {
             z: 0 // Por debajo de los botones
             visible: repeater.count > 0
 
+            property Item targetItem: repeater.count > 0 ? repeater.itemAt(root.currentIndex) : null
 
-            property real idx1X: root.currentIndex % (root.layout === "row" ? root.actions.length : root.columns)
-            property real idx2X: root.currentIndex % (root.layout === "row" ? root.actions.length : root.columns)
-            property real idx1Y: root.layout === "row" ? 0 : Math.floor(root.currentIndex / root.columns)
-            property real idx2Y: root.layout === "row" ? 0 : Math.floor(root.currentIndex / root.columns)
+            // Target values (geometry relative to container)
+            property real tx: targetItem ? targetItem.x : 0
+            property real ty: targetItem ? targetItem.y : 0
+            property real tw: targetItem ? targetItem.width : 0
+            property real th: targetItem ? targetItem.height : 0
 
-            // Posición y tamaño con efecto elástico
-            x: {
-                let minX = Math.min(idx1X, idx2X) * (root.buttonSize + root.spacing) + container.x;
-                return minX;
-            }
+            // Tracker 1 (Fast / Lead)
+            property real t1x: tx
+            property real t1y: ty
+            property real t1w: tw
+            property real t1h: th
 
-            y: {
-                let minY = Math.min(idx1Y, idx2Y) * (root.buttonSize + root.spacing) + container.y;
-                return minY;
-            }
+            Behavior on t1x { enabled: Config.animDuration > 0; NumberAnimation { duration: Config.animDuration / 3; easing.type: Easing.OutSine } }
+            Behavior on t1y { enabled: Config.animDuration > 0; NumberAnimation { duration: Config.animDuration / 3; easing.type: Easing.OutSine } }
+            Behavior on t1w { enabled: Config.animDuration > 0; NumberAnimation { duration: Config.animDuration / 3; easing.type: Easing.OutSine } }
+            Behavior on t1h { enabled: Config.animDuration > 0; NumberAnimation { duration: Config.animDuration / 3; easing.type: Easing.OutSine } }
 
-            width: {
-                let stretchX = Math.abs(idx1X - idx2X) * (root.buttonSize + root.spacing) + root.buttonSize;
-                return stretchX;
-            }
+            // Tracker 2 (Slow / Follow)
+            property real t2x: tx
+            property real t2y: ty
+            property real t2w: tw
+            property real t2h: th
 
-            height: {
-                let stretchY = Math.abs(idx1Y - idx2Y) * (root.buttonSize + root.spacing) + root.buttonSize;
-                return stretchY;
-            }
+            Behavior on t2x { enabled: Config.animDuration > 0; NumberAnimation { duration: Config.animDuration; easing.type: Easing.OutSine } }
+            Behavior on t2y { enabled: Config.animDuration > 0; NumberAnimation { duration: Config.animDuration; easing.type: Easing.OutSine } }
+            Behavior on t2w { enabled: Config.animDuration > 0; NumberAnimation { duration: Config.animDuration; easing.type: Easing.OutSine } }
+            Behavior on t2h { enabled: Config.animDuration > 0; NumberAnimation { duration: Config.animDuration; easing.type: Easing.OutSine } }
 
-            Behavior on idx1X {
-                enabled: Config.animDuration > 0
-                NumberAnimation {
-                    duration: Config.animDuration / 3
-                    easing.type: Easing.OutSine
-                }
-            }
-            Behavior on idx2X {
-                enabled: Config.animDuration > 0
-                NumberAnimation {
-                    duration: Config.animDuration
-                    easing.type: Easing.OutSine
-                }
-            }
-            Behavior on idx1Y {
-                enabled: Config.animDuration > 0
-                NumberAnimation {
-                    duration: Config.animDuration / 3
-                    easing.type: Easing.OutSine
-                }
-            }
-            Behavior on idx2Y {
-                enabled: Config.animDuration > 0
-                NumberAnimation {
-                    duration: Config.animDuration
-                    easing.type: Easing.OutSine
-                }
-            }
+            // Final geometry combining both trackers to create elastic effect
+            x: Math.min(t1x, t2x) + container.x
+            y: Math.min(t1y, t2y) + container.y
+            width: Math.max(t1x + t1w, t2x + t2w) - Math.min(t1x, t2x)
+            height: Math.max(t1y + t1h, t2y + t2h) - Math.min(t1y, t2y)
         }
 
         Grid {
@@ -152,66 +144,89 @@ FocusScope {
             Repeater {
                 id: repeater
 
-                delegate: Button {
-                    id: actionButton
-
-                    implicitWidth: root.buttonSize
-                    implicitHeight: root.buttonSize
-                    z: 1 // Por encima del highlight
-
-                    Process {
-                        id: commandProcess
-                        command: ["bash", "-c", modelData.command || ""]
-                        running: false
-                    }
+                delegate: Item {
+                    id: delegateWrapper
+                    readonly property bool isSeparator: (modelData.type === "separator")
+                    
+                    implicitWidth: isSeparator ? (root.layout === "row" ? 2 : root.buttonSize) : root.buttonSize
+                    implicitHeight: isSeparator ? (root.layout === "row" ? root.buttonSize : 2) : root.buttonSize
+                    z: 1
 
                     function triggerAction() {
-                        root.actionTriggered(modelData);
-                        if (modelData.command) {
-                            commandProcess.running = true;
+                        if (!isSeparator) actionButton.triggerAction()
+                    }
+
+                    Button {
+                        id: actionButton
+                        anchors.fill: parent
+                        visible: !delegateWrapper.isSeparator
+                        enabled: !delegateWrapper.isSeparator
+
+                        Process {
+                            id: commandProcess
+                            command: ["bash", "-c", modelData.command || ""]
+                            running: false
                         }
-                    }
 
-                    background: Rectangle {
-                        color: "transparent"
-                        radius: Styling.radius(4)
-                    }
-
-                    contentItem: Text {
-                        text: modelData.icon || ""
-                        textFormat: Text.RichText
-                        font.family: Icons.font
-                        font.pixelSize: root.iconSize
-                        color: actionButton.pressed ? Colors.primary : (index === root.currentIndex ? Config.resolveColor(Config.theme.srPrimary.itemColor) : Colors.overBackground)
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-
-                        Behavior on color {
-                            enabled: Config.animDuration > 0
-                            ColorAnimation {
-                                duration: Config.animDuration / 2
-                                easing.type: Easing.OutQuart
+                        function triggerAction() {
+                            root.actionTriggered(modelData);
+                            if (modelData.command) {
+                                commandProcess.running = true;
                             }
                         }
-                    }
 
-                    onClicked: triggerAction()
+                        background: Rectangle {
+                            color: "transparent"
+                            radius: Styling.radius(4)
+                        }
 
-                    onHoveredChanged: {
-                        if (hovered) {
-                            root.currentIndex = index;
+                        contentItem: Text {
+                            text: modelData.icon || ""
+                            textFormat: Text.RichText
+                            font.family: Icons.font
+                            font.pixelSize: root.iconSize
+                            color: actionButton.pressed ? Colors.primary : (index === root.currentIndex ? Config.resolveColor(Config.theme.srPrimary.itemColor) : Colors.overBackground)
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+
+                            Behavior on color {
+                                enabled: Config.animDuration > 0
+                                ColorAnimation {
+                                    duration: Config.animDuration / 2
+                                    easing.type: Easing.OutQuart
+                                }
+                            }
+                        }
+
+                        onClicked: triggerAction()
+
+                        onHoveredChanged: {
+                            if (hovered) {
+                                root.currentIndex = index;
+                            }
+                        }
+
+                        onActiveFocusChanged: {
+                            if (activeFocus) {
+                                root.currentIndex = index;
+                            }
+                        }
+
+                        StyledToolTip {
+                            visible: parent.hovered
+                            tooltipText: modelData.tooltip || ""
+                            delay: 500
                         }
                     }
 
-                    onActiveFocusChanged: {
-                        if (activeFocus) {
-                            root.currentIndex = index;
+                    Item {
+                        anchors.fill: parent
+                        visible: delegateWrapper.isSeparator
+                        Separator {
+                            anchors.centerIn: parent
+                            vert: root.layout === "row"
                         }
                     }
-
-                    ToolTip.visible: hovered
-                    ToolTip.text: modelData.tooltip || ""
-                    ToolTip.delay: 500
                 }
             }
         }

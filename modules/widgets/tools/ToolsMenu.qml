@@ -25,6 +25,9 @@ ActionGrid {
             command: ""
         },
         {
+            type: "separator"
+        },
+        {
             icon: Icons.recordScreen,
             tooltip: "Record Screen",
             command: ""
@@ -33,6 +36,9 @@ ActionGrid {
             icon: Icons.recordings,
             tooltip: "Open Recordings",
             command: ""
+        },
+        {
+            type: "separator"
         },
         {
             icon: Icons.picker,
