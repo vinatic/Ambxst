@@ -16,4 +16,5 @@ with pkgs; [
   wl-clipboard
   wlsunset
   wtype
+  zbar
 ]
