@@ -71,6 +71,11 @@ ActionGrid {
         }
     ]
 
+    Process {
+        id: colorPickerProc
+        command: ["bash", "-c", "/home/adriano/Repos/Axenide/Ambxst/scripts/color_picker.sh"]
+    }
+
     onActionTriggered: action => {
         console.log("Tools action triggered:", action.tooltip);
         
@@ -82,6 +87,8 @@ ActionGrid {
             } else {
                 GlobalStates.screenRecordToolVisible = true
             }
+        } else if (action.tooltip === "Color Picker") {
+            colorPickerProc.running = true
         }
         
         root.itemSelected();
