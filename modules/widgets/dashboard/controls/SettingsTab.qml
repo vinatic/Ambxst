@@ -120,7 +120,7 @@ Rectangle {
                                 isIcon: true
                             },
                             {
-                                icon: Qt.resolvedUrl("../../../../assets/ambxst-icon.svg"),
+                                icon: Qt.resolvedUrl("../../../../assets/ambxst/ambxst-icon.svg"),
                                 label: "Ambxst",
                                 section: 8,
                                 isIcon: false
