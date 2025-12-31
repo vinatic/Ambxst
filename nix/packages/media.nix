@@ -2,7 +2,7 @@
 { pkgs, wrapWithNixGL }:
 
 with pkgs; [
-  (wrapWithNixGL wf-recorder)
+  (wrapWithNixGL gpu-screen-recorder)
   (wrapWithNixGL mpvpaper)
 
   ffmpeg
