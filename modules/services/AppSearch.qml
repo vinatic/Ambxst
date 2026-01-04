@@ -7,6 +7,78 @@ import Quickshell.Io
 Singleton {
     id: root
 
+    property var iconCache: ({})
+    
+    function getCachedIcon(str) {
+        if (!str) return "image-missing";
+        if (iconCache[str]) return iconCache[str];
+        
+        const result = guessIcon(str);
+        iconCache[str] = result;
+        return result;
+    }
+
+    function iconExists(iconName) {
+        return (Quickshell.iconPath(iconName, true).length > 0) 
+            && !iconName.includes("image-missing");
+    }
+
+    function getIconFromDesktopEntry(className) {
+        if (!className || className.length === 0) return null;
+
+        const normalizedClassName = className.toLowerCase();
+
+        for (let i = 0; i < list.length; i++) {
+            const app = list[i];
+            if (app.command && app.command.length > 0) {
+                const executableLower = app.command[0].toLowerCase();
+                if (executableLower === normalizedClassName) {
+                    return app.icon || "application-x-executable";
+                }
+            }
+            if (app.name && app.name.toLowerCase() === normalizedClassName) {
+                return app.icon || "application-x-executable";
+            }
+            if (app.keywords && app.keywords.length > 0) {
+                for (let j = 0; j < app.keywords.length; j++) {
+                    if (app.keywords[j].toLowerCase() === normalizedClassName) {
+                        return app.icon || "application-x-executable";
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    function guessIcon(str) {
+        if (!str || str.length == 0) return "image-missing";
+
+        const desktopIcon = getIconFromDesktopEntry(str);
+        if (desktopIcon) return desktopIcon;
+
+        if (substitutions[str])
+            return substitutions[str];
+
+        for (let i = 0; i < regexSubstitutions.length; i++) {
+            const substitution = regexSubstitutions[i];
+            const replacedName = str.replace(
+                substitution.regex,
+                substitution.replace,
+            );
+            if (replacedName != str) return replacedName;
+        }
+
+        if (iconExists(str)) return str;
+
+        const extensionGuess = str.split('.').pop().toLowerCase();
+        if (iconExists(extensionGuess)) return extensionGuess;
+
+        const dashedGuess = str.toLowerCase().replace(/\s+/g, "-");
+        if (iconExists(dashedGuess)) return dashedGuess;
+
+        return str;
+    }
+
     property var substitutions: ({
         "code-url-handler": "visual-studio-code",
         "Code": "visual-studio-code",
@@ -36,81 +108,9 @@ Singleton {
         }
     ]
 
-    function iconExists(iconName) {
-        return (Quickshell.iconPath(iconName, true).length > 0) 
-            && !iconName.includes("image-missing");
-    }
 
-    function getIconFromDesktopEntry(className) {
-        if (!className || className.length === 0) return null;
 
-        const normalizedClassName = className.toLowerCase();
 
-        for (let i = 0; i < list.length; i++) {
-            const app = list[i];
-            // Match by executable name (first command argument)
-            if (app.command && app.command.length > 0) {
-                const executableLower = app.command[0].toLowerCase();
-                if (executableLower === normalizedClassName) {
-                    return app.icon || "application-x-executable";
-                }
-            }
-            // Match by application name
-            if (app.name && app.name.toLowerCase() === normalizedClassName) {
-                return app.icon || "application-x-executable";
-            }
-            // Match by keywords
-            if (app.keywords && app.keywords.length > 0) {
-                for (let j = 0; j < app.keywords.length; j++) {
-                    if (app.keywords[j].toLowerCase() === normalizedClassName) {
-                        return app.icon || "application-x-executable";
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    property var iconCache: ({})
-    
-    function getCachedIcon(str) {
-        if (!str) return "image-missing";
-        if (iconCache[str]) return iconCache[str];
-        
-        const result = guessIcon(str);
-        iconCache[str] = result;
-        return result;
-    }
-
-    function guessIcon(str) {
-        if (!str || str.length == 0) return "image-missing";
-
-        // First, try to find icon from desktop entries
-        const desktopIcon = getIconFromDesktopEntry(str);
-        if (desktopIcon) return desktopIcon;
-
-        if (substitutions[str])
-            return substitutions[str];
-
-        for (let i = 0; i < regexSubstitutions.length; i++) {
-            const substitution = regexSubstitutions[i];
-            const replacedName = str.replace(
-                substitution.regex,
-                substitution.replace,
-            );
-            if (replacedName != str) return replacedName;
-        }
-
-        if (iconExists(str)) return str;
-
-        const extensionGuess = str.split('.').pop().toLowerCase();
-        if (iconExists(extensionGuess)) return extensionGuess;
-
-        const dashedGuess = str.toLowerCase().replace(/\s+/g, "-");
-        if (iconExists(dashedGuess)) return dashedGuess;
-
-        return str;
-    }
     
     readonly property list<DesktopEntry> list: Array.from(DesktopEntries.applications.values)
         .sort((a, b) => a.name.localeCompare(b.name))

@@ -108,8 +108,16 @@ Rectangle {
             property bool keyboardNavigation: false
 
             // Animated model for smooth filtering
-            property var filteredApps: searchText.length > 0 ? AppSearch.fuzzyQuery(searchText) : AppSearch.getAllApps()
+            property var filteredApps: []
             property var appsById: ({})
+
+            function updateFilteredApps() {
+                if (searchText.length > 0) {
+                    filteredApps = AppSearch.fuzzyQuery(searchText);
+                } else {
+                    filteredApps = AppSearch.getAllApps();
+                }
+            }
 
             onFilteredAppsChanged: {
                 resultsList.enableScrollAnimation = false;
@@ -156,11 +164,13 @@ Rectangle {
             }
 
             Component.onCompleted: {
+                updateFilteredApps();
                 updateAppsModel();
                 focusSearchInput();
             }
 
             onSearchTextChanged: {
+                updateFilteredApps();
                 // Detect prefix and switch tab if needed
                 let detectedTab = detectPrefix(searchText);
                 if (detectedTab !== currentTab) {
