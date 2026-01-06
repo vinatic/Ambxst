@@ -122,7 +122,7 @@ install_dependencies() {
       ttf-nerd-fonts-symbols
 
       # Special Packages
-      matugen-bin gpu-screen-recorder wl-clip-persist mpvpaper
+      matugen gpu-screen-recorder wl-clip-persist mpvpaper
       quickshell-git ttf-phosphor-icons ttf-league-gothic
     )
 

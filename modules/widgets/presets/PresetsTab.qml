@@ -23,11 +23,7 @@ Item {
     readonly property string activePreset: PresetsService.activePreset
 
     // Available config files
-    readonly property var availableConfigFiles: [
-        "ai.js", "bar.js", "desktop.js", "dock.js", "hyprland.js",
-        "lockscreen.js", "notch.js", "overview.js", "performance.js",
-        "prefix.js", "system.js", "theme.js", "weather.js", "workspaces.js"
-    ]
+    readonly property var availableConfigFiles: ["ai.js", "bar.js", "desktop.js", "dock.js", "hyprland.js", "lockscreen.js", "notch.js", "overview.js", "performance.js", "prefix.js", "system.js", "theme.js", "weather.js", "workspaces.js"]
 
     // List model
     ListModel {
@@ -120,9 +116,12 @@ Item {
     }
 
     function cancelModesFromExternal() {
-        if (deleteMode) cancelDeleteMode();
-        if (renameMode) cancelRenameMode();
-        if (updateMode) cancelUpdateMode();
+        if (deleteMode)
+            cancelDeleteMode();
+        if (renameMode)
+            cancelRenameMode();
+        if (updateMode)
+            cancelUpdateMode();
     }
 
     function updateFilteredPresets() {
@@ -268,7 +267,7 @@ Item {
         updateSelectedIndex = selectedIndex;
         updateMode = true;
         presetToUpdate = presetName;
-        
+
         // Pre-select the config files that are already in this preset
         const preset = presets.find(p => p.name === presetName);
         if (preset) {
@@ -373,11 +372,16 @@ Item {
                 } else if (root.expandedItemIndex >= 0) {
                     let preset = root.filteredPresets[root.expandedItemIndex];
                     if (preset && !preset.isCreateButton && !preset.isCreateSpecificButton) {
-                        let options = [
-                            function () { root.enterRenameMode(preset.name); root.expandedItemIndex = -1; },
-                            function () { root.enterUpdateMode(preset.name); root.expandedItemIndex = -1; },
-                            function () { root.enterDeleteMode(preset.name); root.expandedItemIndex = -1; }
-                        ];
+                        let options = [function () {
+                                root.enterRenameMode(preset.name);
+                                root.expandedItemIndex = -1;
+                            }, function () {
+                                root.enterUpdateMode(preset.name);
+                                root.expandedItemIndex = -1;
+                            }, function () {
+                                root.enterDeleteMode(preset.name);
+                                root.expandedItemIndex = -1;
+                            }];
 
                         if (root.selectedOptionIndex >= 0 && root.selectedOptionIndex < options.length) {
                             options[root.selectedOptionIndex]();
@@ -568,7 +572,7 @@ Item {
                     } else if (isInRenameMode) {
                         return Styling.styledRectItem("secondary");
                     } else if (isInUpdateMode) {
-                        return Styling.styledRectItem("focus");
+                        return Styling.styledRectItem("tertiary");
                     } else if (isExpanded) {
                         return Styling.styledRectItem("pane");
                     } else if (root.selectedIndex === index) {
@@ -589,7 +593,8 @@ Item {
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
 
                     onEntered: {
-                        if (resultsList.isScrolling) return;
+                        if (resultsList.isScrolling)
+                            return;
                         if (!root.deleteMode && !root.renameMode && !root.updateMode && root.expandedItemIndex === -1) {
                             root.selectedIndex = index;
                             resultsList.currentIndex = index;
@@ -695,8 +700,8 @@ Item {
                                 {
                                     text: "Update",
                                     icon: Icons.arrowCounterClockwise,
-                                    highlightColor: Colors.focus,
-                                    textColor: Styling.styledRectItem("focus"),
+                                    highlightColor: Colors.tertiary,
+                                    textColor: Styling.styledRectItem("tertiary"),
                                     action: function () {
                                         root.enterUpdateMode(modelData.name);
                                         root.expandedItemIndex = -1;
@@ -728,8 +733,8 @@ Item {
                                                 return "error";
                                             if (item.highlightColor === Colors.secondary)
                                                 return "secondary";
-                                            if (item.highlightColor === Colors.focus)
-                                                return "focus";
+                                            if (item.highlightColor === Colors.tertiary)
+                                                return "tertiary";
                                             return "primary";
                                         }
                                     }
@@ -1131,12 +1136,16 @@ Item {
                         Layout.preferredWidth: 32
                         Layout.preferredHeight: 32
                         variant: {
-                            if (isInDeleteMode) return "overerror";
-                            if (isInRenameMode) return "oversecondary";
-                            if (isInUpdateMode) return "overfocus";
-                            if (root.selectedIndex === index) return "overprimary";
-                            if (modelData.isCreateButton || modelData.isCreateSpecificButton) return "primary";
-                            if (isActive) return "primary";
+                            if (isInDeleteMode)
+                                return "overerror";
+                            if (isInRenameMode)
+                                return "oversecondary";
+                            if (isInUpdateMode)
+                                return "overtertiary";
+                            if (root.selectedIndex === index)
+                                return "overprimary";
+                            if (modelData.isCreateButton || modelData.isCreateSpecificButton)
+                                return "primary";
                             return "common";
                         }
                         radius: Styling.radius(-4)
@@ -1144,11 +1153,16 @@ Item {
                         Text {
                             anchors.centerIn: parent
                             text: {
-                                if (isInDeleteMode) return Icons.alert;
-                                if (isInRenameMode) return Icons.edit;
-                                if (isInUpdateMode) return Icons.arrowCounterClockwise;
-                                if (modelData.isCreateButton || modelData.isCreateSpecificButton) return Icons.plus;
-                                if (isActive) return Icons.check;
+                                if (isInDeleteMode)
+                                    return Icons.alert;
+                                if (isInRenameMode)
+                                    return Icons.edit;
+                                if (isInUpdateMode)
+                                    return Icons.arrowCounterClockwise;
+                                if (modelData.isCreateButton || modelData.isCreateSpecificButton)
+                                    return Icons.plus;
+                                if (isActive)
+                                    return Icons.accept;
                                 return Icons.magicWand;
                             }
                             color: iconBackground.item
@@ -1257,6 +1271,7 @@ Item {
 
                     // Active badge
                     StyledRect {
+                        id: activeBadge
                         visible: isActive && !modelData.isCreateButton && !modelData.isCreateSpecificButton && !isInDeleteMode && !isInRenameMode && !isInUpdateMode
                         Layout.preferredHeight: 20
                         Layout.preferredWidth: 60
@@ -1269,7 +1284,7 @@ Item {
                             font.family: Config.theme.font
                             font.pixelSize: 10
                             font.weight: Font.Bold
-                            color: parent.item
+                            color: root.selectedIndex === index ? activeBadge.item : Styling.styledRectItem("primary")
                         }
                     }
                 }
@@ -1326,10 +1341,14 @@ Item {
                 StyledRect {
                     anchors.fill: parent
                     variant: {
-                        if (root.deleteMode) return "error";
-                        if (root.renameMode) return "secondary";
-                        if (root.updateMode) return "focus";
-                        if (root.expandedItemIndex >= 0 && root.selectedIndex === root.expandedItemIndex) return "pane";
+                        if (root.deleteMode)
+                            return "error";
+                        if (root.renameMode)
+                            return "secondary";
+                        if (root.updateMode)
+                            return "tertiary";
+                        if (root.expandedItemIndex >= 0 && root.selectedIndex === root.expandedItemIndex)
+                            return "pane";
                         return "primary";
                     }
                     radius: Styling.radius(4)
@@ -1364,7 +1383,8 @@ Item {
                         isExpanded = true;
                     }
 
-                    if (activeIndex < 0) return false;
+                    if (activeIndex < 0)
+                        return false;
 
                     var itemY = activeIndex * 48;
                     var itemHeight = 48;
@@ -1430,7 +1450,9 @@ Item {
         visible: updateMode
         radius: 20
 
-        MouseArea { anchors.fill: parent }
+        MouseArea {
+            anchors.fill: parent
+        }
 
         ColumnLayout {
             anchors.fill: parent
@@ -1444,7 +1466,7 @@ Item {
                 StyledRect {
                     Layout.preferredWidth: 32
                     Layout.preferredHeight: 32
-                    variant: "overfocus"
+                    variant: "overtertiary"
                     radius: Styling.radius(-4)
 
                     Text {
@@ -1452,7 +1474,7 @@ Item {
                         text: Icons.arrowCounterClockwise
                         font.family: Icons.font
                         font.pixelSize: 16
-                        color: parent.item
+                        color: Styling.styledRectItem("overtertiary")
                     }
                 }
 
@@ -1512,17 +1534,17 @@ Item {
                             StyledRect {
                                 Layout.preferredWidth: 18
                                 Layout.preferredHeight: 18
-                                variant: fileDelegate.checked ? "focus" : "pane"
+                                variant: fileDelegate.checked ? "tertiary" : "pane"
                                 radius: 4
                                 border.width: fileDelegate.checked ? 0 : 1
                                 border.color: Colors.outline
 
                                 Text {
                                     anchors.centerIn: parent
-                                    text: Icons.check
+                                    text: Icons.accept
                                     font.family: Icons.font
                                     visible: fileDelegate.checked
-                                    color: Styling.styledRectItem("focus")
+                                    color: Styling.styledRectItem("tertiary")
                                     font.pixelSize: 12
                                 }
                             }
@@ -1566,14 +1588,14 @@ Item {
                 StyledRect {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 36
-                    variant: "focus"
+                    variant: "tertiary"
                     radius: 4
                     opacity: root.selectedConfigFiles.length > 0 ? 1 : 0.5
 
                     Text {
                         anchors.centerIn: parent
                         text: `Update (${root.selectedConfigFiles.length})`
-                        color: Styling.styledRectItem("focus")
+                        color: Styling.styledRectItem("tertiary")
                         font.family: Config.theme.font
                         font.weight: Font.Bold
                     }
