@@ -155,7 +155,8 @@ Item {
                 isCreateSpecificButton: isCreateSpecific,
                 presetNameToCreate: presetNameToCreate,
                 configFiles: [],
-                icon: "plus"
+                icon: "plus",
+                isOfficial: false
             });
         }
 
@@ -686,38 +687,46 @@ Item {
                             clip: true
                             interactive: false
                             boundsBehavior: Flickable.StopAtBounds
-                            model: [
-                                {
-                                    text: "Rename",
-                                    icon: Icons.edit,
-                                    highlightColor: Colors.secondary,
-                                    textColor: Styling.srItem("secondary"),
-                                    action: function () {
-                                        root.enterRenameMode(modelData.name);
-                                        root.expandedItemIndex = -1;
+                            model: {
+                                var options = [
+                                    {
+                                        text: "Rename",
+                                        icon: Icons.edit,
+                                        highlightColor: Colors.secondary,
+                                        textColor: Styling.srItem("secondary"),
+                                        action: function () {
+                                            root.enterRenameMode(modelData.name);
+                                            root.expandedItemIndex = -1;
+                                        }
+                                    },
+                                    {
+                                        text: "Update",
+                                        icon: Icons.arrowCounterClockwise,
+                                        highlightColor: Colors.tertiary,
+                                        textColor: Styling.srItem("tertiary"),
+                                        action: function () {
+                                            root.enterUpdateMode(modelData.name);
+                                            root.expandedItemIndex = -1;
+                                        }
+                                    },
+                                    {
+                                        text: "Delete",
+                                        icon: Icons.trash,
+                                        highlightColor: Colors.error,
+                                        textColor: Styling.srItem("error"),
+                                        action: function () {
+                                            root.enterDeleteMode(modelData.name);
+                                            root.expandedItemIndex = -1;
+                                        }
                                     }
-                                },
-                                {
-                                    text: "Update",
-                                    icon: Icons.arrowCounterClockwise,
-                                    highlightColor: Colors.tertiary,
-                                    textColor: Styling.srItem("tertiary"),
-                                    action: function () {
-                                        root.enterUpdateMode(modelData.name);
-                                        root.expandedItemIndex = -1;
-                                    }
-                                },
-                                {
-                                    text: "Delete",
-                                    icon: Icons.trash,
-                                    highlightColor: Colors.error,
-                                    textColor: Styling.srItem("error"),
-                                    action: function () {
-                                        root.enterDeleteMode(modelData.name);
-                                        root.expandedItemIndex = -1;
-                                    }
+                                ];
+
+                                if (modelData.isOfficial) {
+                                    // Only keep Update
+                                    return options.filter(o => o.text === "Update");
                                 }
-                            ]
+                                return options;
+                            }
                             currentIndex: root.selectedOptionIndex
                             highlightFollowsCurrentItem: true
                             highlightRangeMode: ListView.ApplyRange
@@ -1269,8 +1278,26 @@ Item {
                         }
                     }
 
-                    // Active badge
-                    StyledRect {
+                        // Official badge
+                        StyledRect {
+                            visible: modelData.isOfficial && !modelData.isCreateButton && !modelData.isCreateSpecificButton && !isInDeleteMode && !isInRenameMode && !isInUpdateMode
+                            Layout.preferredHeight: 20
+                            Layout.preferredWidth: 65
+                            variant: "pane"
+                            radius: 10
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: "OFFICIAL"
+                                font.family: Config.theme.font
+                                font.pixelSize: 10
+                                font.weight: Font.Bold
+                                color: Styling.srItem("pane")
+                            }
+                        }
+
+                        // Active badge
+                        StyledRect {
                         id: activeBadge
                         visible: isActive && !modelData.isCreateButton && !modelData.isCreateSpecificButton && !isInDeleteMode && !isInRenameMode && !isInUpdateMode
                         Layout.preferredHeight: 20

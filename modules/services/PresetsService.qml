@@ -18,6 +18,7 @@ Singleton {
     // Config directory paths
     readonly property string configDir: (Quickshell.env("XDG_CONFIG_HOME") || (Quickshell.env("HOME") + "/.config")) + "/Ambxst"
     readonly property string presetsDir: configDir + "/presets"
+    readonly property string assetsPresetsDir: "/home/adriano/Repos/Axenide/Ambxst/assets/presets"
     readonly property string activePresetFile: presetsDir + "/active_preset"
 
     // Signal when presets change
@@ -27,6 +28,11 @@ Singleton {
     function scanPresets() {
         scanProcess.running = true
         readActivePresetProcess.running = true
+    }
+
+    // Check if a preset name is taken by an official preset
+    function isOfficialName(name) {
+        return presets.some(p => p.name === name && p.isOfficial)
     }
 
     // Load a preset by name
@@ -40,6 +46,14 @@ Singleton {
         currentPreset = presetName
 
         // Find the preset object to get its config files
+        // Prioritize user presets if names collide? Or just find the first match?
+        // Since names can be duplicated now, we need to know WHICH one to load.
+        // But the loadPreset signature only takes a name. 
+        // For now, let's assume the UI passes the unique ID or we handle the ambiguity.
+        // Given the constraints, let's try to find a match.
+        // If we have duplicate names, 'activePreset' just stores the string name.
+        // This is a limitation of the current active_preset storage (just a string).
+        // Use the first match found.
         const preset = presets.find(p => p.name === presetName)
         if (!preset) {
             console.warn("Preset not found in list:", presetName)
@@ -47,7 +61,8 @@ Singleton {
         }
 
         // Build command to copy config files
-        const presetPath = presetsDir + "/" + presetName
+        // Use the preset's actual path (which could be in assets)
+        const presetPath = preset.path
         let copyCmd = ""
         
         for (const configFile of preset.configFiles) {
@@ -72,6 +87,12 @@ Singleton {
     function savePreset(presetName: string, configFiles: var) {
         if (presetName === "") {
             console.warn("Cannot save preset with empty name")
+            return
+        }
+
+        if (isOfficialName(presetName)) {
+            console.warn("Cannot create preset with official name:", presetName)
+            Quickshell.execDetached(["notify-send", "Error", `Cannot use reserved official name "${presetName}".`])
             return
         }
 
@@ -122,9 +143,8 @@ Singleton {
     // Scan presets process
     Process {
         id: scanProcess
-        // Find all JSON files in subdirectories of presetsDir (depth 2)
-        // Structure: presets/PresetName/config.json
-        command: ["find", presetsDir, "-mindepth", "2", "-maxdepth", "2", "-name", "*.json"]
+        // Find all JSON files in subdirectories of presetsDir (depth 2) and assetsPresetsDir
+        command: ["find", presetsDir, assetsPresetsDir, "-mindepth", "2", "-maxdepth", "2", "-name", "*.json"]
         running: false
 
         stdout: StdioCollector {
@@ -135,28 +155,41 @@ Singleton {
                 for (const file of files) {
                     // file: /path/to/presets/PresetName/config.json
                     const parts = file.split('/')
-                    const configName = parts.pop() // config.json
-                    const presetName = parts.pop() // PresetName
+                    const configName = parts.pop() // remove config.json, parts is now the folder path
                     
-                    if (!presetsMap[presetName]) {
-                        // Reconstruct path: /path/to/presets + / + PresetName
-                        // We can't trust parts.join('/') because parts is now missing the last two elements.
-                        // However, we know presetsDir and presetName.
-                        presetsMap[presetName] = {
+                    // The path to the preset directory
+                    const presetPath = parts.join('/')
+                    // The name of the preset is the last folder name
+                    const presetName = parts[parts.length - 1]
+                    
+                    // Determine if official based on path prefix
+                    const isOfficial = file.startsWith(root.assetsPresetsDir)
+
+                    // Use presetPath as key to ensure uniqueness per preset folder
+                    const key = presetPath
+
+                    if (!presetsMap[key]) {
+                        presetsMap[key] = {
                             name: presetName,
-                            path: root.presetsDir + '/' + presetName,
+                            path: presetPath,
+                            isOfficial: isOfficial,
                             configFiles: []
                         }
                     }
                     
                     // Convert .json to .js for UI display
-                    presetsMap[presetName].configFiles.push(configName.replace('.json', '.js'))
+                    presetsMap[key].configFiles.push(configName.replace('.json', '.js'))
                 }
 
                 // Convert map to array
                 const newPresets = Object.values(presetsMap)
                 // Sort by name
-                newPresets.sort((a, b) => a.name.localeCompare(b.name))
+                newPresets.sort((a, b) => {
+                     // Sort official first? Or just alphabetical?
+                     // Let's keep alphabetical for now, maybe official ones could be grouped?
+                     // User didn't specify, just alphabetical is standard.
+                     return a.name.localeCompare(b.name)
+                })
 
                 root.presets = newPresets
                 root.presetsUpdated()
@@ -179,6 +212,18 @@ Singleton {
             return
         }
 
+        const preset = presets.find(p => p.name === oldName)
+        if (preset && preset.isOfficial) {
+             console.warn("Cannot rename official preset")
+             return
+        }
+
+        if (isOfficialName(newName)) {
+            console.warn("Cannot rename to official name")
+            Quickshell.execDetached(["notify-send", "Error", `Cannot rename to reserved official name "${newName}".`])
+            return
+        }
+
         console.log("Renaming preset:", oldName, "to:", newName)
         root.pendingRename = { oldName: oldName, newName: newName }
 
@@ -192,6 +237,15 @@ Singleton {
     function updatePreset(presetName: string, configFiles: var) {
         if (presetName === "" || configFiles.length === 0) {
             console.warn("Invalid update parameters")
+            return
+        }
+
+        // Find the preset to check if it's official
+        const preset = presets.find(p => p.name === presetName)
+        if (preset && preset.isOfficial) {
+            console.log("Updating official preset - creating custom copy")
+            const newName = presetName + " (Custom)"
+            savePreset(newName, configFiles)
             return
         }
 
@@ -218,6 +272,12 @@ Singleton {
         if (presetName === "") {
             console.warn("Cannot delete preset with empty name")
             return
+        }
+
+        const preset = presets.find(p => p.name === presetName)
+        if (preset && preset.isOfficial) {
+             console.warn("Cannot delete official preset")
+             return
         }
 
         console.log("Deleting preset:", presetName)
