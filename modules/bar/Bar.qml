@@ -401,22 +401,33 @@ PanelWindow {
 
                     sourceComponent: Button {
                         id: pinButton
-                        implicitWidth: 32
-                        implicitHeight: 32
+                        implicitWidth: 36
+                        implicitHeight: 36
 
                         background: StyledRect {
-                            visible: panel.pinned || pinButton.hovered
-                            variant: panel.pinned ? "primary" : "focus"
-                            radius: Styling.radius(-2)
-                            enableShadow: false
-                            enableBorder: false
+                            id: pinButtonBg
+                            variant: panel.pinned ? "primary" : "bg"
+                            enableShadow: Config.showBackground
+                            Rectangle {
+                                anchors.fill: parent
+                                color: Styling.srItem("overprimary")
+                                opacity: panel.pinned ? 0 : (pinButton.pressed ? 0.5 : (pinButton.hovered ? 0.25 : 0))
+                                radius: parent.radius ?? 0
+
+                                Behavior on opacity {
+                                    enabled: (Config.animDuration ?? 0) > 0
+                                    NumberAnimation {
+                                        duration: (Config.animDuration ?? 0) / 2
+                                    }
+                                }
+                            }
                         }
 
                         contentItem: Text {
                             text: Icons.pin
                             font.family: Icons.font
-                            font.pixelSize: 16
-                            color: panel.pinned ? Styling.srItem("primary") : Colors.overBackground
+                            font.pixelSize: 18
+                            color: panel.pinned ? pinButtonBg.item : (pinButton.pressed ? Colors.background : (Styling.srItem("overprimary") || Colors.foreground))
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
 
@@ -577,22 +588,33 @@ PanelWindow {
 
                             sourceComponent: Button {
                                 id: pinButtonV
-                                implicitWidth: 32
-                                implicitHeight: 32
+                                implicitWidth: 36
+                                implicitHeight: 36
 
                                 background: StyledRect {
-                                    visible: panel.pinned || pinButtonV.hovered
-                                    variant: panel.pinned ? "primary" : "focus"
-                                    radius: Styling.radius(-2)
-                                    enableShadow: false
-                                    enableBorder: false
+                                    id: pinButtonVBg
+                                    variant: panel.pinned ? "primary" : "bg"
+                                    enableShadow: Config.showBackground
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        color: Styling.srItem("overprimary")
+                                        opacity: panel.pinned ? 0 : (pinButtonV.pressed ? 0.5 : (pinButtonV.hovered ? 0.25 : 0))
+                                        radius: parent.radius ?? 0
+
+                                        Behavior on opacity {
+                                            enabled: (Config.animDuration ?? 0) > 0
+                                            NumberAnimation {
+                                                duration: (Config.animDuration ?? 0) / 2
+                                            }
+                                        }
+                                    }
                                 }
 
                                 contentItem: Text {
                                     text: Icons.pin
                                     font.family: Icons.font
-                                    font.pixelSize: 16
-                                    color: panel.pinned ? Styling.srItem("primary") : Colors.overBackground
+                                    font.pixelSize: 18
+                                    color: panel.pinned ? pinButtonVBg.item : (pinButtonV.pressed ? Colors.background : (Styling.srItem("overprimary") || Colors.foreground))
                                     horizontalAlignment: Text.AlignHCenter
                                     verticalAlignment: Text.AlignVCenter
 
