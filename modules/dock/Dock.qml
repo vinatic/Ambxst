@@ -85,6 +85,16 @@ Scope {
             required property ShellScreen modelData
             screen: modelData
 
+            // Reference to the bar panel on this screen to check its state
+            readonly property var barPanelRef: Visibilities.barPanels[screen.name]
+            // Only allow exclusive zone if the bar is also pinned (to prevent pushing the bar when it's floating)
+            readonly property bool barPinned: {
+                if (barPanelRef && typeof barPanelRef.pinned !== 'undefined') {
+                    return barPanelRef.pinned;
+                }
+                return true; // Default to true if not found, to maintain original behavior
+            }
+
             // Reveal logic: pinned, hover, no active window
             property bool reveal: root.pinned || (Config.dock?.hoverToReveal && dockMouseArea.containsMouse) || !ToplevelManager.activeToplevel?.activated
 
@@ -99,8 +109,9 @@ Scope {
             readonly property int shadowSpace: 32
             readonly property int dockSize: Config.dock?.height ?? 56
 
-            // Reserve space when pinned (without shadow space to not push windows too far)
-            exclusiveZone: root.pinned ? dockSize + totalMargin : 0
+            // Reserve space when pinned, but ONLY if bar is also pinned (to avoid displacement issues)
+            // If bar is unpinned (auto-hide), dock becomes overlay-only (0 zone)
+            exclusiveZone: (root.pinned && barPinned) ? dockSize + totalMargin : 0
 
             implicitWidth: root.isVertical ? dockSize + totalMargin + shadowSpace * 2 : dockContent.implicitWidth + shadowSpace * 2
             implicitHeight: root.isVertical ? dockContent.implicitHeight + shadowSpace * 2 : dockSize + totalMargin + shadowSpace * 2
