@@ -354,12 +354,8 @@ help | --help | -h)
 	show_help
 	;;
 "")
-	# Run daemon priority script
-	bash "${SCRIPT_DIR}/scripts/daemon_priority.sh"
-
-	# Kill any existing easyeffects and start it as a service
-	pkill -x easyeffects 2>/dev/null || true
-	nohup easyeffects --gapplication-service >/dev/null 2>&1 &
+	# Run daemon priority script (backgrounded to not block startup)
+	bash "${SCRIPT_DIR}/scripts/daemon_priority.sh" &
 
 	# Set QS_ICON_THEME environment variable
 	if command -v gsettings >/dev/null 2>&1; then
