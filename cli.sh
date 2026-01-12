@@ -368,6 +368,9 @@ help | --help | -h)
 		echo "DEBUG: gsettings not found in PATH" >&2
 	fi
 
+	# Force Qt6CT
+	export QT_QPA_PLATFORMTHEME=qt6ct
+
 	# Launch QuickShell with the main shell.qml
 	# If NIXGL_BIN is set (NixOS/Nix setup), use it. Otherwise, just run qs directly.
 	if [ -n "$NIXGL_BIN" ]; then
