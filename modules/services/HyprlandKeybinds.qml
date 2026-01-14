@@ -75,7 +75,9 @@ QtObject {
                 tools: cloneKeybind(ambxst.system.tools),
                 screenshot: cloneKeybind(ambxst.system.screenshot),
                 screenrecord: cloneKeybind(ambxst.system.screenrecord),
-                lens: cloneKeybind(ambxst.system.lens)
+                lens: cloneKeybind(ambxst.system.lens),
+                reload: ambxst.system.reload ? cloneKeybind(ambxst.system.reload) : null,
+                quit: ambxst.system.quit ? cloneKeybind(ambxst.system.quit) : null
             }
         };
 
@@ -196,6 +198,8 @@ QtObject {
                 unbindCommands.push(createUnbindCommand(previousAmbxstBinds.system.screenshot));
                 unbindCommands.push(createUnbindCommand(previousAmbxstBinds.system.screenrecord));
                 unbindCommands.push(createUnbindCommand(previousAmbxstBinds.system.lens));
+                if (previousAmbxstBinds.system.reload) unbindCommands.push(createUnbindCommand(previousAmbxstBinds.system.reload));
+                if (previousAmbxstBinds.system.quit) unbindCommands.push(createUnbindCommand(previousAmbxstBinds.system.quit));
             }
 
             // Unbind previous custom keybinds
@@ -242,6 +246,8 @@ QtObject {
         unbindCommands.push(createUnbindCommand(system.screenshot));
         unbindCommands.push(createUnbindCommand(system.screenrecord));
         unbindCommands.push(createUnbindCommand(system.lens));
+        if (system.reload) unbindCommands.push(createUnbindCommand(system.reload));
+        if (system.quit) unbindCommands.push(createUnbindCommand(system.quit));
 
         batchCommands.push(createBindCommand(system.overview, system.overview.flags || ""));
         batchCommands.push(createBindCommand(system.powermenu, system.powermenu.flags || ""));
@@ -251,6 +257,8 @@ QtObject {
         batchCommands.push(createBindCommand(system.screenshot, system.screenshot.flags || ""));
         batchCommands.push(createBindCommand(system.screenrecord, system.screenrecord.flags || ""));
         batchCommands.push(createBindCommand(system.lens, system.lens.flags || ""));
+        if (system.reload) batchCommands.push(createBindCommand(system.reload, system.reload.flags || ""));
+        if (system.quit) batchCommands.push(createBindCommand(system.quit, system.quit.flags || ""));
 
         // Procesar custom keybinds (new format with keys[] and actions[])
         const customBinds = Config.keybindsLoader.adapter.custom;
