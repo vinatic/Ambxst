@@ -230,7 +230,8 @@ FocusScope {
                         id: actionButton
                         anchors.fill: parent
                         visible: !delegateWrapper.isSeparator
-                        enabled: !delegateWrapper.isSeparator
+                        enabled: !delegateWrapper.isSeparator && (modelData.enabled !== undefined ? modelData.enabled : true)
+                        opacity: enabled ? 1.0 : 0.5
 
                         Process {
                             id: commandProcess

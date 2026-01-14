@@ -56,17 +56,20 @@ PanelWindow {
             {
                 name: "region",
                 icon: Icons.regionScreenshot,
-                tooltip: "Region"
+                tooltip: ScreenRecorder.canRecordDirectly ? "Region" : "Region (Unavailable on NixOS without config)",
+                enabled: ScreenRecorder.canRecordDirectly
             },
             {
                 name: "window",
                 icon: Icons.windowScreenshot,
-                tooltip: "Window"
+                tooltip: "Window",
+                enabled: ScreenRecorder.canRecordDirectly
             },
             {
                 name: "screen",
                 icon: Icons.fullScreenshot,
-                tooltip: "Screen"
+                tooltip: ScreenRecorder.canRecordDirectly ? "Screen" : "Screen (Unavailable on NixOS without config)",
+                enabled: ScreenRecorder.canRecordDirectly
             },
             {
                 name: "portal",
