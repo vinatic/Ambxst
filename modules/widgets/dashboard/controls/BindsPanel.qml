@@ -977,6 +977,9 @@ Item {
                                                 "argument": defaultBind.argument || "",
                                                 "flags": defaultBind.flags || ""
                                             }];
+                                            
+                                            // Auto-save immediately
+                                            root.saveEdit();
                                         }
                                     }
                                 }
