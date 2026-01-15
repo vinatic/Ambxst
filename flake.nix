@@ -14,7 +14,10 @@
     let
       ambxstLib = import ./nix/lib.nix { inherit nixpkgs; };
     in {
-      nixosModules.default = import ./nix/modules;
+      nixosModules.default = { pkgs, lib, ... }: {
+        imports = [ ./nix/modules ];
+        programs.ambxst.package = lib.mkDefault self.packages.${pkgs.system}.default;
+      };
 
       packages = ambxstLib.forAllSystems (system:
         let
