@@ -16,6 +16,7 @@
     in {
       nixosModules.default = { pkgs, lib, ... }: {
         imports = [ ./nix/modules ];
+        programs.ambxst.enable = lib.mkDefault true;
         programs.ambxst.package = lib.mkDefault self.packages.${pkgs.system}.default;
       };
 
