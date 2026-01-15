@@ -1109,6 +1109,7 @@ Singleton {
             property int hoverRegionHeight: 4
             property bool pinnedOnStartup: false
             property bool hoverToReveal: true
+            property bool availableOnFullscreen: false
             property bool showRunningIndicators: true
             property bool showPinButton: true
             property bool showOverviewButton: true
