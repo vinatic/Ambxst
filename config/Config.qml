@@ -753,9 +753,9 @@ Singleton {
         }
 
         adapter: JsonAdapter {
-            property list<string> activeBorderColor: ["primary"]
+            property var activeBorderColor: ["primary"]
             property int borderAngle: 45
-            property list<string> inactiveBorderColor: ["surface"]
+            property var inactiveBorderColor: ["surface"]
             property int inactiveBorderAngle: 45
             property int borderSize: 2
             property int rounding: 16

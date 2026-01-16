@@ -519,7 +519,7 @@ Singleton {
 
     function applyCompositorChanges() {
         if (compositorHasChanges) {
-            Config.loader.writeAdapter();
+            Config.saveHyprland();
             compositorHasChanges = false;
             compositorSnapshot = null;
             Config.pauseAutoSave = false;
