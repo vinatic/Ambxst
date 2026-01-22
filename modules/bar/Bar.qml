@@ -597,7 +597,7 @@ PanelWindow {
                 PresetsButton {
                     id: presetsButtonVert
                     startRadius: panel.innerRadius
-                    endRadius: panel.innerRadius
+                    endRadius: panel.outerRadius
                     vertical: true
                 }
 
@@ -629,8 +629,9 @@ PanelWindow {
                             bar: panel
                             layerEnabled: Config.showBackground
                             Layout.alignment: Qt.AlignHCenter
-                            startRadius: panel.innerRadius
+                            startRadius: panel.outerRadius
                             endRadius: panel.innerRadius
+                            vertical: true
                         }
 
                         Workspaces {
@@ -661,7 +662,7 @@ PanelWindow {
                                     enableShadow: Config.showBackground
                                     
                                     property real startRadius: panel.innerRadius
-                                    property real endRadius: panel.innerRadius
+                                    property real endRadius: panel.outerRadius
                                     
                                     topLeftRadius: startRadius
                                     topRightRadius: startRadius
@@ -730,7 +731,7 @@ PanelWindow {
                     id: controlsButtonVert
                     bar: panel
                     layerEnabled: Config.showBackground
-                    startRadius: panel.innerRadius
+                    startRadius: panel.outerRadius
                     endRadius: panel.innerRadius
                 }
 
