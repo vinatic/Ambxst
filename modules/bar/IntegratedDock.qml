@@ -28,7 +28,16 @@ StyledRect {
     visible: (Config.dock?.enabled ?? false) && isIntegrated
 
     variant: "bg"
-    radius: Styling.radius(0)
+    
+    // Radius handling from parent
+    property real startRadius: radius
+    property real endRadius: radius
+
+    topLeftRadius: isVertical ? startRadius : startRadius
+    topRightRadius: isVertical ? startRadius : endRadius
+    bottomLeftRadius: isVertical ? endRadius : startRadius
+    bottomRightRadius: isVertical ? endRadius : endRadius
+    
     enableShadow: Config.showBackground
 
     implicitWidth: isVertical ? 36 : dockLayout.implicitWidth + 8

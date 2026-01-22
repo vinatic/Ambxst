@@ -123,11 +123,14 @@ PanelWindow {
                 return "end";
             return "center";
         }
-
-        // Vertical always falls back to center (or default logic) for now
-        // to match the reverted behavior where it ignores start/end.
+        
+        // Vertical always falls back to center logic inside the column but we treat it as appended to group
         return "center";
     }
+
+    // Radius helpers for dock connections
+    readonly property bool dockAtStart: integratedDockEnabled && integratedDockPosition === "start"
+    readonly property bool dockAtEnd: integratedDockEnabled && integratedDockPosition === "end"
 
     anchors {
         top: barPosition !== "bottom"
@@ -402,7 +405,7 @@ PanelWindow {
                     bar: panel
                     layerEnabled: Config.showBackground
                     startRadius: panel.innerRadius
-                    endRadius: (panel.pinButtonVisible && !(integratedDockEnabled && integratedDockPosition !== "start")) ? panel.innerRadius : panel.outerRadius
+                    endRadius: (panel.pinButtonVisible) ? panel.innerRadius : (panel.dockAtStart ? panel.innerRadius : panel.outerRadius)
                 }
 
                 // Pin button (horizontal)
@@ -421,11 +424,9 @@ PanelWindow {
                             variant: panel.pinned ? "primary" : "bg"
                             enableShadow: Config.showBackground
                             
-                            // PinButton is typically last in group 1 (unless IntegratedDock follows)
-                            // If integratedDockEnabled, Pin is usually Inner/Inner or Inner/Outer depending on dock position logic?
-                            // Assuming basic structure: Pin is last of left group
+                            // PinButton is typically last in group 1 (unless IntegratedDock follows at start)
                             property real startRadius: panel.innerRadius
-                            property real endRadius: panel.outerRadius
+                            property real endRadius: panel.dockAtStart ? panel.innerRadius : panel.outerRadius
                             
                             topLeftRadius: startRadius
                             bottomLeftRadius: startRadius
@@ -490,6 +491,10 @@ PanelWindow {
                         orientation: panel.orientation
                         anchors.verticalCenter: parent.verticalCenter
 
+                        // Connect to left/right groups if at start/end
+                        startRadius: panel.dockAtStart ? panel.innerRadius : panel.outerRadius
+                        endRadius: panel.dockAtEnd ? panel.innerRadius : panel.outerRadius
+
                         // Calculate target position based on config
                         property real targetX: {
                             if (integratedDockPosition === "start")
@@ -517,7 +522,7 @@ PanelWindow {
 
                 PresetsButton {
                     id: presetsButton
-                    startRadius: panel.outerRadius
+                    startRadius: panel.dockAtEnd ? panel.innerRadius : panel.outerRadius
                     endRadius: panel.innerRadius
                 }
 
@@ -662,7 +667,8 @@ PanelWindow {
                                     enableShadow: Config.showBackground
                                     
                                     property real startRadius: panel.innerRadius
-                                    property real endRadius: panel.outerRadius
+                                    // In vertical, dock is always appended to this group if enabled
+                                    property real endRadius: panel.integratedDockEnabled ? panel.innerRadius : panel.outerRadius
                                     
                                     topLeftRadius: startRadius
                                     topRightRadius: startRadius
@@ -723,6 +729,9 @@ PanelWindow {
                             visible: integratedDockEnabled
                             Layout.fillHeight: true
                             Layout.fillWidth: true
+                            
+                            startRadius: panel.innerRadius
+                            endRadius: panel.outerRadius
                         }
                     }
                 }
