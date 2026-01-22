@@ -182,7 +182,26 @@ ShellRoot {
     // Application Dock - only load when enabled and not integrated
     Loader {
         id: dockLoader
-        active: (Config.dock?.enabled ?? false) && (Config.dock?.theme ?? "default") !== "integrated"
+
+        // Delay dock loading to ensure bar loads first (prevents layout issues)
+        property bool _ready: false
+        Timer {
+            id: dockDelayTimer
+            interval: 300
+            running: true
+            repeat: false
+            onTriggered: dockLoader._ready = true
+        }
+
+        Connections {
+            target: Config.bar
+            function onPositionChanged() {
+                dockLoader._ready = false;
+                dockDelayTimer.restart();
+            }
+        }
+
+        active: _ready && (Config.dock?.enabled ?? false) && (Config.dock?.theme ?? "default") !== "integrated"
         sourceComponent: Dock {}
     }
 
