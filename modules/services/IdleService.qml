@@ -87,6 +87,26 @@ Singleton {
         }
     }
 
+    function executeCommand(cmd) {
+        if (!cmd) return;
+        
+        // Escape backslashes and quotes for the QML string
+        let escapedCmd = cmd.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+        
+        try {
+            let proc = Qt.createQmlObject(`
+                import Quickshell.Io
+                Process {
+                    command: ["sh", "-c", "${escapedCmd}"]
+                    running: true
+                    onExited: destroy()
+                }
+            `, root, "dynamicProc");
+        } catch (e) {
+            console.error("Failed to create process for command:", cmd, e);
+        }
+    }
+
     function checkListeners() {
         let listeners = Config.system.idle.listeners;
         for (let i = 0; i < listeners.length; i++) {
@@ -97,8 +117,7 @@ Singleton {
             if (root.elapsedIdleTime >= tVal && !root.triggeredListeners.includes(i)) {
                 if (listener.onTimeout) {
                     console.log("Idle timer " + tVal + "s reached: " + listener.onTimeout);
-                    executionProc.command = ["sh", "-c", listener.onTimeout];
-                    executionProc.running = true;
+                    root.executeCommand(listener.onTimeout);
                 }
                 root.triggeredListeners.push(i);
             }
@@ -116,18 +135,12 @@ Singleton {
 
             if (listener && listener.onResume) {
                 console.log("Idle resuming (undoing " + (listener.timeout || 0) + "s): " + listener.onResume);
-                executionProc.command = ["sh", "-c", listener.onResume];
-                executionProc.running = true;
+                root.executeCommand(listener.onResume);
             }
         }
 
         // Reset counters
         root.elapsedIdleTime = 0;
         root.triggeredListeners = [];
-    }
-
-    // Shared process for command execution to avoid garbage collection issues
-    Process {
-        id: executionProc
     }
 }
