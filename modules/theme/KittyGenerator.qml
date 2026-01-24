@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.config
 
 QtObject {
     id: root
@@ -18,6 +19,7 @@ QtObject {
         const selectionForeground = fmt(Colors.overSecondary)
         const selectionBackground = fmt(Colors.secondaryFixedDim)
         const urlColor = fmt(Colors.primary)
+        const backgroundOpacity = Config.theme.srBg.opacity
 
         // black
         const color0 = fmt(Colors.surfaceContainerLow)
@@ -58,6 +60,7 @@ QtObject {
         
         conf += `foreground ${foreground}\n`
         conf += `background ${background}\n`
+        conf += `background_opacity ${backgroundOpacity}\n`
         conf += `selection_foreground ${selectionForeground}\n`
         conf += `selection_background ${selectionBackground}\n`
         conf += `url_color ${urlColor}\n\n`

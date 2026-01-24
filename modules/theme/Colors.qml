@@ -21,6 +21,13 @@ FileView {
         }
     }
 
+    property Connections themeWatcher: Connections {
+        target: Config.loader
+        function onFileChanged() {
+            generationTimer.restart()
+        }
+    }
+
     property QtCtGenerator qtCtGenerator: QtCtGenerator {
         id: qtCtGenerator
     }
