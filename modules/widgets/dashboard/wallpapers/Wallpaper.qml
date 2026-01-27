@@ -5,6 +5,7 @@ import Quickshell.Io
 import qs.modules.globals
 import qs.modules.theme
 import qs.config
+import "MpvShaderGenerator.js" as ShaderGenerator
 
 PanelWindow {
     id: wallpaper
@@ -33,6 +34,22 @@ PanelWindow {
     property bool _wallpaperDirInitialized: false
     property string currentMatugenScheme: wallpaperConfig.adapter.matugenScheme
     property alias tintEnabled: wallpaperAdapter.tintEnabled
+
+    property string mpvShaderPath: Quickshell.dataDir + "/mpv_tint.glsl"
+    property bool mpvShaderReady: false
+    
+    readonly property var optimizedPalette: [
+        "background", "overBackground", "shadow",
+        "surface", "surfaceBright", "surfaceDim",
+        "surfaceContainer", "surfaceContainerHigh", "surfaceContainerHighest", "surfaceContainerLow", "surfaceContainerLowest",
+        "primary", "secondary", "tertiary",
+        "red", "lightRed",
+        "green", "lightGreen",
+        "blue", "lightBlue",
+        "yellow", "lightYellow",
+        "cyan", "lightCyan",
+        "magenta", "lightMagenta"
+    ]
 
     // Sync state from the primary wallpaper manager to secondary instances
     Binding {
@@ -381,6 +398,72 @@ PanelWindow {
         }
     }
 
+    function updateMpvShader() {
+        if (!wallpaperAdapter.tintEnabled) return;
+        
+        var colors = [];
+        for (var i = 0; i < optimizedPalette.length; i++) {
+            var rawColor = Colors[optimizedPalette[i]];
+            // Verify color validity before pushing
+            if (rawColor) {
+                var c = Qt.darker(rawColor, 1.0);
+                colors.push({r: c.r, g: c.g, b: c.b});
+            }
+        }
+        
+        if (colors.length === 0) {
+            console.warn("MpvShaderGenerator: No colors found for palette!");
+            return;
+        }
+
+        var shaderContent = ShaderGenerator.generate(colors);
+        
+        // Write to file using python one-liner
+        var cmd = [
+            "python3", "-c", 
+            "import sys; open(sys.argv[1], 'w').write(sys.argv[2])", 
+            mpvShaderPath, 
+            shaderContent
+        ];
+        
+        mpvShaderWriter.command = cmd;
+        mpvShaderWriter.running = true;
+    }
+
+    Process {
+        id: mpvShaderWriter
+        running: false
+        onExited: code => {
+            if (code === 0) {
+                console.log("MPV tint shader generated at:", mpvShaderPath);
+                mpvShaderReady = true;
+                
+                // Force restart mpvpaper if running
+                // We do this by triggering the signal or just letting the user interactions handle it
+                // For now, let's just log it. 
+            } else {
+                console.warn("Failed to generate MPV shader");
+            }
+        }
+    }
+    
+    // Trigger update when colors change
+    Timer {
+        id: shaderUpdateDebounce
+        interval: 500
+        onTriggered: updateMpvShader()
+    }
+    
+    Connections {
+        target: Colors
+        // Watch for a primary color change as a signal that theme has updated
+        function onPrimaryChanged() { shaderUpdateDebounce.restart() }
+    }
+    
+    onTintEnabledChanged: {
+        if (tintEnabled) updateMpvShader();
+    }
+
     Component.onCompleted: {
         // Only the first Wallpaper instance should manage scanning
         // Other instances (for other screens) share the same data via GlobalStates
@@ -407,6 +490,10 @@ PanelWindow {
         Qt.callLater(function() {
             if (currentWallpaper) {
                 generateLockscreenFrame(currentWallpaper);
+            }
+            // Force shader generation on startup if enabled
+            if (tintEnabled) {
+                updateMpvShader();
             }
         });
     }
@@ -1109,7 +1196,7 @@ PanelWindow {
                 Process {
                     id: mpvpaperProcess
                     running: false
-                    command: sourceFile ? ["bash", scriptPath, sourceFile] : []
+                    command: sourceFile ? ["bash", scriptPath, sourceFile, (wallpaper.tintEnabled ? wallpaper.mpvShaderPath : "")] : []
 
                     stdout: StdioCollector {
                         onStreamFinished: {
