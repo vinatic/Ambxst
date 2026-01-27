@@ -7,7 +7,7 @@ Item {
     id: root
 
     required property ShellScreen screen
-    
+
     // States from Bar and Dock
     property bool barEnabled: true
     property string barPosition: "top"
@@ -15,6 +15,7 @@ Item {
     property bool barReveal: true
     property bool barFullscreen: false
     property int barHeight: Config.showBackground ? 44 : 40
+    property bool containBar: Config.bar?.containBar ?? false
 
     property bool dockEnabled: true
     property string dockPosition: "bottom"
@@ -27,7 +28,8 @@ Item {
     property bool frameEnabled: Config.bar?.frameEnabled ?? false
     property int frameThickness: {
         const value = Config.bar?.frameThickness;
-        if (typeof value !== "number") return 6;
+        if (typeof value !== "number")
+            return 6;
         return Math.max(1, Math.min(Math.round(value), 40));
     }
     readonly property int actualFrameSize: frameEnabled ? frameThickness : 0
@@ -35,18 +37,38 @@ Item {
     // Helper to check if a component is active for exclusive zone on a specific side
     function getExtraZone(side) {
         let zone = actualFrameSize;
-        
+
         // Bar zone
         if (barEnabled && barPosition === side && barPinned && barReveal && !barFullscreen) {
             zone += barHeight;
+            // Add extra thickness if containing bar
+            if (containBar) {
+                zone += actualFrameSize;
+            }
         }
-        
+
         // Dock zone
         if (dockEnabled && dockPosition === side && dockPinned && dockReveal && !dockFullscreen) {
             zone += dockHeight;
         }
-        
+
         return zone;
+    }
+    
+    // Determine exclusion mode based on whether we are reserving ANY space
+    // If zone > 0 we should probably be ExclusionMode.Normal to ensure it takes effect
+    function getExclusionMode(side) {
+        // If we are calculating a zone > 0, we generally want Normal.
+        // But the original code had Ignore everywhere.
+        // Assuming the user wants to FIX reservation, we likely need Normal.
+        // However, let's respect if the zone is 0 or minimal.
+        // But actualFrameSize is at least 6 if enabled.
+        
+        // Wait, if original was Ignore, maybe it was just overlay?
+        // But user says "no reserva el espacio que debería". This implies it SHOULD reserve.
+        // So Ignore is likely wrong for the case where we WANT reservation.
+        
+        return getExtraZone(side) > 0 ? ExclusionMode.Normal : ExclusionMode.Ignore;
     }
 
     Item {
@@ -62,13 +84,19 @@ Item {
         visible: true
         implicitHeight: 1 // Minimal height
         color: "transparent"
-        anchors { left: true; right: true; top: true }
+        anchors {
+            left: true
+            right: true
+            top: true
+        }
         WlrLayershell.layer: WlrLayer.Top
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
         WlrLayershell.namespace: "quickshell:reservation:top"
-        exclusionMode: ExclusionMode.Ignore
+        exclusionMode: root.getExclusionMode("top")
         exclusiveZone: root.getExtraZone("top")
-        mask: Region { item: noInputRegion }
+        mask: Region {
+            item: noInputRegion
+        }
     }
 
     PanelWindow {
@@ -77,13 +105,19 @@ Item {
         visible: true
         implicitHeight: 1
         color: "transparent"
-        anchors { left: true; right: true; bottom: true }
+        anchors {
+            left: true
+            right: true
+            bottom: true
+        }
         WlrLayershell.layer: WlrLayer.Top
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
         WlrLayershell.namespace: "quickshell:reservation:bottom"
-        exclusionMode: ExclusionMode.Ignore
+        exclusionMode: root.getExclusionMode("bottom")
         exclusiveZone: root.getExtraZone("bottom")
-        mask: Region { item: noInputRegion }
+        mask: Region {
+            item: noInputRegion
+        }
     }
 
     PanelWindow {
@@ -92,13 +126,19 @@ Item {
         visible: true
         implicitWidth: 1
         color: "transparent"
-        anchors { top: true; bottom: true; left: true }
+        anchors {
+            top: true
+            bottom: true
+            left: true
+        }
         WlrLayershell.layer: WlrLayer.Top
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
         WlrLayershell.namespace: "quickshell:reservation:left"
-        exclusionMode: ExclusionMode.Ignore
+        exclusionMode: root.getExclusionMode("left")
         exclusiveZone: root.getExtraZone("left")
-        mask: Region { item: noInputRegion }
+        mask: Region {
+            item: noInputRegion
+        }
     }
 
     PanelWindow {
@@ -107,12 +147,18 @@ Item {
         visible: true
         implicitWidth: 1
         color: "transparent"
-        anchors { top: true; bottom: true; right: true }
+        anchors {
+            top: true
+            bottom: true
+            right: true
+        }
         WlrLayershell.layer: WlrLayer.Top
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
         WlrLayershell.namespace: "quickshell:reservation:right"
-        exclusionMode: ExclusionMode.Ignore
+        exclusionMode: root.getExclusionMode("right")
         exclusiveZone: root.getExtraZone("right")
-        mask: Region { item: noInputRegion }
+        mask: Region {
+            item: noInputRegion
+        }
     }
 }

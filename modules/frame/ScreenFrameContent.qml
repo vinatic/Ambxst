@@ -13,9 +13,28 @@ Item {
 
     required property ShellScreen targetScreen
 
+    // These properties are now handled by parent ScreenFrame
+    // but we can expose aliases or simple properties for drawing
+    
+    // We expect the parent to set these, but we can't 'required property' them 
+    // easily if they are not passed in instantiation inside ScreenFrame.
+    // However, ScreenFrame DOES instantiate this.
+    // But in QML scope, 'ScreenFrame' properties are accessible if we are a child.
+    
+    // Let's rely on parent properties injection or direct access if needed, 
+    // but better to keep it clean.
+    
+    // Actually, ScreenFrame.qml defines 'frameContent' inside it.
+    // We can just use parent properties or aliases.
+    
+    // BUT to keep it standalone-ish or at least type-safe:
+    // We will re-read Config here OR rely on parent.
+    // Ideally, we shouldn't duplicate logic.
+    
     readonly property bool frameEnabled: Config.bar?.frameEnabled ?? false
+    
+    // Use the same thickness logic as ScreenFrame to ensure consistency
     readonly property int thickness: {
-        // Always return valid number for corners, even if frame is disabled
         const value = Config.bar?.frameThickness;
         if (typeof value !== "number")
             return 6;
@@ -25,13 +44,8 @@ Item {
     readonly property bool containBar: Config.bar?.containBar ?? false
     readonly property string barPos: Config.bar?.position ?? "top"
 
-    // We inherit thickness properties from parent root now to avoid duplication/cycles,
-    // or we calculate them here for drawing purposes.
-    // Ideally, ScreenFrame passes them down, but since we are inside ScreenFrame, we can access them via root's properties?
-    // No, ScreenFrameContent is independent component.
-    // Let's keep logic here for drawing, but ensure it matches ScreenFrame.
-
-    // Total side height = thickness (outer) + 44 (bar) + thickness (inner)
+    // This must match ScreenFrame.qml logic EXACTLY
+    // ScreenFrame: barExpansion = 44 + thickness
     readonly property int barExpansion: 44 + thickness
 
     readonly property int topThickness: thickness + ((containBar && barPos === "top") ? barExpansion : 0)

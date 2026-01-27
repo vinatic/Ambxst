@@ -46,7 +46,7 @@ Item {
         WlrLayershell.namespace: "quickshell:screenFrame:top"
         
         // Always Normal mode, control zone size directly
-        exclusionMode: ExclusionMode.Normal
+        exclusionMode: (root.containBar && root.barPos === "top") ? ExclusionMode.Normal : ExclusionMode.Ignore
         exclusiveZone: (root.containBar && root.barPos === "top") ? root.topThickness : 0
 
         mask: Region { item: noInputRegion }
@@ -68,7 +68,7 @@ Item {
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
         WlrLayershell.namespace: "quickshell:screenFrame:bottom"
         
-        exclusionMode: ExclusionMode.Normal
+        exclusionMode: (root.containBar && root.barPos === "bottom") ? ExclusionMode.Normal : ExclusionMode.Ignore
         exclusiveZone: (root.containBar && root.barPos === "bottom") ? root.bottomThickness : 0
 
         mask: Region { item: noInputRegion }
@@ -90,7 +90,7 @@ Item {
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
         WlrLayershell.namespace: "quickshell:screenFrame:left"
         
-        exclusionMode: ExclusionMode.Normal
+        exclusionMode: (root.containBar && root.barPos === "left") ? ExclusionMode.Normal : ExclusionMode.Ignore
         exclusiveZone: (root.containBar && root.barPos === "left") ? root.leftThickness : 0
 
         mask: Region { item: noInputRegion }
@@ -112,177 +112,9 @@ Item {
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
         WlrLayershell.namespace: "quickshell:screenFrame:right"
         
-        exclusionMode: ExclusionMode.Normal
+        exclusionMode: (root.containBar && root.barPos === "right") ? ExclusionMode.Normal : ExclusionMode.Ignore
         exclusiveZone: (root.containBar && root.barPos === "right") ? root.rightThickness : 0
 
-        mask: Region { item: noInputRegion }
-    }
-
-
-    PanelWindow {
-        id: topFrame
-        screen: root.targetScreen
-        visible: root.frameEnabled
-        implicitHeight: root.topThickness
-        color: "transparent"
-        anchors {
-            left: true
-            right: true
-            top: true
-        }
-        WlrLayershell.layer: WlrLayer.Top
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-        WlrLayershell.namespace: "quickshell:screenFrame:top"
-        exclusionMode: (root.containBar && root.barPos === "top") ? ExclusionMode.Normal : ExclusionMode.Ignore
-        exclusiveZone: root.topThickness
-        mask: Region { item: noInputRegion }
-    }
-
-    PanelWindow {
-        id: bottomFrame
-        screen: root.targetScreen
-        visible: root.frameEnabled
-        implicitHeight: root.bottomThickness
-        color: "transparent"
-        anchors {
-            left: true
-            right: true
-            bottom: true
-        }
-        WlrLayershell.layer: WlrLayer.Top
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-        WlrLayershell.namespace: "quickshell:screenFrame:bottom"
-        exclusionMode: (root.containBar && root.barPos === "bottom") ? ExclusionMode.Normal : ExclusionMode.Ignore
-        exclusiveZone: root.bottomThickness
-        mask: Region { item: noInputRegion }
-    }
-
-    PanelWindow {
-        id: leftFrame
-        screen: root.targetScreen
-        visible: root.frameEnabled
-        implicitWidth: root.leftThickness
-        color: "transparent"
-        anchors {
-            top: true
-            bottom: true
-            left: true
-        }
-        WlrLayershell.layer: WlrLayer.Top
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-        WlrLayershell.namespace: "quickshell:screenFrame:left"
-        exclusionMode: (root.containBar && root.barPos === "left") ? ExclusionMode.Normal : ExclusionMode.Ignore
-        exclusiveZone: root.leftThickness
-        mask: Region { item: noInputRegion }
-    }
-
-    PanelWindow {
-        id: rightFrame
-        screen: root.targetScreen
-        visible: root.frameEnabled
-        implicitWidth: root.rightThickness
-        color: "transparent"
-        anchors {
-            top: true
-            bottom: true
-            right: true
-        }
-        WlrLayershell.layer: WlrLayer.Top
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-        WlrLayershell.namespace: "quickshell:screenFrame:right"
-        exclusionMode: (root.containBar && root.barPos === "right") ? ExclusionMode.Normal : ExclusionMode.Ignore
-        exclusiveZone: root.rightThickness
-        mask: Region { item: noInputRegion }
-    }
-
-    PanelWindow {
-        id: frameOverlay
-        screen: root.targetScreen
-        visible: root.frameEnabled
-        color: "transparent"
-        anchors {
-            top: true
-            bottom: true
-            left: true
-            right: true
-        }
-        WlrLayershell.layer: WlrLayer.Top
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-        WlrLayershell.namespace: "quickshell:screenFrame:overlay"
-        exclusionMode: ExclusionMode.Ignore
-        exclusiveZone: 0
-        mask: Region { item: noInputRegion }
-
-        ScreenFrameContent {
-            id: frameContent
-            anchors.fill: parent
-            targetScreen: root.targetScreen
-        }
-    }
-}
-
-        WlrLayershell.layer: WlrLayer.Top
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-        WlrLayershell.namespace: "quickshell:screenFrame:top"
-        exclusionMode: (root.containBar && root.barPos === "top") ? ExclusionMode.Normal : ExclusionMode.Ignore
-        exclusiveZone: root.topThickness
-        mask: Region { item: noInputRegion }
-    }
-
-    PanelWindow {
-        id: bottomFrame
-        screen: root.targetScreen
-        visible: root.frameEnabled
-        implicitHeight: root.bottomThickness
-        color: "transparent"
-        anchors {
-            left: true
-            right: true
-            bottom: true
-        }
-        WlrLayershell.layer: WlrLayer.Top
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-        WlrLayershell.namespace: "quickshell:screenFrame:bottom"
-        exclusionMode: (root.containBar && root.barPos === "bottom") ? ExclusionMode.Normal : ExclusionMode.Ignore
-        exclusiveZone: root.bottomThickness
-        mask: Region { item: noInputRegion }
-    }
-
-    PanelWindow {
-        id: leftFrame
-        screen: root.targetScreen
-        visible: root.frameEnabled
-        implicitWidth: root.leftThickness
-        color: "transparent"
-        anchors {
-            top: true
-            bottom: true
-            left: true
-        }
-        WlrLayershell.layer: WlrLayer.Top
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-        WlrLayershell.namespace: "quickshell:screenFrame:left"
-        exclusionMode: (root.containBar && root.barPos === "left") ? ExclusionMode.Normal : ExclusionMode.Ignore
-        exclusiveZone: root.leftThickness
-        mask: Region { item: noInputRegion }
-    }
-
-    PanelWindow {
-        id: rightFrame
-        screen: root.targetScreen
-        visible: root.frameEnabled
-        implicitWidth: root.rightThickness
-        color: "transparent"
-        anchors {
-            top: true
-            bottom: true
-            right: true
-        }
-        WlrLayershell.layer: WlrLayer.Top
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-        WlrLayershell.namespace: "quickshell:screenFrame:right"
-        exclusionMode: (root.containBar && root.barPos === "right") ? ExclusionMode.Normal : ExclusionMode.Ignore
-        exclusiveZone: root.rightThickness
         mask: Region { item: noInputRegion }
     }
 
