@@ -27,6 +27,7 @@ PanelWindow {
     property string fallbackDir: decodeURIComponent(Qt.resolvedUrl("../../../../assets/wallpapers_example").toString().replace("file://", ""))
     property var wallpaperPaths: []
     property var subfolderFilters: []
+    property var allSubdirs: []
     property int currentIndex: 0
     property string currentWallpaper: initialLoadCompleted && wallpaperPaths.length > 0 ? wallpaperPaths[currentIndex] : ""
     property bool initialLoadCompleted: false
@@ -34,6 +35,7 @@ PanelWindow {
     property bool _wallpaperDirInitialized: false
     property string currentMatugenScheme: wallpaperConfig.adapter.matugenScheme
     property alias tintEnabled: wallpaperAdapter.tintEnabled
+    property int thumbnailsVersion: 0
 
     property string mpvShaderPath: Quickshell.dataDir + "/mpv_tint_0.glsl"
     property bool mpvShaderReady: false
@@ -241,7 +243,7 @@ PanelWindow {
     function scanSubfolders() {
         if (!wallpaperDir) return;
         // Explicitly update command with current wallpaperDir
-        var cmd = ["find", wallpaperDir, "-type", "d", "-mindepth", "1", "-maxdepth", "1"];
+        var cmd = ["find", wallpaperDir, "-type", "d", "-mindepth", "1"];
         scanSubfoldersProcess.command = cmd;
         scanSubfoldersProcess.running = true;
     }
@@ -776,6 +778,7 @@ PanelWindow {
         onExited: function (exitCode) {
             if (exitCode === 0) {
                 console.log("✅ Video thumbnails generated successfully");
+                thumbnailsVersion++;
             } else {
                 console.warn("⚠️ Thumbnail generation failed with code:", exitCode);
             }
@@ -784,7 +787,7 @@ PanelWindow {
 
     Timer {
         id: delayedThumbnailGen
-        interval: 5000 // Delay 5 seconds after startup to not block initial load
+        interval: 2000 // Delay 2 seconds after change to not block
         repeat: false
         onTriggered: thumbnailGeneratorScript.running = true
     }
@@ -823,20 +826,30 @@ PanelWindow {
     Process {
         id: scanSubfoldersProcess
         running: false
-        command: wallpaperDir ? ["find", wallpaperDir, "-type", "d", "-mindepth", "1", "-maxdepth", "1"] : []
+        command: wallpaperDir ? ["find", wallpaperDir, "-type", "d", "-mindepth", "1"] : []
 
         stdout: StdioCollector {
             onStreamFinished: {
                 console.log("scanSubfolders stdout:", text);
-                var folders = text.trim().split("\n").filter(function (f) {
+                var rawPaths = text.trim().split("\n").filter(function (f) {
                     return f.length > 0;
-                }).map(function (folder) {
-                    return folder.split('/').pop();
-                }).filter(function (folderName) {
-                    return !folderName.startsWith('.');
                 });
-                folders.sort();
-                subfolderFilters = folders;
+                
+                allSubdirs = rawPaths;
+                
+                var basePath = wallpaperDir.endsWith("/") ? wallpaperDir : wallpaperDir + "/";
+                
+                var topLevelFolders = rawPaths.filter(function(path) {
+                    var relative = path.replace(basePath, "");
+                    return relative.indexOf("/") === -1;
+                }).map(function(path) {
+                    return path.split("/").pop();
+                }).filter(function(name) {
+                    return name.length > 0 && !name.startsWith(".");
+                });
+                
+                topLevelFolders.sort();
+                subfolderFilters = topLevelFolders;
                 subfolderFiltersChanged();  // Emitir señal manualmente
                 console.log("Updated subfolderFilters:", subfolderFilters);
             }
@@ -870,12 +883,32 @@ PanelWindow {
             if (wallpaperDir === "") return;
             console.log("Wallpaper directory changed, rescanning...");
             scanWallpapers.running = true;
+            scanSubfoldersProcess.running = true;
             // Regenerar thumbnails si hay nuevos videos (delayed)
             if (delayedThumbnailGen.running) delayedThumbnailGen.restart();
             else delayedThumbnailGen.start();
         }
 
         // Remove onLoadFailed to prevent premature fallback activation
+    }
+
+    // Recursive directory watchers for subfolders
+    Instantiator {
+        model: allSubdirs
+        
+        delegate: FileView {
+            path: modelData
+            watchChanges: true
+            onFileChanged: {
+                console.log("Subdirectory content changed (" + path + "), rescanning...");
+                scanWallpapers.running = true;
+                scanSubfoldersProcess.running = true;
+                
+                // Regenerar thumbnails (delayed)
+                if (delayedThumbnailGen.running) delayedThumbnailGen.restart();
+                else delayedThumbnailGen.start();
+            }
+        }
     }
 
     // Directory watcher for user color presets
@@ -936,6 +969,10 @@ PanelWindow {
 
                         // Always try to load the saved wallpaper when list changes
                         if (wallpaperPaths.length > 0) {
+                            // Trigger thumbnail generation if list changed
+                            if (delayedThumbnailGen.running) delayedThumbnailGen.restart();
+                            else delayedThumbnailGen.start();
+
                             if (wallpaperConfig.adapter.currentWall) {
                                 var savedIndex = wallpaperPaths.indexOf(wallpaperConfig.adapter.currentWall);
                                 if (savedIndex !== -1) {

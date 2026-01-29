@@ -956,25 +956,25 @@ FocusScope {
         id: staticImageComponent
         Image {
             source: {
-                if (!parent.sourceFile)
+                if (!parent.sourceFile || !GlobalStates.wallpaperManager)
                     return "";
 
-                // Usar thumbnail si está disponible, fallback a original
+                // Usar SOLAMENTE thumbnail, nunca el original (muy pesado)
                 var thumbnailPath = GlobalStates.wallpaperManager.getThumbnailPath(parent.sourceFile);
-                return thumbnailPath ? "file://" + thumbnailPath : "file://" + parent.sourceFile;
+                var version = GlobalStates.wallpaperManager.thumbnailsVersion;
+                return "file://" + thumbnailPath + "?v=" + version;
             }
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
             smooth: true
-            cache: false // Evitar acumular cache innecesario
+            cache: true // El caché se invalida por el parámetro ?v=
             sourceSize.width: wallpaperGridContainer.cellSize
             sourceSize.height: wallpaperGridContainer.cellSize
 
-            // Fallback a imagen original si el thumbnail falla
+            // No hay fallback al original para evitar carga excesiva
             onStatusChanged: {
-                if (status === Image.Error && source.toString().includes("/by-shell/Ambxst/image_thumbnails/")) {
-                    console.log("Thumbnail failed, using original:", parent.sourceFile);
-                    source = "file://" + parent.sourceFile;
+                if (status === Image.Error) {
+                    // console.log("Thumbnail not ready yet for:", parent.sourceFile);
                 }
             }
         }
