@@ -115,7 +115,7 @@ StyledRect {
         source: backgroundArtBlurred
         blurEnabled: true
         blurMax: 32
-        blur: 0.75
+        blur: 1.0
         opacity: player.hasArtwork ? 0.25 : 0.0
         visible: player.hasArtwork
         Behavior on opacity {
