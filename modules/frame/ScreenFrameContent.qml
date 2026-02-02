@@ -34,13 +34,21 @@ Item {
     
     readonly property bool frameEnabled: Config.bar?.frameEnabled ?? false
     
-    // Use the same thickness logic as ScreenFrame to ensure consistency
-    readonly property int thickness: {
+    readonly property real targetThickness: {
         if (hasFullscreenWindow) return 0;
         const value = Config.bar?.frameThickness;
         if (typeof value !== "number")
             return 6;
         return Math.max(1, Math.min(Math.round(value), 40));
+    }
+
+    property real thickness: targetThickness
+    Behavior on thickness {
+        enabled: Config.animDuration > 0
+        NumberAnimation {
+            duration: Config.animDuration
+            easing.type: Easing.OutCubic
+        }
     }
 
     readonly property bool containBar: Config.bar?.containBar ?? false
@@ -77,7 +85,16 @@ Item {
     readonly property int actualFrameSize: frameEnabled ? thickness : 0
 
     readonly property int borderWidth: Config.theme.srBg.border[1]
-    readonly property int innerRadius: Styling.radius(4 + borderWidth)
+    
+    readonly property real targetInnerRadius: root.hasFullscreenWindow ? 0 : Styling.radius(4 + borderWidth)
+    property real innerRadius: targetInnerRadius
+    Behavior on innerRadius {
+        enabled: Config.animDuration > 0
+        NumberAnimation {
+            duration: Config.animDuration
+            easing.type: Easing.OutCubic
+        }
+    }
 
     // Visual part
     StyledRect {

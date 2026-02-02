@@ -75,6 +75,10 @@ ShellRoot {
                 targetScreen: screenShellContainer.modelData
             }
 
+            ScreenCorners {
+                screen: screenShellContainer.modelData
+            }
+
             // Reservation Windows for Exclusive Zones
             ReservationWindows {
                 screen: screenShellContainer.modelData

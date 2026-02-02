@@ -8,7 +8,6 @@ import qs.modules.bar.workspaces
 import qs.modules.notch
 import qs.modules.dock
 import qs.modules.frame
-import qs.modules.corners
 import qs.modules.services
 import qs.modules.globals
 import qs.modules.components
@@ -225,14 +224,6 @@ PanelWindow {
             anchors.fill: parent
             screen: unifiedPanel.targetScreen
             z: 4
-        }
-
-        ScreenCornersContent {
-            id: cornersContent
-            anchors.fill: parent
-            hasFullscreenWindow: unifiedPanel.hasFullscreenWindow
-            z: 5
-            visible: Config.theme.enableCorners && Config.roundness > 0
         }
     }
 }

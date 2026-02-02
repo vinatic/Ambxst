@@ -52,5 +52,6 @@ PanelWindow {
     ScreenCornersContent {
         id: cornersContent
         anchors.fill: parent
+        hasFullscreenWindow: screenCorners.activeWindowFullscreen
     }
 }
