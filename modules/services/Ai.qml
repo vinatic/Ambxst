@@ -14,8 +14,7 @@ Singleton {
     // PROPERTIES
     // ============================================
 
-    property string dataDir: (Quickshell.env("XDG_DATA_HOME") || (Quickshell.env("HOME") + "/.local/share")) + "/Ambxst"
-    property string chatDir: dataDir + "/chats"
+    property string chatDir: Quickshell.dataPath("chats/")
     property string tmpDir: "/tmp/ambxst-ai"
 
     property list<AiModel> models: []
