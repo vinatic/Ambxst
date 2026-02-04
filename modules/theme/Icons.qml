@@ -70,6 +70,7 @@ QtObject {
     readonly property string glassPlus: ""
     readonly property string circuitry: ""
     readonly property string robot: ""
+    readonly property string minusCircle: ""
 
     // Wi-Fi
     readonly property string wifiOff: ""
