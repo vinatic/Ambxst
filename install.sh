@@ -9,10 +9,10 @@ QUICKSHELL_REPO="https://git.outfoxxed.me/outfoxxed/quickshell"
 
 # === Helpers ===
 GREEN='\033[0;32m' BLUE='\033[0;34m' YELLOW='\033[1;33m' RED='\033[0;31m' NC='\033[0m'
-log_info() { echo -e "${BLUE}ℹ  $1${NC}"; }
-log_success() { echo -e "${GREEN}✔  $1${NC}"; }
-log_warn() { echo -e "${YELLOW}⚠  $1${NC}"; }
-log_error() { echo -e "${RED}✖  $1${NC}"; }
+log_info() { echo -e "${BLUE}ℹ  $1${NC}" >&2; }
+log_success() { echo -e "${GREEN}✔  $1${NC}" >&2; }
+log_warn() { echo -e "${YELLOW}⚠  $1${NC}" >&2; }
+log_error() { echo -e "${RED}✖  $1${NC}" >&2; }
 
 has_cmd() { command -v "$1" >/dev/null 2>&1; }
 has_theme() { [[ -d "/usr/share/themes/$1" ]] || [[ -d "$HOME/.themes/$1" ]] || [[ -d "/usr/share/themes/${1}-dark" ]]; }
