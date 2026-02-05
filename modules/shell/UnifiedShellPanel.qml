@@ -47,6 +47,7 @@ PanelWindow {
     readonly property alias dockPinned: dockContent.pinned
     readonly property alias dockReveal: dockContent.reveal
     readonly property alias dockFullscreen: dockContent.activeWindowFullscreen
+    readonly property int dockHeight: dockContent.dockSize + dockContent.totalMargin
 
     readonly property alias notchHoverActive: notchContent.hoverActive
     readonly property alias notchOpen: notchContent.screenNotchOpen

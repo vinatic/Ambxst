@@ -107,6 +107,7 @@ ShellRoot {
                 }
                 dockPosition: unifiedPanel.dockPosition
                 dockPinned: unifiedPanel.dockPinned
+                dockHeight: unifiedPanel.dockHeight
                 containBar: unifiedPanel.containBar
 
                 frameEnabled: Config.bar?.frameEnabled ?? false
