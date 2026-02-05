@@ -5,7 +5,7 @@ var data = {
     "launcherIcon": "",
     "launcherIconTint": true,
     "launcherIconFullTint": true,
-    "launcherIconSize": 18,
+    "launcherIconSize": 24,
     "pillStyle": "default",
     "screenList": [],
     "enableFirefoxPlayer": false,
