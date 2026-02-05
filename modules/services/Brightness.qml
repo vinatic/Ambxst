@@ -15,7 +15,7 @@ import QtQuick
 Singleton {
     id: root
 
-    signal brightnessChanged
+    signal brightnessChanged(real value, var screen)
 
     property var ddcMonitors: []
     readonly property list<BrightnessMonitor> monitors: Quickshell.screens.map(screen => monitorComp.createObject(root, {
@@ -180,7 +180,7 @@ Singleton {
 
         onBrightnessChanged: {
             if (monitor.ready) {
-                root.brightnessChanged();
+                root.brightnessChanged(monitor.brightness, monitor.screen);
             }
         }
 
@@ -207,7 +207,7 @@ Singleton {
                     monitor.rawMaxBrightness = maxRaw;
                     monitor.brightness = currentRaw / monitor.rawMaxBrightness;
                     monitor.ready = true;
-                    root.brightnessChanged();
+                    root.brightnessChanged(monitor.brightness, monitor.screen);
                 }
             }
         }

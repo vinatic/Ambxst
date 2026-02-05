@@ -163,6 +163,10 @@ Singleton {
     // Lockscreen state
     property bool lockscreenVisible: false
 
+    // OSD state
+    property bool osdVisible: false
+    property string osdIndicator: "volume" // volume, mic, brightness
+
     // Screenshot Tool state
     property bool screenshotToolVisible: false
     // property string screenshotToolMode: "normal" // DEPRECATED

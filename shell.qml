@@ -25,6 +25,7 @@ import qs.modules.dock
 import qs.modules.globals
 import qs.modules.shell
 import qs.config
+import qs.modules.shell.osd
 import "modules/tools"
 
 ShellRoot {
@@ -241,6 +242,15 @@ ShellRoot {
         id: settingsWindowLoader
         active: SuspendManager.wakeReady
         source: "modules/widgets/config/SettingsWindow.qml"
+    }
+
+    // OSD
+    Variants {
+        model: Quickshell.screens
+
+        OSD {
+            targetScreen: modelData
+        }
     }
 
     // Initialize clipboard service at startup to ensure clipboard watching starts immediately

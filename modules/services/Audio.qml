@@ -5,6 +5,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Services.Pipewire
 import qs.modules.services
+import qs.modules.theme
 
 /**
  * A nice wrapper for default Pipewire audio sink and source.
@@ -40,9 +41,42 @@ Singleton {
     }
 
     signal sinkProtectionTriggered(string reason);
+    signal volumeChanged(real volume, bool muted, var node);
+    signal micVolumeChanged(real volume, bool muted, var node);
 
     PwObjectTracker {
         objects: [sink, source]
+    }
+
+    // Connect to volume changes for OSD
+    Connections {
+        target: root.sink?.audio ?? null
+        ignoreUnknownSignals: true
+        function onVolumeChanged() {
+            if (root.sink?.ready) {
+                root.volumeChanged(root.sink.audio.volume, root.sink.audio.muted, root.sink);
+            }
+        }
+        function onMutedChanged() {
+            if (root.sink?.ready) {
+                root.volumeChanged(root.sink.audio.volume, root.sink.audio.muted, root.sink);
+            }
+        }
+    }
+
+    Connections {
+        target: root.source?.audio ?? null
+        ignoreUnknownSignals: true
+        function onVolumeChanged() {
+            if (root.source?.ready) {
+                root.micVolumeChanged(root.source.audio.volume, root.source.audio.muted, root.source);
+            }
+        }
+        function onMutedChanged() {
+            if (root.source?.ready) {
+                root.micVolumeChanged(root.source.audio.volume, root.source.audio.muted, root.source);
+            }
+        }
     }
 
     // Helper functions
@@ -178,16 +212,5 @@ Singleton {
         if (volume <= 0) return Icons.speakerNone;
         if (volume < 0.33) return Icons.speakerLow;
         return Icons.speakerHigh;
-    }
-
-    Connections {
-        target: sink?.audio ?? null
-        property bool lastReady: false
-        property real lastVolume: 0
-        function onVolumeChanged() {
-            if (sink.ready && (isNaN(sink.audio.volume) || sink.audio.volume === undefined || sink.audio.volume === null)) {
-                sink.audio.volume = 0;
-            }
-        }
     }
 }
