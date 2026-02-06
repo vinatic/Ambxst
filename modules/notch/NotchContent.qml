@@ -79,11 +79,12 @@ Item {
         if (!hyprlandMonitor || !toplevels) return false;
 
         // Check all toplevels on active workspcace
-        for (var i = 0; i < toplevels.length; i++)
+        for (var i = 0; i < toplevels.length; i++) {
             // Checks first if the wayland handle is ready
             if (toplevels[i].wayland && toplevels[i].wayland.fullscreen == true) {
                return true;
             }
+        }
         return false;
     }
 
